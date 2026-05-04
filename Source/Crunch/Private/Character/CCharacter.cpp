@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Character/CCharacter.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -21,55 +20,22 @@ ACCharacter::ACCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_SpringArm, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Target, ECR_Ignore);
 
-	CAbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>("CAbility System Component");
-	CAttributeSet = CreateDefaultSubobject<UCAttributeSet>("CAttribute Set");
 	OverHeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Over Head Widget Component");
 	OverHeadWidgetComponent->SetupAttachment(GetRootComponent());
-
-	BindGASChangeDelegates();
+	
+	CAbilitySystemComponent = CreateDefaultSubobject<UCAbilitySystemComponent>("CAbility System Component");
+	
+	CAttributeSet = CreateDefaultSubobject<UCAttributeSet>("CAttribute Set");
 
 	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>("Perception Stimuli Source Component");
-}
-
-void ACCharacter::ServerSideInit()
-{
-	CAbilitySystemComponent->InitAbilityActorInfo(this, this);
-	CAbilitySystemComponent->ServerSideInit();
-}
-
-void ACCharacter::ClientSideInit()
-{
-	CAbilitySystemComponent->InitAbilityActorInfo(this, this);
-}
-
-bool ACCharacter::IsLocallyControlledByPlayer() const
-{
-	return GetController() && GetController()->IsLocalPlayerController();
-}
-
-void ACCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ACCharacter, TeamID);
-}
-
-const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& ACCharacter::GetAbilities() const
-{
-	return CAbilitySystemComponent->GetAbilities();
-}
-
-FVector ACCharacter::GetCaptureLocalPosition() const
-{
-	return HeadshotCaptureLocalPosition;
-}
-
-FRotator ACCharacter::GetCaptureLocalRotation() const
-{
-	return HeadshotCaptureLocalRotation;
+	
+	BindGASChangeDelegates();
 }
 
 // Called when the game starts or when spawned
@@ -95,19 +61,55 @@ void ACCharacter::PossessedBy(AController* NewController)
 void ACCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
 void ACCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
+void ACCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACCharacter, TeamID);
 }
 
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 {
 	return CAbilitySystemComponent;
+}
+
+
+FVector ACCharacter::GetCaptureLocalPosition() const
+{
+	return HeadshotCaptureLocalPosition;
+}
+
+FRotator ACCharacter::GetCaptureLocalRotation() const
+{
+	return HeadshotCaptureLocalRotation;
+}
+
+void ACCharacter::ServerSideInit()
+{
+	CAbilitySystemComponent->InitAbilityActorInfo(this, this);
+	CAbilitySystemComponent->ServerSideInit();
+}
+
+void ACCharacter::ClientSideInit()
+{
+	CAbilitySystemComponent->InitAbilityActorInfo(this, this);
+}
+
+bool ACCharacter::IsLocallyControlledByPlayer() const
+{
+	return GetController() && GetController()->IsLocalPlayerController();
+}
+
+const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& ACCharacter::GetAbilities() const
+{
+	return CAbilitySystemComponent->GetAbilities();
 }
 
 void ACCharacter::Server_SendGameplayEventToSelf_Implementation(const FGameplayTag& EventTag, const FGameplayEventData& EventData)
@@ -174,7 +176,7 @@ void ACCharacter::StunTagUpdated(const FGameplayTag Tag, int32 NewCount)
 
 void ACCharacter::AimTagUpdated(const FGameplayTag Tag, int32 NewCount)
 {
-	SetIsAimming(NewCount != 0);
+	SetIsAiming(NewCount != 0);
 }
 
 void ACCharacter::FocusTagUpdated(const FGameplayTag Tag, int32 NewCount)
@@ -182,14 +184,14 @@ void ACCharacter::FocusTagUpdated(const FGameplayTag Tag, int32 NewCount)
 	bIsInFocusMode = NewCount > 0;
 }
 
-void ACCharacter::SetIsAimming(bool bIsAimming)
+void ACCharacter::SetIsAiming(bool bIsAiming)
 {
-	bUseControllerRotationYaw = bIsAimming;
-	GetCharacterMovement()->bOrientRotationToMovement = !bIsAimming;
-	OnAimStateChanged(bIsAimming);
+	bUseControllerRotationYaw = bIsAiming;
+	GetCharacterMovement()->bOrientRotationToMovement = !bIsAiming;
+	OnAimStateChanged(bIsAiming);
 }
 
-void ACCharacter::OnAimStateChanged(bool bIsAimming)
+void ACCharacter::OnAimStateChanged(bool bIsAiming)
 {
 	//Override in child class
 }
@@ -235,23 +237,23 @@ void ACCharacter::ConfigureOverHeadStatusWidget()
 		return;
 	}
 
-	UOverHeadStatsGauge* OverheadStatsGuage = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
-	if (OverheadStatsGuage)
+	UOverHeadStatsGauge* OverheadStatsGauge = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
+	if (OverheadStatsGauge)
 	{
-		OverheadStatsGuage->ConfigureWithASC(GetAbilitySystemComponent());
+		OverheadStatsGauge->ConfigureWithASC(GetAbilitySystemComponent());
 		OverHeadWidgetComponent->SetHiddenInGame(false);
 		GetWorldTimerManager().ClearTimer(HeadStatGaugeVisibilityUpdateTimerHandle);
-		GetWorldTimerManager().SetTimer(HeadStatGaugeVisibilityUpdateTimerHandle, this, &ACCharacter::UpdateHeadGaugeVisibility, HeadStatGaugeVisiblityCheckUpdateGap, true);
+		GetWorldTimerManager().SetTimer(HeadStatGaugeVisibilityUpdateTimerHandle, this, &ACCharacter::UpdateHeadGaugeVisibility, HeadStatGaugeVisibilityCheckUpdateGap, true);
 	}
 }
 
 void ACCharacter::UpdateHeadGaugeVisibility()
 {
-	APawn* LocalPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	const APawn* LocalPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (LocalPlayerPawn)
 	{
-		float DistSquared = FVector::DistSquared(GetActorLocation(), LocalPlayerPawn->GetActorLocation());
-		OverHeadWidgetComponent->SetHiddenInGame(DistSquared > HeadStatGaugeVisiblityRangeSquared);
+		const float DistSquared = FVector::DistSquared(GetActorLocation(), LocalPlayerPawn->GetActorLocation());
+		OverHeadWidgetComponent->SetHiddenInGame(DistSquared > HeadStatGaugeVisibilityRangeSquared);
 	}
 }
 
@@ -314,7 +316,7 @@ void ACCharacter::PlayDeathAnimation()
 {
 	if (DeathMontage)
 	{
-		float MontageDuration = PlayAnimMontage(DeathMontage);
+		const float MontageDuration = PlayAnimMontage(DeathMontage);
 		GetWorldTimerManager().SetTimer(DeathMontageTimerHandle, this, &ACCharacter::DeathMontageFinished, MontageDuration + DeathMontageFinishTimeShift);
 	}
 }
@@ -348,7 +350,7 @@ void ACCharacter::Respawn()
 
 	if (HasAuthority() && GetController())
 	{
-		TWeakObjectPtr<AActor> StartSpot = GetController()->StartSpot;
+		const TWeakObjectPtr<AActor> StartSpot = GetController()->StartSpot;
 		if (StartSpot.IsValid())
 		{
 			SetActorTransform(StartSpot->GetActorTransform());

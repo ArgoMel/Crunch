@@ -46,10 +46,10 @@ FGameplayTag UUpperCut::GetUpperCutLaunchTag()
 
 const FGenericDamgeEffectDef* UUpperCut::GetDamageEffectDefForCurrentCombo() const
 {
-	UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
+	const UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
 	if (OwnerAnimInstance)
 	{
-		FName CurrentComboName = OwnerAnimInstance->Montage_GetCurrentSection(UpperCutMontage);
+		const FName CurrentComboName = OwnerAnimInstance->Montage_GetCurrentSection(UpperCutMontage);
 		const FGenericDamgeEffectDef* EffectDef = ComboDamageMap.Find(CurrentComboName);
 		return EffectDef;
 	}
@@ -62,7 +62,7 @@ void UUpperCut::StartLaunching(FGameplayEventData EventData)
 	if (K2_HasAuthority())
 	{
 		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperCutLaunchSpeed);
-		int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
+		const int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
 
 		for (int i = 0; i < HitResultCount; i++)
 		{
@@ -87,7 +87,7 @@ void UUpperCut::StartLaunching(FGameplayEventData EventData)
 
 void UUpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
 {
-	FGameplayTag EventTag = EventData.EventTag;
+	const FGameplayTag EventTag = EventData.EventTag;
 	if (EventTag == UGA_Combo::GetComboChangedEventEndTag())
 	{
 		NextComboName = NAME_None;
@@ -129,7 +129,7 @@ void UUpperCut::HandleComboDamageEvent(FGameplayEventData EventData)
 			return;
 		}
 
-		int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
+		const int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(EventData.TargetData);
 		for (int i = 0; i < HitResultCount; i++)
 		{
 			FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(EventData.TargetData, i);

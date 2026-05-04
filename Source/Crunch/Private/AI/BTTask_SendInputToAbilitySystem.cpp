@@ -10,13 +10,13 @@
 
 EBTNodeResult::Type UBTTask_SendInputToAbilitySystem::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* OwnerAIC = OwnerComp.GetAIOwner();
+	const AAIController* OwnerAIC = OwnerComp.GetAIOwner();
 	if (OwnerAIC)
 	{
 		UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OwnerAIC->GetPawn());
 		if (OwnerASC)
 		{
-			OwnerASC->PressInputID((int32)InputID);
+			OwnerASC->PressInputID(static_cast<int32>(InputID));
 			return EBTNodeResult::Succeeded;
 		}
 	}

@@ -46,7 +46,7 @@ void UGA_Tornado::TornadoDamageEventReceived(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		FGameplayAbilityTargetDataHandle TargetDataHandle = Payload.TargetData;
+		const FGameplayAbilityTargetDataHandle TargetDataHandle = Payload.TargetData;
 		BP_ApplyGameplayEffectToTarget(TargetDataHandle, HitDamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 		PushTargetsFromOwnerLocation(TargetDataHandle, HitPushSpeed);
 	}

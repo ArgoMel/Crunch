@@ -109,7 +109,7 @@ void UGA_Blackhole::FinalTargetsReceived(const FGameplayAbilityTargetDataHandle&
 	if (K2_HasAuthority())
 	{
 		BP_ApplyGameplayEffectToTarget(TargetDataHandle, FinalBlowDamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
-		FVector BlowCenter = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint;
+		const FVector BlowCenter = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint;
 		PushTargetsFromLocation(TargetDataHandle, BlowCenter,  BlowPushSpeed);
 
 		UAbilityTask_PlayMontageAndWait* PlayFinalBlowMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, FinalBlowMontage);

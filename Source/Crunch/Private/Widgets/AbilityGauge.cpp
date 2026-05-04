@@ -26,7 +26,7 @@ void UAbilityGauge::NativeConstruct()
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(UCHeroAttributeSet::GetUpgradePointAttribute()).AddUObject(this, &UAbilityGauge::UpgradePointUpdated);
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(this, &UAbilityGauge::ManaUpdated);
 		bool bFound = false;
-		float UpgradePoint = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
+		const float UpgradePoint = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
 		if (bFound)
 		{
 			FOnAttributeChangeData ChangeData;
@@ -46,8 +46,8 @@ void UAbilityGauge::NativeOnListItemObjectSet(UObject* ListItemObject)
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 	AbilityCDO = Cast<UGameplayAbility>(ListItemObject);
 
-	float CooldownDuration = UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(AbilityCDO);
-	float Cost = UCAbilitySystemStatics::GetStaticCostForAbility(AbilityCDO);
+	const float CooldownDuration = UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(AbilityCDO);
+	const float Cost = UCAbilitySystemStatics::GetStaticCostForAbility(AbilityCDO);
 
 	CooldownDurationText->SetText(FText::AsNumber(CooldownDuration));
 	CostText->SetText(FText::AsNumber(Cost));
@@ -71,8 +71,8 @@ void UAbilityGauge::CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetD
 	UAbilityToolTip* InstantiatedToolTip = CreateWidget<UAbilityToolTip>(GetOwningPlayer(), AbilityToolTipClass);
 	if (InstantiatedToolTip)
 	{
-		float CooldownDuration = UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(AbilityCDO);
-		float Cost = UCAbilitySystemStatics::GetStaticCostForAbility(AbilityCDO);
+		const float CooldownDuration = UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(AbilityCDO);
+		const float Cost = UCAbilitySystemStatics::GetStaticCostForAbility(AbilityCDO);
 		InstantiatedToolTip->SetAbilityInfo(AbilityWidgetData->AbilityName, AbilityWidgetData->Icon.LoadSynchronous(), AbilityWidgetData->Description, CooldownDuration, Cost);
 
 		SetToolTip(InstantiatedToolTip);
@@ -115,7 +115,7 @@ void UAbilityGauge::CooldownFinished()
 void UAbilityGauge::UpdateCooldown()
 {
 	CachedCooldownTimeRemaining -= CooldownUpdateInterval;
-	FNumberFormattingOptions* FormattingOptions = CachedCooldownTimeRemaining > 1 ? &WholeNumberFormattionOptions : &TwoDigitNumberFormattingOptions;
+	const FNumberFormattingOptions* FormattingOptions = CachedCooldownTimeRemaining > 1 ? &WholeNumberFormattionOptions : &TwoDigitNumberFormattingOptions;
 	CooldownCounterText->SetText(FText::AsNumber(CachedCooldownTimeRemaining, FormattingOptions));
 
 	Icon->GetDynamicMaterial()->SetScalarParameterValue(CooldownPercentParamname, 1.0f - CachedCooldownTimeRemaining / CachedCooldownDuration);
@@ -131,7 +131,7 @@ const FGameplayAbilitySpec* UAbilityGauge::GetAbilitySpec()
 
 	if (!CachedAbilitySpecHandle.IsValid())
 	{
-		FGameplayAbilitySpec* FoundAbilitySpec = OwnerAbilitySystemComponent->FindAbilitySpecFromClass(AbilityCDO->GetClass());
+		const FGameplayAbilitySpec* FoundAbilitySpec = OwnerAbilitySystemComponent->FindAbilitySpecFromClass(AbilityCDO->GetClass());
 		CachedAbilitySpecHandle = FoundAbilitySpec->Handle;
 		return FoundAbilitySpec;
 	}
@@ -148,8 +148,8 @@ void UAbilityGauge::AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec)
 	LevelGauge->GetDynamicMaterial()->SetScalarParameterValue(AbilityLevelParamName, AbilitySpec.Level);
 	UpdateCanCast();
 
-	float NewCooldownDuration = UCAbilitySystemStatics::GetCooldownDurationFor(AbilitySpec.Ability, *OwnerAbilitySystemComponent, AbilitySpec.Level);
-	float NewCost = UCAbilitySystemStatics::GetManaCostFor(AbilitySpec.Ability, *OwnerAbilitySystemComponent, AbilitySpec.Level);
+	const float NewCooldownDuration = UCAbilitySystemStatics::GetCooldownDurationFor(AbilitySpec.Ability, *OwnerAbilitySystemComponent, AbilitySpec.Level);
+	const float NewCost = UCAbilitySystemStatics::GetManaCostFor(AbilitySpec.Ability, *OwnerAbilitySystemComponent, AbilitySpec.Level);
 	CooldownDurationText->SetText(FText::AsNumber(NewCooldownDuration));
 	CostText->SetText(FText::AsNumber(NewCost));
 }
@@ -171,7 +171,7 @@ void UAbilityGauge::UpdateCanCast()
 
 void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
 {
-	bool HasUpgradePoint = Data.NewValue > 0;
+	const bool HasUpgradePoint = Data.NewValue > 0;
 	const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpec();
 	if (AbilitySpec)
 	{

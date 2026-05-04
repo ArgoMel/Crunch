@@ -54,8 +54,8 @@ void ATA_Blackhole::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 void ATA_Blackhole::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
-	
-	UWorld* World = GetWorld();
+
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		World->GetTimerManager().SetTimer(BlackholeDurationTimerHandle, this, &ATA_Blackhole::StopBlackhole, BlackholeDuration);
@@ -66,7 +66,7 @@ void ATA_Blackhole::Tick(float DeltaTime)
 {
 	if (HasAuthority())
 	{
-		for (TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
+		for (const TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
 		{
 			AActor* Target = TargetPair.Key;
 			UNiagaraComponent* NiagaraComponent = TargetPair.Value;
@@ -150,7 +150,7 @@ void ATA_Blackhole::RemoveTarget(AActor* OtherTarget)
 void ATA_Blackhole::StopBlackhole()
 {
 	TArray<TWeakObjectPtr<AActor>> FinalTargets;
-	for (TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
+	for (const TPair<AActor*, UNiagaraComponent*>& TargetPair : ActorsInRangeMap)
 	{
 		FinalTargets.Add(TargetPair.Key);
 		UNiagaraComponent* NiagaraComponent = TargetPair.Value;

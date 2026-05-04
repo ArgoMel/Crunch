@@ -105,14 +105,14 @@ void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		FVector SocketLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
-		USkeletalMeshComponent* MeshComp = GetOwningComponentFromActorInfo();
+		const USkeletalMeshComponent* MeshComp = GetOwningComponentFromActorInfo();
 		if (MeshComp)
 		{
 			TArray<FName> OutNames;
 			UGameplayTagsManager::Get().SplitGameplayTagFName(Payload.EventTag, OutNames);
 			if (OutNames.Num() != 0)
 			{
-				FName SocketName = OutNames.Last();
+				const FName SocketName = OutNames.Last();
 				SocketLocation = MeshComp->GetSocketLocation(SocketName);
 			}
 		}
@@ -161,7 +161,7 @@ void UGA_Shoot::FindAimTarget()
 
 void UGA_Shoot::StartAimTargetCheckTimer()
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		World->GetTimerManager().SetTimer(AimTargetCheckTimerHandle, this, &UGA_Shoot::FindAimTarget, AimTargetCheckTimeInterval, true);
@@ -170,7 +170,7 @@ void UGA_Shoot::StartAimTargetCheckTimer()
 
 void UGA_Shoot::StopAimTargetCheckTimer()
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		World->GetTimerManager().ClearTimer(AimTargetCheckTimerHandle);
@@ -196,7 +196,7 @@ bool UGA_Shoot::IsTargetInRange() const
 	if (!AimTarget)
 		return false;
 
-	float Distance = FVector::Distance(AimTarget->GetActorLocation(), GetAvatarActorFromActorInfo()->GetActorLocation());
+	const float Distance = FVector::Distance(AimTarget->GetActorLocation(), GetAvatarActorFromActorInfo()->GetActorLocation());
 	return Distance <= ShootProjectileRange;
 }
 

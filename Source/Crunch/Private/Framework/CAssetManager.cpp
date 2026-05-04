@@ -24,7 +24,7 @@ void UCAssetManager::LoadCharacterDefinations(const FStreamableDelegate& LoadFin
 bool UCAssetManager::GetLoadedCharacterDefinations(TArray<UPA_CharacterDefination*>& LoadedCharacterDefinations) const
 {
 	TArray<UObject*> LoadedObjects;
-	bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefination::GetCharacterDefinationAssetType(), LoadedObjects);
+	const bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefination::GetCharacterDefinationAssetType(), LoadedObjects);
 	if (bLoaded)
 	{
 		for (UObject* LoadedObject : LoadedObjects)
@@ -44,7 +44,7 @@ void UCAssetManager::LoadShopItems(const FStreamableDelegate& LoadFinishedCallba
 bool UCAssetManager::GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const
 {
 	TArray<UObject*> LoadedObjects;
-	bool bLoaded = GetPrimaryAssetObjectList(UPA_ShopItem::GetShopItemAssetType(), LoadedObjects);
+	const bool bLoaded = GetPrimaryAssetObjectList(UPA_ShopItem::GetShopItemAssetType(), LoadedObjects);
 
 	if (bLoaded)
 	{
@@ -88,7 +88,7 @@ void UCAssetManager::BuildItemMaps()
 			TArray<const UPA_ShopItem*> Items;
 			for (const TSoftObjectPtr<UPA_ShopItem>& Ingredient : Item->GetIngredients())
 			{
-				UPA_ShopItem* IngredientItem = Ingredient.LoadSynchronous();
+				const UPA_ShopItem* IngredientItem = Ingredient.LoadSynchronous();
 				Items.Add(IngredientItem);
 				AddToCombinationMap(IngredientItem, Item);
 			}

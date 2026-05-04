@@ -7,9 +7,8 @@
 #include "GameplayTagContainer.h"
 #include "CAnimInstance.generated.h"
 
-/**
- * 
- */
+class UCharacterMovementComponent;
+
 UCLASS()
 class UCAnimInstance : public UAnimInstance
 {
@@ -25,6 +24,7 @@ public:
 	// for linked anim instances, only called when the hosting node(s) are relevant
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
 
+public:	
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetSpeed() const { return Speed; }
 
@@ -53,7 +53,7 @@ public:
 	FORCEINLINE bool GetIsOnGround() const { return !bIsJumping; }
 
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
-	FORCEINLINE bool GetIsAimming() const { return bIsAimming; }
+	FORCEINLINE bool GetIsAiming() const { return bIsAiming; }
 
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
 	FORCEINLINE float GetLookYawOffset() const { return LookRotOffset.Yaw; }
@@ -63,13 +63,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta=(BlueprintThreadSafe))
 	bool ShouldDoFullBody() const;
+	
 private:
 	void OwnerAimTagChanged(const FGameplayTag Tag, int32 NewCount);
+	
+private:
 	UPROPERTY()
-	class ACharacter* OwnerCharacter;
+	ACharacter* OwnerCharacter;
 
 	UPROPERTY()
-	class UCharacterMovementComponent* OwnerMovementComp;
+	UCharacterMovementComponent* OwnerMovementComp;
 
 	float Speed;
 	float YawSpeed;
@@ -77,7 +80,7 @@ private:
 	float FwdSpeed;
 	float RightSpeed;
 	bool bIsJumping;
-	bool bIsAimming;
+	bool bIsAiming;
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	float YawSpeedSmoothLerpSpeed = 1.f;
 

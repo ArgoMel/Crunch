@@ -8,17 +8,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Widgets/GameplayWidget.h"
 
-void ACPlayerController::OnPossess(APawn* NewPawn)
-{
-	Super::OnPossess(NewPawn);
-	CPlayerCharacter = Cast<ACPlayerCharacter>(NewPawn);
-	if (CPlayerCharacter)
-	{
-		CPlayerCharacter->ServerSideInit();
-		CPlayerCharacter->SetGenericTeamId(TeamID);
-	}
-}
-
 void ACPlayerController::AcknowledgePossession(APawn* NewPawn)
 {
 	Super::AcknowledgePossession(NewPawn);
@@ -46,6 +35,26 @@ void ACPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME(ACPlayerController, TeamID);
 }
 
+void ACPlayerController::MatchFinished(AActor* ViewTarget, int WiningTeam)
+{
+	if (!HasAuthority())
+		return;
+
+	CPlayerCharacter->DisableInput(this);
+	Client_MatchFinished(ViewTarget, WiningTeam);
+}
+
+void ACPlayerController::OnPossess(APawn* NewPawn)
+{
+	Super::OnPossess(NewPawn);
+	CPlayerCharacter = Cast<ACPlayerCharacter>(NewPawn);
+	if (CPlayerCharacter)
+	{
+		CPlayerCharacter->ServerSideInit();
+		CPlayerCharacter->SetGenericTeamId(TeamID);
+	}
+}
+
 void ACPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -62,15 +71,6 @@ void ACPlayerController::SetupInputComponent()
 		EnhancedInputComp->BindAction(ShopToggleInputAction, ETriggerEvent::Triggered, this, &ACPlayerController::ToggleShop);
 		EnhancedInputComp->BindAction(ToggleGameplayMenuAction, ETriggerEvent::Triggered, this, &ACPlayerController::ToggleGameplayMenu);
 	}
-}
-
-void ACPlayerController::MatchFinished(AActor* ViewTarget, int WiningTeam)
-{
-	if (!HasAuthority())
-		return;
-
-	CPlayerCharacter->DisableInput(this);
-	Client_MatchFinished(ViewTarget, WiningTeam);
 }
 
 void ACPlayerController::Client_MatchFinished_Implementation(AActor* ViewTarget, int WiningTeam)

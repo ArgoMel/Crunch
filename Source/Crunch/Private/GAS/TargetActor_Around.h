@@ -19,10 +19,10 @@ public:
 	void ConfigureDetection(float DetectionRadius, const FGenericTeamId& InTeamId, const FGameplayTag& InLocalGameplayCueTag);
 
 	/** Assigns Team Agent to given TeamID */
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID);
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	
 	/** Retrieve team identifier in form of FGenericTeamId */
-	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const { return TeamId; }
+	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
 	UPROPERTY(Replicated)

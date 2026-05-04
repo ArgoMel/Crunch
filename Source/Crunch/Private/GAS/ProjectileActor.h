@@ -26,10 +26,10 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID);
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	
 	/** Retrieve team identifier in form of FGenericTeamId */
-	virtual FGenericTeamId GetGenericTeamId() const { return TeamId; }
+	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 private:

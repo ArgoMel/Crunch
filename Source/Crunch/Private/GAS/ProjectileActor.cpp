@@ -36,8 +36,8 @@ void AProjectileActor::ShootProjectile(float InSpeed, float InMaxDistance, const
 
 	MoveDir = OwnerViewRot.Vector();
 	HitEffectSpecHandle = InHitEffectHandle;
-	
-	float TravelMaxTime = InMaxDistance / InSpeed;
+
+	const float TravelMaxTime = InMaxDistance / InSpeed;
 	GetWorldTimerManager().SetTimer(ShootTimerHandle, this, &AProjectileActor::TravelMaxDIstanceReached, TravelMaxTime);
 }
 

@@ -22,8 +22,8 @@ void UValueGauge::SetAndBoundToGameplayAttribute(UAbilitySystemComponent* Abilit
 	if (AbilitySystemComponent)
 	{
 		bool bFound;
-		float Value = AbilitySystemComponent->GetGameplayAttributeValue(Attribute, bFound);
-		float MaxValue = AbilitySystemComponent->GetGameplayAttributeValue(MaxAttribute, bFound);
+		const float Value = AbilitySystemComponent->GetGameplayAttributeValue(Attribute, bFound);
+		const float MaxValue = AbilitySystemComponent->GetGameplayAttributeValue(MaxAttribute, bFound);
 		if (bFound)
 		{
 			SetValue(Value, MaxValue);
@@ -45,10 +45,10 @@ void UValueGauge::SetValue(float NewValue, float NewMaxValue)
 		return;
 	}
 
-	float NewPercent = NewValue / NewMaxValue;
+	const float NewPercent = NewValue / NewMaxValue;
 	ProgressBar->SetPercent(NewPercent);
 
-	FNumberFormattingOptions FormatOps = FNumberFormattingOptions().SetMaximumFractionalDigits(0);
+	const FNumberFormattingOptions FormatOps = FNumberFormattingOptions().SetMaximumFractionalDigits(0);
 
 	ValueText->SetText(
 		FText::Format(

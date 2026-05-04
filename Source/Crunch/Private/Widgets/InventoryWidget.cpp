@@ -13,7 +13,7 @@
 void UInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	if (APawn* OwnerPawn = GetOwningPlayerPawn())
+	if (const APawn* OwnerPawn = GetOwningPlayerPawn())
 	{
 		InventoryComponent = OwnerPawn->GetComponentByClass<UInventoryComponent>();
 		if (InventoryComponent)
@@ -22,7 +22,7 @@ void UInventoryWidget::NativeConstruct()
 			InventoryComponent->OnItemRemoved.AddUObject(this, &UInventoryWidget::ItemRemoved);
 			InventoryComponent->OnItemStackCountChanged.AddUObject(this, &UInventoryWidget::ItemStackCountChanged);
 			InventoryComponent->OnItemAbilityCommitted.AddUObject(this, &UInventoryWidget::ItemAbilityCommitted);
-			int Capacity = InventoryComponent->GetCapacity();
+			const int Capacity = InventoryComponent->GetCapacity();
 			
 			ItemList->ClearChildren();
 				
@@ -103,24 +103,24 @@ void UInventoryWidget::ToggleContextMenu(const FInventoryItemHandle& ItemHandle)
 	if (!ItemWidgetPtrPtr)
 		return;
 
-	UInventoryItemWidget* ItemWidget = *ItemWidgetPtrPtr;
+	const UInventoryItemWidget* ItemWidget = *ItemWidgetPtrPtr;
 	if (!ItemWidget)
 		return;
 
 	SetContextMenuVisible(true);
-	FVector2D ItemAbsPos = ItemWidget->GetCachedGeometry().GetAbsolutePositionAtCoordinates(FVector2D{1.f, 0.5f});
+	const FVector2D ItemAbsPos = ItemWidget->GetCachedGeometry().GetAbsolutePositionAtCoordinates(FVector2D{1.f, 0.5f});
 
 	FVector2D ItemWidgetPixelPos, ItemWidgetViewportPos;
 	USlateBlueprintLibrary::AbsoluteToViewport(this, ItemAbsPos, ItemWidgetPixelPos, ItemWidgetViewportPos);
 
-	APlayerController* OwningPlayerController = GetOwningPlayer();
+	const APlayerController* OwningPlayerController = GetOwningPlayer();
 	if (OwningPlayerController)
 	{
 		int ViewportSizeX, ViewportSizeY;
 		OwningPlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
-		float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
+		const float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
 
-		int Overshoot = ItemWidgetPixelPos.Y + ContextMenuWidget->GetDesiredSize().Y * Scale - ViewportSizeY;
+		const int Overshoot = ItemWidgetPixelPos.Y + ContextMenuWidget->GetDesiredSize().Y * Scale - ViewportSizeY;
 		if (Overshoot > 0)
 		{
 			ItemWidgetPixelPos.Y -= Overshoot;

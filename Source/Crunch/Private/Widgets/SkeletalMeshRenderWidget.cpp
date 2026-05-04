@@ -11,7 +11,7 @@ void USkeletalMeshRenderWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	ACharacter* PlayerCharacter = GetOwningPlayerPawn<ACharacter>();
-	IRenderActorTargetInterface* PlayerCharacterRenderTargetInterface = Cast<IRenderActorTargetInterface>(PlayerCharacter);
+	const IRenderActorTargetInterface* PlayerCharacterRenderTargetInterface = Cast<IRenderActorTargetInterface>(PlayerCharacter);
 	if (PlayerCharacter && SkeletalMeshRenderActor)
 	{
 		SkeletalMeshRenderActor->ConfigureSkeletalMesh(PlayerCharacter->GetMesh()->GetSkeletalMeshAsset(), PlayerCharacter->GetMesh()->GetAnimClass());

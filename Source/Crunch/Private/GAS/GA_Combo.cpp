@@ -11,7 +11,7 @@
 
 UGA_Combo::UGA_Combo()
 {
-	AbilityTags.AddTag(UCAbilitySystemStatics::GetBasicAttackAbilityTag());
+	SetAssetTags(UCAbilitySystemStatics::GetBasicAttackAbilityTag().GetSingleTagContainer());
 	BlockAbilitiesWithTag.AddTag(UCAbilitySystemStatics::GetBasicAttackAbilityTag());
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
@@ -95,10 +95,10 @@ void UGA_Combo::TryCommitCombo()
 
 TSubclassOf<UGameplayEffect> UGA_Combo::GetDamageEffectForCurrentCombo() const
 {
-	UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
+	const UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
 	if (OwnerAnimInstance)
 	{
-		FName CurrentSectionName = OwnerAnimInstance->Montage_GetCurrentSection(ComboMontage);
+		const FName CurrentSectionName = OwnerAnimInstance->Montage_GetCurrentSection(ComboMontage);
 		const TSubclassOf<UGameplayEffect>* FoundEffectPtr = DamageEffectMap.Find(CurrentSectionName);
 		if (FoundEffectPtr)
 		{
@@ -111,7 +111,7 @@ TSubclassOf<UGameplayEffect> UGA_Combo::GetDamageEffectForCurrentCombo() const
 
 void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 {
-	FGameplayTag EventTag = Data.EventTag;
+	const FGameplayTag EventTag = Data.EventTag;
 
 	if (EventTag == GetComboChangedEventEndTag())
 	{
@@ -127,12 +127,12 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 
 void UGA_Combo::DoDamage(FGameplayEventData Data)
 {
-	int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(Data.TargetData);
+	const int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(Data.TargetData);
 
 	for (int i = 0; i < HitResultCount; i++)
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(Data.TargetData, i);
-		TSubclassOf<UGameplayEffect> GameplayEffect = GetDamageEffectForCurrentCombo();
+		const TSubclassOf<UGameplayEffect> GameplayEffect = GetDamageEffectForCurrentCombo();
 		ApplyGameplayEffectToHitResultActor(HitResult, GameplayEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));
 	}
 }

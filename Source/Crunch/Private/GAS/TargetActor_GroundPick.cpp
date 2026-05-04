@@ -45,7 +45,7 @@ void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
 
 	TSet<AActor*> TargetActors;
 
-	IGenericTeamAgentInterface* OwnerTeamInterface = nullptr; 
+	const IGenericTeamAgentInterface* OwnerTeamInterface = nullptr; 
 	if (OwningAbility)
 	{
 		OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(OwningAbility->GetAvatarActorFromActorInfo());
@@ -99,7 +99,7 @@ FVector ATargetActor_GroundPick::GetTargetPoint() const
 
 	PrimaryPC->GetPlayerViewPoint(ViewLoc, ViewRot);
 
-	FVector TraceEnd = ViewLoc + ViewRot.Vector() * TargetTraceRange;
+	const FVector TraceEnd = ViewLoc + ViewRot.Vector() * TargetTraceRange;
 
 	GetWorld()->LineTraceSingleByChannel(TraceResult, ViewLoc, TraceEnd, ECC_Target);
 

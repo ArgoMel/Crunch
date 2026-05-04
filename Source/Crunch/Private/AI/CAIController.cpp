@@ -36,7 +36,7 @@ void ACAIController::OnPossess(APawn* NewPawn)
 {
 	Super::OnPossess(NewPawn);
 
-	IGenericTeamAgentInterface* PawnTeamInterface = Cast<IGenericTeamAgentInterface>(NewPawn);
+	const IGenericTeamAgentInterface* PawnTeamInterface = Cast<IGenericTeamAgentInterface>(NewPawn);
 	if (PawnTeamInterface)
 	{
 		SetGenericTeamId(PawnTeamInterface->GetGenericTeamId());

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/CPlayerCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -17,6 +16,11 @@
 
 ACPlayerCharacter::ACPlayerCharacter()
 {	
+	bUseControllerRotationYaw = false;
+	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("Camera Boom");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->bUsePawnControlRotation = true;
@@ -25,10 +29,6 @@ ACPlayerCharacter::ACPlayerCharacter()
 	ViewCam = CreateDefaultSubobject<UCameraComponent>("View Cam");
 	ViewCam->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-	bUseControllerRotationYaw = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-
 	HeroAttributeSet = CreateDefaultSubobject<UCHeroAttributeSet>("Hero Attribute Set");
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("Inventory Component");
 }
@@ -36,7 +36,7 @@ ACPlayerCharacter::ACPlayerCharacter()
 void ACPlayerCharacter::PawnClientRestart()
 {
 	Super::PawnClientRestart();
-	APlayerController* OwningPlayerController = GetController<APlayerController>();
+	const APlayerController* OwningPlayerController = GetController<APlayerController>();
 	if (OwningPlayerController)
 	{
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem = OwningPlayerController->GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
@@ -54,18 +54,18 @@ void ACPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	UEnhancedInputComponent* EnhancedInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComp)
 	{
-		EnhancedInputComp->BindAction(JumpInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::Jump);
-		EnhancedInputComp->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleLookInput);
-		EnhancedInputComp->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleMoveInput);
-		EnhancedInputComp->BindAction(LearnAbilityLeaderAction, ETriggerEvent::Started, this, &ACPlayerCharacter::LearnAbiltiyLeaderDown);
-		EnhancedInputComp->BindAction(LearnAbilityLeaderAction, ETriggerEvent::Completed, this, &ACPlayerCharacter::LearnAbiltiyLeaderUp);
+		EnhancedInputComp->BindAction(JumpInputAction, ETriggerEvent::Triggered, this, &ThisClass::Jump);
+		EnhancedInputComp->BindAction(LookInputAction, ETriggerEvent::Triggered, this, &ThisClass::HandleLookInput);
+		EnhancedInputComp->BindAction(MoveInputAction, ETriggerEvent::Triggered, this, &ThisClass::HandleMoveInput);
+		EnhancedInputComp->BindAction(LearnAbilityLeaderAction, ETriggerEvent::Started, this, &ThisClass::LearnAbilityLeaderDown);
+		EnhancedInputComp->BindAction(LearnAbilityLeaderAction, ETriggerEvent::Completed, this, &ThisClass::LearnAbilityLeaderUp);
 
 		for (const TPair<ECAbilityInputID, UInputAction*>& InputActionPair : GameplayAbilityInputActions)
 		{
-			EnhancedInputComp->BindAction(InputActionPair.Value, ETriggerEvent::Triggered, this, &ACPlayerCharacter::HandleAbilityInput, InputActionPair.Key);
+			EnhancedInputComp->BindAction(InputActionPair.Value, ETriggerEvent::Triggered, this, &ThisClass::HandleAbilityInput, InputActionPair.Key);
 		}
 
-		EnhancedInputComp->BindAction(UseInventoryItemAction, ETriggerEvent::Triggered, this, &ACPlayerCharacter::UseInventoryItem);
+		EnhancedInputComp->BindAction(UseInventoryItemAction, ETriggerEvent::Triggered, this, &ThisClass::UseInventoryItem);
 	}
 }
 
@@ -75,54 +75,61 @@ void ACPlayerCharacter::GetActorEyesViewPoint(FVector& OutLocation, FRotator& Ou
 	OutRotation = GetBaseAimRotation();
 }
 
+FVector ACPlayerCharacter::GetLookRightDir() const
+{
+	return ViewCam->GetRightVector();
+}
+
+FVector ACPlayerCharacter::GetLookFwdDir() const
+{
+	return ViewCam->GetForwardVector();
+}
+
+FVector ACPlayerCharacter::GetMoveFwdDir() const
+{
+	return FVector::CrossProduct(GetLookRightDir(), FVector::UpVector);
+}
+
 void ACPlayerCharacter::HandleLookInput(const FInputActionValue& InputActionValue)
 {
-	FVector2D InputVal = InputActionValue.Get<FVector2D>();
+	const FVector2D InputVal = InputActionValue.Get<FVector2D>();
 
 	AddControllerPitchInput(-InputVal.Y);
 	AddControllerYawInput(InputVal.X);
 }
 
-void ACPlayerCharacter::OnDead()
-{
-	SetInputEnabledFromPlayerController(false);
-}
-void ACPlayerCharacter::OnRespawn()
-{
-	SetInputEnabledFromPlayerController(true);
-}
-
-
 void ACPlayerCharacter::HandleMoveInput(const FInputActionValue& InputActionValue)
 {
 	if (GetIsInFocusMode())
+	{
 		return;
-
+	}
 	FVector2D InputVal = InputActionValue.Get<FVector2D>();
 	InputVal.Normalize();
 	
 	AddMovementInput(GetMoveFwdDir()*InputVal.Y + GetLookRightDir() * InputVal.X);
 }
 
-void ACPlayerCharacter::LearnAbiltiyLeaderDown(const FInputActionValue& InputActionValue)
+void ACPlayerCharacter::LearnAbilityLeaderDown(const FInputActionValue& InputActionValue)
 {
 	bIsLearnAbilityLeaderDown = true;
 }
 
-void ACPlayerCharacter::LearnAbiltiyLeaderUp(const FInputActionValue& InputActionValue)
+void ACPlayerCharacter::LearnAbilityLeaderUp(const FInputActionValue& InputActionValue)
 {
 	bIsLearnAbilityLeaderDown = false;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ACPlayerCharacter::UseInventoryItem(const FInputActionValue& InputActionValue)
 {
-	int Value = FMath::RoundToInt(InputActionValue.Get<float>());
+	const int Value = FMath::RoundToInt(InputActionValue.Get<float>());
 	InventoryComponent->TryActivateItemInSlot(Value-1);
 }
 
 void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID)
 {
-	bool bPressed = InputActionValue.Get<bool>();
+	const bool bPressed = InputActionValue.Get<bool>();
 
 	if (bPressed && bIsLearnAbilityLeaderDown)
 	{
@@ -132,16 +139,16 @@ void ACPlayerCharacter::HandleAbilityInput(const FInputActionValue& InputActionV
 
 	if (bPressed)
 	{
-		GetAbilitySystemComponent()->AbilityLocalInputPressed((int32)InputID);
+		GetAbilitySystemComponent()->AbilityLocalInputPressed(static_cast<int32>(InputID));
 	}
 	else
 	{
-		GetAbilitySystemComponent()->AbilityLocalInputReleased((int32)InputID);
+		GetAbilitySystemComponent()->AbilityLocalInputReleased(static_cast<int32>(InputID));
 	}
 
 	if (InputID == ECAbilityInputID::BasicAttack)
 	{
-		FGameplayTag BasicAttackTag = bPressed ? UCAbilitySystemStatics::GetBasicAttackInputPressedTag() : UCAbilitySystemStatics::GetBasicAttackInputReleasedTag();
+		const FGameplayTag BasicAttackTag = bPressed ? UCAbilitySystemStatics::GetBasicAttackInputPressedTag() : UCAbilitySystemStatics::GetBasicAttackInputReleasedTag();
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this , BasicAttackTag, FGameplayEventData());
 		Server_SendGameplayEventToSelf(BasicAttackTag, FGameplayEventData());
 	}
@@ -177,45 +184,39 @@ void ACPlayerCharacter::OnRecoverFromStun()
 	SetInputEnabledFromPlayerController(true);
 }
 
-FVector ACPlayerCharacter::GetLookRightDir() const
+void ACPlayerCharacter::OnDead()
 {
-	return ViewCam->GetRightVector();
+	SetInputEnabledFromPlayerController(false);
+}
+void ACPlayerCharacter::OnRespawn()
+{
+	SetInputEnabledFromPlayerController(true);
 }
 
-FVector ACPlayerCharacter::GetLookFwdDir() const
-{
-	return ViewCam->GetForwardVector();
-}
-
-FVector ACPlayerCharacter::GetMoveFwdDir() const
-{
-	return FVector::CrossProduct(GetLookRightDir(), FVector::UpVector);
-}
-
-void ACPlayerCharacter::OnAimStateChanged(bool bIsAimming)
+void ACPlayerCharacter::OnAimStateChanged(bool bIsAiming)
 {
 	//if(IsLocallyControlledByPlayer())
-	LerpCameraToLocalOffsetLocation(bIsAimming ? CameraAimLocalOffset : FVector{0.f});
+	LerpCameraToLocalOffsetLocation(bIsAiming ? CameraAimLocalOffset : FVector{0.f});
 }
 
 void ACPlayerCharacter::LerpCameraToLocalOffsetLocation(const FVector& Goal)
 {
-	GetWorldTimerManager().ClearTimer(CamerLerpTimerHandle);
-	CamerLerpTimerHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ACPlayerCharacter::TickCameraLocalOffsetLerp, Goal));
+	GetWorldTimerManager().ClearTimer(CameraLerpTimerHandle);
+	CameraLerpTimerHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ACPlayerCharacter::TickCameraLocalOffsetLerp, Goal));
 }
 
 void ACPlayerCharacter::TickCameraLocalOffsetLerp(FVector Goal)
 {
-	FVector CurrentLocalOffset = ViewCam->GetRelativeLocation();
+	const FVector CurrentLocalOffset = ViewCam->GetRelativeLocation();
 	if (FVector::Dist(CurrentLocalOffset, Goal) < 1.f)
 	{
 		ViewCam->SetRelativeLocation(Goal);
 		return;
 	}
 
-	float LerpAlpha = FMath::Clamp(GetWorld()->GetDeltaSeconds() * CamerLerpSpeed, 0.f, 1.f);
-	FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, LerpAlpha);
+	const float LerpAlpha = FMath::Clamp(GetWorld()->GetDeltaSeconds() * CameraLerpSpeed, 0.f, 1.f);
+	const FVector NewLocalOffset = FMath::Lerp(CurrentLocalOffset, Goal, LerpAlpha);
 	ViewCam->SetRelativeLocation(NewLocalOffset);
 
-	CamerLerpTimerHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ACPlayerCharacter::TickCameraLocalOffsetLerp, Goal));
+	CameraLerpTimerHandle = GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ACPlayerCharacter::TickCameraLocalOffsetLerp, Goal));
 }

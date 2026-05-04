@@ -58,8 +58,8 @@ void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
 			UUniformGridSlot* NewGridSlot = TeamSelectionSlotGridPanel->AddChildToUniformGrid(NewSelectionSlot);
 			if (NewGridSlot)
 			{
-				int Row = i % UCNetStatics::GetPlayerCountPerTeam();
-				int Column = i < UCNetStatics::GetPlayerCountPerTeam() ? 0 : 1;
+				const int Row = i % UCNetStatics::GetPlayerCountPerTeam();
+				const int Column = i < UCNetStatics::GetPlayerCountPerTeam() ? 0 : 1;
 
 				NewGridSlot->SetRow(Row);
 				NewGridSlot->SetColumn(Column);
@@ -81,7 +81,7 @@ void ULobbyWidget::SlotSelected(uint8 NewSlotID)
 
 void ULobbyWidget::ConfigureGameState()
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (!World)
 		return;
 
@@ -190,7 +190,7 @@ void ULobbyWidget::SpawnCharacterDisplay()
 		return;
 
 	FTransform CharacterDisplayTransform = FTransform::Identity;
-	AActor* PlayerStart = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass());
+	const AActor* PlayerStart = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass());
 	if (PlayerStart)
 	{
 		CharacterDisplayTransform = PlayerStart->GetActorTransform();

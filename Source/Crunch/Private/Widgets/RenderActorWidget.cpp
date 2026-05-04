@@ -38,7 +38,7 @@ void URenderActorWidget::ConfigureRenderActor()
 	}
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	RenderTarget->InitAutoFormat((int)RenderSize.X, (int)RenderSize.Y);
+	RenderTarget->InitAutoFormat(static_cast<int>(RenderSize.X), static_cast<int>(RenderSize.Y));
 	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8_SRGB;
 	GetRenderActor()->SetRenderTarget(RenderTarget);
 
@@ -51,8 +51,8 @@ void URenderActorWidget::ConfigureRenderActor()
 
 void URenderActorWidget::BeginRenderCapture()
 {
-	RenderTickInterval = 1.f / (float)FrameRate;
-	UWorld* World = GetWorld();
+	RenderTickInterval = 1.f / static_cast<float>(FrameRate);
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		World->GetTimerManager().SetTimer(RenderTimerHandle, this, &URenderActorWidget::UpdateRender, RenderTickInterval, true);
@@ -71,7 +71,7 @@ void URenderActorWidget::UpdateRender()
 void URenderActorWidget::StopRenderCapture()
 {
 
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		World->GetTimerManager().ClearTimer(RenderTimerHandle);

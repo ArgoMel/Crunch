@@ -33,23 +33,23 @@ void ULevelGauge::NativeConstruct()
 void ULevelGauge::UpdateGauge(const FOnAttributeChangeData& Data)
 {
 	bool bFound;
-	float CurrentExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetExperienceAttribute(), bFound);
+	const float CurrentExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetExperienceAttribute(), bFound);
 	if (!bFound)
 		return;
-	float NextLevelExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetNextLevelExperienceAttribute(), bFound);
+	const float NextLevelExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetNextLevelExperienceAttribute(), bFound);
 	if (!bFound)
 		return;
-	float PrevLevelExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetPrevLevelExperienceAttribute(), bFound);
+	const float PrevLevelExperience = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetPrevLevelExperienceAttribute(), bFound);
 	if (!bFound)
 		return;
-	float CurrentLevel = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
+	const float CurrentLevel = OwnerASC->GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
 	if (!bFound)
 		return;
 
 	LevelText->SetText(FText::AsNumber(CurrentLevel, &NumberFormattingOptions));
 
-	float Progress = CurrentExperience - PrevLevelExperience;
-	float LevelExpAmt = NextLevelExperience - PrevLevelExperience;
+	const float Progress = CurrentExperience - PrevLevelExperience;
+	const float LevelExpAmt = NextLevelExperience - PrevLevelExperience;
 
 	float Percent = Progress / LevelExpAmt;
 

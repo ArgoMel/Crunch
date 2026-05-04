@@ -58,15 +58,15 @@ void UInventoryItemWidget::UpdateInventoryItem(const UInventoryItem* Item)
 	if (InventoryItem->IsGrantingAnyAbility())
 	{
 		UpdateCanCastDisplay(InventoryItem->CanCastAbility());
-		float AbilityCooldownRemaining = InventoryItem->GetAbilityCooldownTimeRemaining();
-		float AbilityCooldownDuration = InventoryItem->GetAbilityCooldownDuration();
+		const float AbilityCooldownRemaining = InventoryItem->GetAbilityCooldownTimeRemaining();
+		const float AbilityCooldownDuration = InventoryItem->GetAbilityCooldownDuration();
 
 		if (AbilityCooldownRemaining > 0.f)
 		{
 			StartCooldown(AbilityCooldownDuration, AbilityCooldownRemaining);
 		}
 
-		float AbilityCost = InventoryItem->GetAbilityManaCost();
+		const float AbilityCost = InventoryItem->GetAbilityManaCost();
 		ManaCostText->SetVisibility(AbilityCost == 0.f ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
 		ManaCostText->SetText(FText::AsNumber(AbilityCost));
 
@@ -210,7 +210,7 @@ void UInventoryItemWidget::CooldownFinished()
 void UInventoryItemWidget::UpdateCooldown()
 {
 	CooldownTimeRemaining -= CooldownUpdateInterval;
-	float CooldownAmt = 1.f - CooldownTimeRemaining / CooldownTimeDuration;
+	const float CooldownAmt = 1.f - CooldownTimeRemaining / CooldownTimeDuration;
 	CooldownDisplayFormattingOptions.MaximumFractionalDigits = CooldownTimeRemaining > 1.f ? 0 : 2;
 	CooldownCountText->SetText(FText::AsNumber(CooldownTimeRemaining, &CooldownDisplayFormattingOptions));
 	if (GetItemIcon())

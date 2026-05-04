@@ -45,17 +45,17 @@ void UGAP_Dead::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		}
 
 		bool bFound = false;
-		float SelfExperience = GetAbilitySystemComponentFromActorInfo_Ensured()->GetGameplayAttributeValue(UCHeroAttributeSet::GetExperienceAttribute(), bFound);
+		const float SelfExperience = GetAbilitySystemComponentFromActorInfo_Ensured()->GetGameplayAttributeValue(UCHeroAttributeSet::GetExperienceAttribute(), bFound);
 
 		float TotalExperienceReward = BaseExperienceReward + ExperienceRewardPerExperience * SelfExperience;
 		float TotalGoldReward = BaseGoldReward + GoldRewardPerExperience * SelfExperience;
 
 		if (Killer)
 		{
-			float KillerExperienceReward = TotalExperienceReward * KillerRewardPortion;
-			float KillerGoldReward = TotalGoldReward * KillerRewardPortion;
+			const float KillerExperienceReward = TotalExperienceReward * KillerRewardPortion;
+			const float KillerGoldReward = TotalGoldReward * KillerRewardPortion;
 
-			FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
+			const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
 			EffectSpec.Data->SetSetByCallerMagnitude(UCAbilitySystemStatics::GetExperienceAttributeTag(), KillerExperienceReward);
 			EffectSpec.Data->SetSetByCallerMagnitude(UCAbilitySystemStatics::GetGoldAttributeTag(), KillerGoldReward);
 
@@ -65,10 +65,10 @@ void UGAP_Dead::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 			TotalGoldReward -= KillerGoldReward;
 		}
 
-		float ExperiencePerTarget = TotalExperienceReward / RewardTargets.Num();
-		float GoldPerTarget = TotalGoldReward / RewardTargets.Num();
+		const float ExperiencePerTarget = TotalExperienceReward / RewardTargets.Num();
+		const float GoldPerTarget = TotalGoldReward / RewardTargets.Num();
 
-		FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
+		const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(RewardEffect);
 		EffectSpec.Data->SetSetByCallerMagnitude(UCAbilitySystemStatics::GetExperienceAttributeTag(), ExperiencePerTarget);
 		EffectSpec.Data->SetSetByCallerMagnitude(UCAbilitySystemStatics::GetGoldAttributeTag(), GoldPerTarget);
 
@@ -81,7 +81,7 @@ TArray<AActor*> UGAP_Dead::GetRewardTargets() const
 {
 	TSet<AActor*> OutActors;
 
-	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+	const AActor* AvatarActor = GetAvatarActorFromActorInfo();
 	if (!AvatarActor || !GetWorld())
 	{
 		return OutActors.Array();

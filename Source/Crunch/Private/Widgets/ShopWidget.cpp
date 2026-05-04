@@ -14,7 +14,7 @@ void UShopWidget::NativeConstruct()
 	SetIsFocusable(true);
 	LoadShopItems();
 	ShopItemList->OnEntryWidgetGenerated().AddUObject(this, &UShopWidget::ShopItemWidgetGenerated);
-	if (APawn* OwnerPawn = GetOwningPlayerPawn())
+	if (const APawn* OwnerPawn = GetOwningPlayerPawn())
 	{
 		OwnerInventoryComponent = OwnerPawn->GetComponentByClass<UInventoryComponent>();
 	}

@@ -13,20 +13,34 @@
 #include "CCharacter.generated.h"
 
 UCLASS()
-class ACCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface, public IRenderActorTargetInterface
+class ACCharacter  : public ACharacter
+	, public IAbilitySystemInterface
+	, public IGenericTeamAgentInterface
+	, public IRenderActorTargetInterface
 {
 	GENERATED_BODY()
-
 public:
 	// Sets default values for this character's properties
 	ACCharacter();
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	virtual FVector GetCaptureLocalPosition() const override;
+	virtual FRotator GetCaptureLocalRotation() const override;
+	
+public:
 	void ServerSideInit();
 	void ClientSideInit();
 	bool IsLocallyControlledByPlayer() const;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const;
-	virtual FVector GetCaptureLocalPosition() const override;
-	virtual FRotator GetCaptureLocalRotation() const override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
@@ -34,26 +48,11 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Capture")
 	FRotator HeadshotCaptureLocalRotation;
-
-protected:
-	// Called when the game starts or when spawned
-
-	virtual void BeginPlay() override;
-	virtual void PossessedBy(AController* NewController) override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	/**********************************************************************/
 	/*                             Gameplay Ability                       */
 	/**********************************************************************/
 public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_SendGameplayEventToSelf(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
 	FORCEINLINE bool GetIsInFocusMode() const { return bIsInFocusMode; }
@@ -68,8 +67,8 @@ private:
 
 	bool bIsInFocusMode = false;
 
-	void SetIsAimming(bool bIsAimming);
-	virtual void OnAimStateChanged(bool bIsAimming);
+	void SetIsAiming(bool bIsAiming);
+	virtual void OnAimStateChanged(bool bIsAiming);
 	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
 	void MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data);
 	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
@@ -79,6 +78,7 @@ private:
 	class UCAbilitySystemComponent* CAbilitySystemComponent;
 	UPROPERTY()
 	class UCAttributeSet* CAttributeSet;
+	
 	/**********************************************************************/
 	/*                              UI                                    */
 	/**********************************************************************/
@@ -88,10 +88,10 @@ private:
 	void ConfigureOverHeadStatusWidget();
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	float HeadStatGaugeVisiblityCheckUpdateGap = 1.f;
+	float HeadStatGaugeVisibilityCheckUpdateGap = 1.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	float HeadStatGaugeVisiblityRangeSquared = 10000000.f;
+	float HeadStatGaugeVisibilityRangeSquared = 10000000.f;
 	
 	FTimerHandle HeadStatGaugeVisibilityUpdateTimerHandle;
 

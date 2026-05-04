@@ -23,9 +23,9 @@ void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
 	TArray<UCanvasPanelSlot*> LowerStreamSlots, UpperStreamSlots;
 
 	DrawStream(false, NodeInterface, CenterWidget, CenterWidgetPanelSlot, 0, NextLeafXPos, LowerStreamSlots);
-	float LowerStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
+	const float LowerStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
 
-	float LowerMoveAmt = 0.f - LowerStreamXMax / 2.0f;
+	const float LowerMoveAmt = 0.f - LowerStreamXMax / 2.0f;
 	for (UCanvasPanelSlot* StreamSlot : LowerStreamSlots)
 	{
 		StreamSlot->SetPosition(StreamSlot->GetPosition() + FVector2D{LowerMoveAmt, 0.f});
@@ -33,9 +33,9 @@ void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
 
 	NextLeafXPos = 0.f;
 	DrawStream(true, NodeInterface, CenterWidget, CenterWidgetPanelSlot, 0, NextLeafXPos, UpperStreamSlots);
-	float UpperStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
+	const float UpperStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
 
-	float UpperMoveAmt = 0.f - UpperStreamXMax / 2.0f;
+	const float UpperMoveAmt = 0.f - UpperStreamXMax / 2.0f;
 	for (UCanvasPanelSlot* StreamSlot : UpperStreamSlots)
 	{
 		StreamSlot->SetPosition(StreamSlot->GetPosition() + FVector2D{UpperMoveAmt, 0.f});
@@ -47,7 +47,7 @@ void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
 void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* StartingNodeInteface, UUserWidget* StartingNodeWidget, UCanvasPanelSlot* StartingNodeSlot, int StartingNodeDepth, float& NextLeafXPosition, TArray<UCanvasPanelSlot*>& OutStreamSlots)
 {
 	TArray<const ITreeNodeInterface*> NextTreeNodeInterfaces = bUpperStream ? StartingNodeInteface->GetInputs() : StartingNodeInteface->GetOuputs();
-	float StartingNodeYPos = (NodeSize.Y + NodeGap.Y) * StartingNodeDepth * (bUpperStream ? -1 : 1);
+	const float StartingNodeYPos = (NodeSize.Y + NodeGap.Y) * StartingNodeDepth * (bUpperStream ? -1 : 1);
 
 	if (NextTreeNodeInterfaces.Num() == 0)
 	{
@@ -75,7 +75,7 @@ void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* St
 		NextNodeXPosSum += NextWidgetSlot->GetPosition().X;
 	}
 
-	float StartingNodeXPos = NextNodeXPosSum / NextTreeNodeInterfaces.Num();
+	const float StartingNodeXPos = NextNodeXPosSum / NextTreeNodeInterfaces.Num();
 	StartingNodeSlot->SetPosition(FVector2D{StartingNodeXPos, StartingNodeYPos});
 }
 

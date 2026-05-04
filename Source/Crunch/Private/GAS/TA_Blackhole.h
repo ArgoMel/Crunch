@@ -21,7 +21,7 @@ public:
 	virtual void SetGenericTeamId(const FGenericTeamId& InTeamId) override;
 	
 	/** Retrieve team identifier in form of FGenericTeamId */
-	virtual FGenericTeamId GetGenericTeamId() const { return TeamId; }
+	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void StartTargeting(class UGameplayAbility* Ability) override;
 	virtual void Tick(float DeltaTime) override;

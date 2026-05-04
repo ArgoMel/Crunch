@@ -27,7 +27,7 @@ void UMatchStatWidget::UpdateTeamInfluence(int TeamOneCount, int TeamTwoCount)
 
 void UMatchStatWidget::MatchFinished(AActor* ViewTarget, int WinningTeam)
 {
-	float Progress = WinningTeam == 0 ? 1 : 0;
+	const float Progress = WinningTeam == 0 ? 1 : 0;
 
 	GetWorld()->GetTimerManager().ClearTimer(UpdateProgressTimerHandle);
 	ProgressImage->GetDynamicMaterial()->SetScalarParameterValue(ProgressDynamicMaterialParamName, Progress);
@@ -37,7 +37,7 @@ void UMatchStatWidget::UpdateProgress()
 {
 	if (StormCore)
 	{
-		float Progress = StormCore->GetProgress();
+		const float Progress = StormCore->GetProgress();
 		ProgressImage->GetDynamicMaterial()->SetScalarParameterValue(ProgressDynamicMaterialParamName, Progress);
 	}
 }

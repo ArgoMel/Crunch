@@ -49,12 +49,12 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 	if (!CachedPlayerController || !CrosshairCanvasPanelSlot)
 		return;
 
-	float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(this);
+	const float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(this);
 	int32 SizeX, SizeY;
 	CachedPlayerController->GetViewportSize(SizeX, SizeY);
 	if (!AimTarget)
 	{
-		FVector2D ViewportSize = FVector2D{(float)SizeX, (float)SizeY};
+		const FVector2D ViewportSize = FVector2D{static_cast<float>(SizeX), static_cast<float>(SizeY)};
 		CrosshairCanvasPanelSlot->SetPosition(ViewportSize / 2.f / ViewportScale);
 		return;
 	}

@@ -16,7 +16,7 @@ class UMMC_LevelBased : public UGameplayModMagnitudeCalculation
 public:
 	UMMC_LevelBased();
 
-	float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
+	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 private:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayAttribute RateAttribute;

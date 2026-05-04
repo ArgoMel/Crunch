@@ -53,5 +53,5 @@ bool FPlayerSelection::IsValid() const
 
 uint8 FPlayerSelection::GetInvalidSlot()
 {
-	return uint8(255);
+	return static_cast<uint8>(255);
 }

@@ -19,7 +19,7 @@ APlayerController* ACGameMode::SpawnPlayerController(ENetRole InRemoteRole, cons
 {
 	APlayerController* NewPlayerController = Super::SpawnPlayerController(InRemoteRole, Options);
 	IGenericTeamAgentInterface* NewPlayerTeamInterface = Cast<IGenericTeamAgentInterface>(NewPlayerController);
-	FGenericTeamId TeamId = GetTeamIDForPlayer(NewPlayerController);
+	const FGenericTeamId TeamId = GetTeamIDForPlayer(NewPlayerController);
 	if (NewPlayerTeamInterface)
 	{
 		NewPlayerTeamInterface->SetGenericTeamId(TeamId);
@@ -41,7 +41,7 @@ void ACGameMode::StartPlay()
 
 UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController* Controller)
 {
-	ACPlayerState* CPlayerState = Controller->GetPlayerState<ACPlayerState>();
+	const ACPlayerState* CPlayerState = Controller->GetPlayerState<ACPlayerState>();
 	if (CPlayerState && CPlayerState->GetSelectedPawnClass())
 	{
 		return CPlayerState->GetSelectedPawnClass();
@@ -53,7 +53,7 @@ UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController*
 APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
 	IGenericTeamAgentInterface* NewPlayerTeamInterface = Cast<IGenericTeamAgentInterface>(NewPlayer);
-	FGenericTeamId TeamId = GetTeamIDForPlayer(NewPlayer);
+	const FGenericTeamId TeamId = GetTeamIDForPlayer(NewPlayer);
 
 	if (NewPlayerTeamInterface)
 	{
@@ -68,7 +68,7 @@ APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AA
 
 FGenericTeamId ACGameMode::GetTeamIDForPlayer(const AController* InController) const
 {
-	ACPlayerState* CPlayerState = InController->GetPlayerState<ACPlayerState>();
+	const ACPlayerState* CPlayerState = InController->GetPlayerState<ACPlayerState>();
 	if (CPlayerState && CPlayerState->GetSelectedPawnClass())
 	{
 		return CPlayerState->GetTeamIdBasedOnSlot();
@@ -87,7 +87,7 @@ AActor* ACGameMode::FindNextStartSpotForTeam(const FGenericTeamId& TeamID) const
 		return nullptr;
 	}
 
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	
 	for (TActorIterator<APlayerStart> It(World); It; ++It)
 	{
@@ -103,7 +103,7 @@ AActor* ACGameMode::FindNextStartSpotForTeam(const FGenericTeamId& TeamID) const
 
 AStormCore* ACGameMode::GetStormCore() const
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		for (TActorIterator<AStormCore> It(World); It; ++It)
@@ -117,7 +117,7 @@ AStormCore* ACGameMode::GetStormCore() const
 
 void ACGameMode::MatchFinished(AActor* ViewTarget, int WiningTeam)
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 	if (World)
 	{
 		for (TActorIterator<ACPlayerController> It(World); It; ++It)

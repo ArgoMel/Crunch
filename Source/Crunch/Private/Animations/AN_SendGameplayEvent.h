@@ -19,5 +19,5 @@ public:
 private:
 	UPROPERTY(EditAnywhere, Category = "Gameplay Ability")
 	FGameplayTag EventTag;
-	virtual FString GetNotifyName_Implementation() const; 
+	virtual FString GetNotifyName_Implementation() const override; 
 };

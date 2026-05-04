@@ -58,7 +58,7 @@ void UGA_Dash::PushForward()
 {
 	if (OwnerCharacterMovementComponent)
 	{
-		FVector ForwardActor = GetAvatarActorFromActorInfo()->GetActorForwardVector();
+		const FVector ForwardActor = GetAvatarActorFromActorInfo()->GetActorForwardVector();
 		OwnerCharacterMovementComponent->AddInputVector(ForwardActor);
 		PushForwardInputTimerHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UGA_Dash::PushForward);
 	}

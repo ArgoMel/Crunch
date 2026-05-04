@@ -15,8 +15,8 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetHealthAttribute()).AddUObject(this, &UCAbilitySystemComponent::HealthUpdated);
 	GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(this, &UCAbilitySystemComponent::ManaUpdated);
 	GetGameplayAttributeValueChangeDelegate(UCHeroAttributeSet::GetExperienceAttribute()).AddUObject(this, &UCAbilitySystemComponent::ExperienceUpdated);
-	GenericConfirmInputID = (int32)ECAbilityInputID::Confirm;
-	GenericCancelInputID = (int32)ECAbilityInputID::Cancel;
+	GenericConfirmInputID = static_cast<int32>(ECAbilityInputID::Confirm);
+	GenericCancelInputID = static_cast<int32>(ECAbilityInputID::Cancel);
 }
 
 void UCAbilitySystemComponent::InitializeBaseAttributes()
@@ -55,10 +55,10 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 	const FRealCurve* ExperienceCurve = AbilitySystemGenerics->GetExperienceCurve();
 	if (ExperienceCurve)
 	{
-		int MaxLevel = ExperienceCurve->GetNumKeys();
+		const int MaxLevel = ExperienceCurve->GetNumKeys();
 		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelAttribute(), MaxLevel);
 
-		float MaxExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
+		const float MaxExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
 		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxExp);
 
 		UE_LOG(LogTemp, Warning, TEXT("Max Level is: %d, max experience is: %f"), MaxLevel, MaxExp);
@@ -96,12 +96,12 @@ void UCAbilitySystemComponent::GiveInitialAbilities()
 
 	for (const TPair<ECAbilityInputID,TSubclassOf<UGameplayAbility>>& AbilityPair : Abilities)
 	{
-		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 0, (int32)AbilityPair.Key, nullptr));
+		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 0, static_cast<int32>(AbilityPair.Key), nullptr));
 	}
 
 	for (const TPair<ECAbilityInputID,TSubclassOf<UGameplayAbility>>& AbilityPair : BasicAbilities)
 	{
-		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 1, (int32)AbilityPair.Key, nullptr));
+		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 1, static_cast<int32>(AbilityPair.Key), nullptr));
 	}
 
 	if (!AbilitySystemGenerics)
@@ -128,19 +128,19 @@ const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& UCAbilitySystemComp
 bool UCAbilitySystemComponent::IsAtMaxLevel() const
 {
 	bool bFound;
-	float CurrentLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
-	float MaxLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetMaxLevelAttribute(), bFound);
+	const float CurrentLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetLevelAttribute(), bFound);
+	const float MaxLevel = GetGameplayAttributeValue(UCHeroAttributeSet::GetMaxLevelAttribute(), bFound);
 	return CurrentLevel >= MaxLevel;
 }
 
 void UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Implementation(ECAbilityInputID InputID)
 {
 	bool bFound = false;
-	float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
+	const float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
 	if (!bFound || UpgradePoint <= 0)
 		return;
 
-	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromInputID((int32)InputID);
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromInputID(static_cast<int32>(InputID));
 	if (!AbilitySpec || UCAbilitySystemStatics::IsAbilityAtMaxLevel(*AbilitySpec))
 		return;
 
@@ -171,7 +171,7 @@ void UCAbilitySystemComponent::AuthApplyGameplayEffect(TSubclassOf<UGameplayEffe
 
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(GameplayEffect, Level, MakeEffectContext());
+		const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(GameplayEffect, Level, MakeEffectContext());
 		ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
 }
@@ -181,7 +181,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 
 	bool bFound = false;
-	float MaxHealth = GetGameplayAttributeValue(UCAttributeSet::GetMaxHealthAttribute(), bFound);
+	const float MaxHealth = GetGameplayAttributeValue(UCAttributeSet::GetMaxHealthAttribute(), bFound);
 	if (bFound && ChangeData.NewValue >= MaxHealth)
 	{
 		if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthFullStatTag()))
@@ -223,7 +223,7 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
 
 	bool bFound = false;
-	float MaxMana = GetGameplayAttributeValue(UCAttributeSet::GetMaxManaAttribute(), bFound);
+	const float MaxMana = GetGameplayAttributeValue(UCAttributeSet::GetMaxManaAttribute(), bFound);
 	if (bFound && ChangeData.NewValue >= MaxMana)
 	{
 		if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetManaFullStatTag()))
@@ -261,7 +261,7 @@ void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& C
 	if (!AbilitySystemGenerics)
 		return;
 
-	float CurrentExp = ChangeData.NewValue;
+	const float CurrentExp = ChangeData.NewValue;
 
 	const FRealCurve* ExperienceCurve = AbilitySystemGenerics->GetExperienceCurve();
 	if (!ExperienceCurve)
@@ -276,7 +276,7 @@ void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& C
 
 	for (auto Iter = ExperienceCurve->GetKeyHandleIterator(); Iter; ++Iter)
 	{
-		float ExperienceToReachLevel = ExperienceCurve->GetKeyValue(*Iter);
+		const float ExperienceToReachLevel = ExperienceCurve->GetKeyValue(*Iter);
 		if (CurrentExp < ExperienceToReachLevel)
 		{
 			NextLevelExp = ExperienceToReachLevel;
@@ -287,11 +287,11 @@ void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& C
 		NewLevel = Iter.GetIndex() + 1;
 	}
 
-	float CurrentLevel = GetNumericAttributeBase(UCHeroAttributeSet::GetLevelAttribute());
-	float CurrentUpgradePoint = GetNumericAttribute(UCHeroAttributeSet::GetUpgradePointAttribute());
+	const float CurrentLevel = GetNumericAttributeBase(UCHeroAttributeSet::GetLevelAttribute());
+	const float CurrentUpgradePoint = GetNumericAttribute(UCHeroAttributeSet::GetUpgradePointAttribute());
 
-	float LevelUpgraded = NewLevel - CurrentLevel;
-	float NewUpgradePoint = CurrentUpgradePoint + LevelUpgraded;
+	const float LevelUpgraded = NewLevel - CurrentLevel;
+	const float NewUpgradePoint = CurrentUpgradePoint + LevelUpgraded;
 
 	SetNumericAttributeBase(UCHeroAttributeSet::GetLevelAttribute(), NewLevel);
 	SetNumericAttributeBase(UCHeroAttributeSet::GetPrevLevelExperienceAttribute(), PrevLevelExp);

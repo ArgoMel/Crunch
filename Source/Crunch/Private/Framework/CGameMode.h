@@ -7,9 +7,8 @@
 #include "GenericTeamAgentInterface.h"
 #include "CGameMode.generated.h"
 
-/**
- * 
- */
+class AStormCore;
+
 UCLASS()
 class ACGameMode : public AGameModeBase
 {
@@ -25,14 +24,15 @@ private:
 	FGenericTeamId GetTeamIDForPlayer(const AController* InController) const;
 
 	AActor* FindNextStartSpotForTeam(const FGenericTeamId& TeamID) const;
+	
+	AStormCore* GetStormCore() const;
 
+	void MatchFinished(AActor* ViewTarget, int WiningTeam);
+	
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "Team")
 	TSubclassOf<APawn> BackupPawn;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team")
 	TMap<FGenericTeamId, FName> TeamStartSpotTagMap;
-
-	class AStormCore* GetStormCore() const;
-
-	void MatchFinished(AActor* ViewTarget, int WiningTeam);
 };

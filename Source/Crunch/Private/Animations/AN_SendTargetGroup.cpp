@@ -25,14 +25,14 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 	}
 
 	FGameplayEventData Data;
-	TSet<AActor*> HitActors;
+	const TSet<AActor*> HitActors;
 	AActor* OwnerActor = MeshComp->GetOwner();
 	const IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(OwnerActor);
 
 	for (int i = 1; i < TargetSocketNames.Num(); ++i)
 	{
-		FVector StartLoc = MeshComp->GetSocketLocation(TargetSocketNames[i-1]);
-		FVector EndLoc = MeshComp->GetSocketLocation(TargetSocketNames[i]);
+		const FVector StartLoc = MeshComp->GetSocketLocation(TargetSocketNames[i-1]);
+		const FVector EndLoc = MeshComp->GetSocketLocation(TargetSocketNames[i]);
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
@@ -44,7 +44,7 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 			ActorsToIgnore.Add(OwnerActor);
 		}
 
-		EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+		const EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
 
 		UKismetSystemLibrary::SphereTraceMultiForObjects(MeshComp, StartLoc, EndLoc, SphereSweepRadius, 
 			ObjectTypes, false, ActorsToIgnore, DrawDebugTrace, HitResults, false);

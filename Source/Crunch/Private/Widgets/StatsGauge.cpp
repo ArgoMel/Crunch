@@ -27,7 +27,7 @@ void UStatsGauge::NativeConstruct()
 	if (OwnerASC)
 	{
 		bool bFound;
-		float AttributeVal = OwnerASC->GetGameplayAttributeValue(Attribute, bFound);
+		const float AttributeVal = OwnerASC->GetGameplayAttributeValue(Attribute, bFound);
 		SetValue(AttributeVal);
 
 		OwnerASC->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this, &UStatsGauge::AttributeChanged);

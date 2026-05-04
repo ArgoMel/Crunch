@@ -27,7 +27,7 @@ FOnlineSessionSettings UCNetStatics::GenerateOnlineSesisonSettings(const FName& 
 
 IOnlineSessionPtr UCNetStatics::GetSessionPtr()
 {
-	IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
+	const IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
 	if (OnlineSubSystem)
 	{
 		return OnlineSubSystem->GetSessionInterface();
@@ -37,7 +37,7 @@ IOnlineSessionPtr UCNetStatics::GetSessionPtr()
 
 IOnlineIdentityPtr UCNetStatics::GetIdentityPtr()
 {
-	IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
+	const IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
 	if (OnlineSubSystem)
 	{
 		return OnlineSubSystem->GetIdentityInterface();
@@ -112,7 +112,7 @@ FString UCNetStatics::GetDefaultCoordinatorURL()
 FString UCNetStatics::GetCommandlineArgAsString(const FName& ParamName)
 {
 	FString OutVal = "";
-	FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
+	const FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
 	FParse::Value(FCommandLine::Get(), *CommandLineArg, OutVal);
 	return OutVal;
 }
@@ -120,7 +120,7 @@ FString UCNetStatics::GetCommandlineArgAsString(const FName& ParamName)
 int UCNetStatics::GetCommandlineArgAsInt(const FName& ParamName)
 {
 	int OutVal = 0;
-	FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
+	const FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
 	FParse::Value(FCommandLine::Get(), *CommandLineArg, OutVal);
 	return OutVal;
 }

@@ -36,7 +36,7 @@ void AStormCore::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 float AStormCore::GetProgress() const
 {
-	FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
+	const FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
 	FVector VectorFromTeamOne = GetActorLocation() - TeamTwoGoalLoc;
 	VectorFromTeamOne.Z = 0.f;
 
@@ -47,8 +47,8 @@ float AStormCore::GetProgress() const
 void AStormCore::BeginPlay()
 {
 	Super::BeginPlay();
-	FVector TeamOneGoalLoc = TeamOneGoal->GetActorLocation();
-	FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
+	const FVector TeamOneGoalLoc = TeamOneGoal->GetActorLocation();
+	const FVector TeamTwoGoalLoc = TeamTwoGoal->GetActorLocation();
 
 	FVector GoalOffset = TeamOneGoalLoc - TeamTwoGoalLoc;
 	GoalOffset.Z = 0;
@@ -68,7 +68,7 @@ void AStormCore::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (CoreToCapture)
 	{
-		FVector CoreMoveDir = (GetMesh()->GetComponentLocation() - CoreToCapture->GetActorLocation()).GetSafeNormal();
+		const FVector CoreMoveDir = (GetMesh()->GetComponentLocation() - CoreToCapture->GetActorLocation()).GetSafeNormal();
 		CoreToCapture->AddActorWorldOffset(CoreMoveDir * CoreCaptureSpeed * DeltaTime);
 	}
 }
@@ -84,12 +84,12 @@ void AStormCore::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AStormCore::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	FName PropertyName = PropertyChangedEvent.GetPropertyName();
+	const FName PropertyName = PropertyChangedEvent.GetPropertyName();
 
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AStormCore, InfluenceRadius))
 	{
 		InfluenceRange->SetSphereRadius(InfluenceRadius);
-		FVector DecalSize = GroundDecalComponent->DecalSize;
+		const FVector DecalSize = GroundDecalComponent->DecalSize;
 		GroundDecalComponent->DecalSize = FVector{DecalSize.X, InfluenceRadius, InfluenceRadius};
 	}
 }
@@ -107,7 +107,7 @@ void AStormCore::NewInfluenerInRange(UPrimitiveComponent* OverlappedComponent, A
 		GoalReached(1);
 	}
 
-	IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
+	const IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
 	if (OtherTeamInterface)
 	{
 		if (OtherTeamInterface->GetGenericTeamId().GetId() == 0)
@@ -124,7 +124,7 @@ void AStormCore::NewInfluenerInRange(UPrimitiveComponent* OverlappedComponent, A
 
 void AStormCore::InfluencerLeftRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
+	const IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OtherActor);
 	if (OtherTeamInterface)
 	{
 		if (OtherTeamInterface->GetGenericTeamId().GetId() == 0)
@@ -156,8 +156,8 @@ void AStormCore::UpdateTeamWeight()
 	}
 	else
 	{
-		float TeamOffset = TeamOneInfluncerCount - TeamTwoInfluncerCount;
-		float TeamTotal = TeamOneInfluncerCount + TeamTwoInfluncerCount;
+		const float TeamOffset = TeamOneInfluncerCount - TeamTwoInfluncerCount;
+		const float TeamTotal = TeamOneInfluncerCount + TeamTwoInfluncerCount;
 
 		TeamWeight = TeamOffset / TeamTotal;
 	}
@@ -185,7 +185,7 @@ void AStormCore::UpdateGoal()
 		OwnerAIC->MoveToActor(TeamTwoGoal);
 	}
 
-	float Speed = MaxMoveSpeed * FMath::Abs(TeamWeight);
+	const float Speed = MaxMoveSpeed * FMath::Abs(TeamWeight);
 
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
@@ -212,7 +212,7 @@ void AStormCore::GoalReached(int WiningTeam)
 
 void AStormCore::CaptureCore()
 {
-	float ExpandDuration = GetMesh()->GetAnimInstance()->Montage_Play(ExpandMontage);
+	const float ExpandDuration = GetMesh()->GetAnimInstance()->Montage_Play(ExpandMontage);
 	CoreCaptureSpeed = FVector::Distance(GetMesh()->GetComponentLocation(), CoreToCapture->GetActorLocation())/ExpandDuration;
 
 	CoreToCapture->SetActorEnableCollision(false);

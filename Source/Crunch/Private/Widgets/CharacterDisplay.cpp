@@ -27,6 +27,6 @@ void ACharacterDisplay::ConfigureWithCharacterDefination(const UPA_CharacterDefi
 
 	MeshComponent->SetSkeletalMesh(CharacterDefination->LoadDisplayMesh());
 	MeshComponent->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	MeshComponent->SetAnimClass(CharacterDefination->LoadDisplayAnimationBP());
+	MeshComponent->SetAnimInstanceClass(CharacterDefination->LoadDisplayAnimationBP());
 }
 

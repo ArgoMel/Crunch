@@ -44,11 +44,11 @@ TSubclassOf<UAnimInstance> UPA_CharacterDefination::LoadDisplayAnimationBP() con
 
 USkeletalMesh* UPA_CharacterDefination::LoadDisplayMesh() const
 {
-	TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
+	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
 	if (!LoadedCharaterClass)
 		return nullptr;
 
-	ACharacter* Character = Cast<ACharacter>(LoadedCharaterClass.GetDefaultObject());
+	const ACharacter* Character = Cast<ACharacter>(LoadedCharaterClass.GetDefaultObject());
 	if (!Character)
 		return nullptr;
 
@@ -57,11 +57,11 @@ USkeletalMesh* UPA_CharacterDefination::LoadDisplayMesh() const
 
 const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* UPA_CharacterDefination::GetAbilities() const
 {
-	TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
+	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
 	if (!LoadedCharaterClass)
 		return nullptr;
 
-	ACCharacter* Character = Cast<ACCharacter>(LoadedCharaterClass.GetDefaultObject());
+	const ACCharacter* Character = Cast<ACCharacter>(LoadedCharaterClass.GetDefaultObject());
 	if (!Character)
 		return nullptr;
 

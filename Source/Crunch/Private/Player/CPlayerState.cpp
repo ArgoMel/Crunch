@@ -12,7 +12,7 @@
 ACPlayerState::ACPlayerState()
 {
 	bReplicates = true;
-	NetUpdateFrequency = 100.f;
+	SetNetUpdateFrequency(100.f);
 }
 
 void ACPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

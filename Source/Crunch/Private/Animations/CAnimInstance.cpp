@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Animations/CAnimInstance.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -28,10 +27,10 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (OwnerCharacter)
 	{
-		FVector Velocity = OwnerCharacter->GetVelocity();
+		const FVector Velocity = OwnerCharacter->GetVelocity();
 		Speed = Velocity.Length();
-		FRotator BodyRot = OwnerCharacter->GetActorRotation();
-		FRotator BodyRotDelta = UKismetMathLibrary::NormalizedDeltaRotator(BodyRot, BodyPrevRot);
+		const FRotator BodyRot = OwnerCharacter->GetActorRotation();
+		const FRotator BodyRotDelta = UKismetMathLibrary::NormalizedDeltaRotator(BodyRot, BodyPrevRot);
 		BodyPrevRot = BodyRot;
 
 		YawSpeed = BodyRotDelta.Yaw / DeltaSeconds;
@@ -42,7 +41,7 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 
 		SmoothedYawSpeed = UKismetMathLibrary::FInterpTo(SmoothedYawSpeed, YawSpeed, DeltaSeconds, YawLerpSpeed);
-		FRotator ControlRot = OwnerCharacter->GetBaseAimRotation();
+		const FRotator ControlRot = OwnerCharacter->GetBaseAimRotation();
 		LookRotOffset = UKismetMathLibrary::NormalizedDeltaRotator(ControlRot, BodyRot);
 
 		FwdSpeed = Velocity.Dot(ControlRot.Vector());
@@ -62,10 +61,10 @@ void UCAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 
 bool UCAnimInstance::ShouldDoFullBody() const
 {
-	return (GetSpeed() <= 0) && !(GetIsAimming());
+	return (GetSpeed() <= 0) && !(GetIsAiming());
 }
 
 void UCAnimInstance::OwnerAimTagChanged(const FGameplayTag Tag, int32 NewCount)
 {
-	bIsAimming = NewCount != 0;
+	bIsAiming = NewCount != 0;
 }

@@ -84,8 +84,8 @@ void UGA_Blink::Teleport(FGameplayEventData Payload)
 {
 	if (K2_HasAuthority())
 	{
-		FHitResult PickedLocationHitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(BlinkTargetDataHandle, 1);
-		FVector PickedTeleportLocation = PickedLocationHitResult.ImpactPoint;
+		const FHitResult PickedLocationHitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(BlinkTargetDataHandle, 1);
+		const FVector PickedTeleportLocation = PickedLocationHitResult.ImpactPoint;
 
 		GetAvatarActorFromActorInfo()->SetActorLocation(PickedTeleportLocation);
 		BP_ApplyGameplayEffectToTarget(BlinkTargetDataHandle, DamageEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo));

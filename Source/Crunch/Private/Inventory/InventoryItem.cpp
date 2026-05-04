@@ -107,7 +107,7 @@ bool UInventoryItem::IsGrantintAbility(TSubclassOf<class UGameplayAbility> Abili
 	if (!ShopItem)
 		return false;
 
-	TSubclassOf<UGameplayAbility> GrantedAbility = ShopItem->GetGrantedAbility();
+	const TSubclassOf<UGameplayAbility> GrantedAbility = ShopItem->GetGrantedAbility();
 	return GrantedAbility == AbilityClass;
 }
 
@@ -157,7 +157,7 @@ void UInventoryItem::ApplyConsumeEffect()
 	if (!ShopItem)
 		return;
 
-	TSubclassOf<UGameplayEffect> ConsumeEffect = ShopItem->GetConsumeEffect();
+	const TSubclassOf<UGameplayEffect> ConsumeEffect = ShopItem->GetConsumeEffect();
 	if (!ConsumeEffect)
 		return;
 
@@ -188,13 +188,13 @@ void UInventoryItem::ApplyGASModifications()
 	if (!OwnerAbilitySystemComponent->GetOwner() || !OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
 		return;
 
-	TSubclassOf<UGameplayEffect> EquipEffect = GetShopItem()->GetEquippedEffect();
+	const TSubclassOf<UGameplayEffect> EquipEffect = GetShopItem()->GetEquippedEffect();
 	if (EquipEffect)
 	{
 		 AppliedEquipedEffectHandle = OwnerAbilitySystemComponent->BP_ApplyGameplayEffectToSelf(EquipEffect, 1, OwnerAbilitySystemComponent->MakeEffectContext());
 	}
 
-	TSubclassOf<UGameplayAbility> GrantedAbility = GetShopItem()->GetGrantedAbility();
+	const TSubclassOf<UGameplayAbility> GrantedAbility = GetShopItem()->GetGrantedAbility();
 	if (GrantedAbility)
 	{
 		GrantedAbiltiySpecHandle = OwnerAbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrantedAbility));
@@ -240,7 +240,7 @@ bool UInventoryItem::CanCastAbility() const
 	if (!IsGrantingAnyAbility() || !OwnerAbilitySystemComponent)
 		return false;
 
-	FGameplayAbilitySpec* Spec = OwnerAbilitySystemComponent->FindAbilitySpecFromHandle(GrantedAbiltiySpecHandle);
+	const FGameplayAbilitySpec* Spec = OwnerAbilitySystemComponent->FindAbilitySpecFromHandle(GrantedAbiltiySpecHandle);
 	if (Spec)
 	{
 		return UCAbilitySystemStatics::CheckAbilityCost(*Spec, *OwnerAbilitySystemComponent);

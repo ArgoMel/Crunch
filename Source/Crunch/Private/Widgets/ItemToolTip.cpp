@@ -10,11 +10,11 @@ void UItemToolTip::SetItem(const UPA_ShopItem* Item)
 {
 	ItemTitleText->SetText(Item->GetItemName());
 	ItemDescriptionText->SetText(Item->GetItemDescription());
-	ItemPriceText->SetText(FText::AsNumber((int)Item->GetPrice()));
+	ItemPriceText->SetText(FText::AsNumber(static_cast<int>(Item->GetPrice())));
 	IconImage->SetBrushFromTexture(Item->GetIcon());
 }
 
 void UItemToolTip::SetPrice(float newPrice)
 {
-	ItemPriceText->SetText(FText::AsNumber((int)newPrice));
+	ItemPriceText->SetText(FText::AsNumber(static_cast<int>(newPrice)));
 }

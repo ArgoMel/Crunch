@@ -20,7 +20,7 @@ UInventoryComponent::UInventoryComponent()
 
 void UInventoryComponent::TryActivateItem(const FInventoryItemHandle& ItemHandle)
 {
-	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	const UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem)
 		return;
 
@@ -45,7 +45,7 @@ float UInventoryComponent::GetGold() const
 	bool bFound = false;
 	if (OwnerAbilitySystemComponent)
 	{
-		float Gold = OwnerAbilitySystemComponent->GetGameplayAttributeValue(UCHeroAttributeSet::GetGoldAttribute(), bFound);
+		const float Gold = OwnerAbilitySystemComponent->GetGameplayAttributeValue(UCHeroAttributeSet::GetGoldAttribute(), bFound);
 		if (bFound)
 		{
 			return Gold;
@@ -151,7 +151,7 @@ UInventoryItem* UInventoryComponent::TryGetItemForShopItem(const UPA_ShopItem* I
 
 void UInventoryComponent::TryActivateItemInSlot(int SlotNumber)
 {
-	for (TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
+	for (const TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
 	{
 		if (ItemPair.Value->GetItemSlot() == SlotNumber)
 		{
@@ -225,7 +225,7 @@ void UInventoryComponent::Server_SellItem_Implementation(FInventoryItemHandle It
 	if (!InventoryItem || !InventoryItem->IsValid())
 		return;
 
-	float SellPrice = InventoryItem->GetShopItem()->GetSellPrice();
+	const float SellPrice = InventoryItem->GetShopItem()->GetSellPrice();
 	OwnerAbilitySystemComponent->ApplyModToAttribute(UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, SellPrice * InventoryItem->GetStackCount());
 	RemoveItem(InventoryItem);
 }
@@ -251,12 +251,12 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 			return;
 
 		UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
-		FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
+		const FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
 		InventoryItem->InitItem(NewHandle, NewItem, OwnerAbilitySystemComponent);
 		InventoryMap.Add(NewHandle, InventoryItem);
 		OnItemAdded.Broadcast(InventoryItem);
 		UE_LOG(LogTemp, Warning, TEXT("Server Adding Shop Item: %s, with Id: %d"), *(InventoryItem->GetShopItem()->GetItemName().ToString()), NewHandle.GetHandleId());
-		FGameplayAbilitySpecHandle GrantedAbilitySpecHandle = InventoryItem->GetGrantedAbilitySpecHandle();
+		const FGameplayAbilitySpecHandle GrantedAbilitySpecHandle = InventoryItem->GetGrantedAbilitySpecHandle();
 		Client_ItemAdded(NewHandle, NewItem, GrantedAbilitySpecHandle);
 	}
 }

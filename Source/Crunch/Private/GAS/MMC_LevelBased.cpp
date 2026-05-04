@@ -15,7 +15,7 @@ UMMC_LevelBased::UMMC_LevelBased()
 
 float UMMC_LevelBased::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
-	UAbilitySystemComponent* ASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
+	const UAbilitySystemComponent* ASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
 	if (!ASC)
 		return 0.f;
 
@@ -26,7 +26,7 @@ float UMMC_LevelBased::CalculateBaseMagnitude_Implementation(const FGameplayEffe
 	GetCapturedAttributeMagnitude(LevelCaptureDefination, Spec, EvalParams, Level);
 
 	bool bFound;
-	float RateAttributeVal = ASC->GetGameplayAttributeValue(RateAttribute, bFound);
+	const float RateAttributeVal = ASC->GetGameplayAttributeValue(RateAttribute, bFound);
 	if (!bFound)
 		return 0.f;
 

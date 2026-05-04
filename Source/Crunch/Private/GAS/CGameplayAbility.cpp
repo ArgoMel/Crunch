@@ -17,7 +17,7 @@ UCGameplayAbility::UCGameplayAbility()
 
 bool UCGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
-	FGameplayAbilitySpec* AbilitySpec = ActorInfo->AbilitySystemComponent->FindAbilitySpecFromHandle(Handle);
+	const FGameplayAbilitySpec* AbilitySpec = ActorInfo->AbilitySystemComponent->FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Level <= 0)
 	{
 		return false;
@@ -28,14 +28,14 @@ bool UCGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 AActor* UCGameplayAbility::GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const
 {
-	AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
+	const AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
 	if (OwnerAvatarActor)
 	{
 		FVector Location;
 		FRotator Rotation;
 		OwnerAvatarActor->GetActorEyesViewPoint(Location, Rotation);
-		
-		FVector AimEnd = Location + Rotation.Vector() * AimDistance;
+
+		const FVector AimEnd = Location + Rotation.Vector() * AimDistance;
 
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.AddIgnoredActor(OwnerAvatarActor);
@@ -66,7 +66,7 @@ AActor* UCGameplayAbility::GetAimTarget(float AimDistance, ETeamAttitude::Type T
 
 UAnimInstance* UCGameplayAbility::GetOwnerAnimInstance() const
 {
-	USkeletalMeshComponent* OwnerSkeletalMeshComp = GetOwningComponentFromActorInfo();
+	const USkeletalMeshComponent* OwnerSkeletalMeshComp = GetOwningComponentFromActorInfo();
 	if (OwnerSkeletalMeshComp)
 	{
 		return OwnerSkeletalMeshComp->GetAnimInstance();
@@ -79,12 +79,12 @@ TArray<FHitResult> UCGameplayAbility::GetHitResultFromSweepLocationTargetData(co
 	TArray<FHitResult> OutResults;
 	TSet<AActor*> HitActors;
 
-	IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
+	const IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
 
 	for (const TSharedPtr<FGameplayAbilityTargetData>& TargetData : TargetDataHandle.Data)
 	{
-		FVector StartLoc = TargetData->GetOrigin().GetTranslation();
-		FVector EndLoc = TargetData->GetEndPoint();
+		const FVector StartLoc = TargetData->GetOrigin().GetTranslation();
+		const FVector EndLoc = TargetData->GetEndPoint();
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
@@ -95,7 +95,7 @@ TArray<FHitResult> UCGameplayAbility::GetHitResultFromSweepLocationTargetData(co
 			ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
 		}
 
-		EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
+		const EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
 
 		TArray<FHitResult> Results;
 		UKismetSystemLibrary::SphereTraceMultiForObjects(this, StartLoc, EndLoc, SphereSweepRadius, ObjectTypes, false, ActorsToIgnore, DrawDebugTrace, Results, false);
@@ -109,7 +109,7 @@ TArray<FHitResult> UCGameplayAbility::GetHitResultFromSweepLocationTargetData(co
 
 			if (OwnerTeamInterface)
 			{
-				ETeamAttitude::Type OtherActorTeamAttitude = OwnerTeamInterface->GetTeamAttitudeTowards(*Result.GetActor());
+				const ETeamAttitude::Type OtherActorTeamAttitude = OwnerTeamInterface->GetTeamAttitudeTowards(*Result.GetActor());
 				if (OtherActorTeamAttitude != TargetTeam)
 				{
 					continue;
@@ -159,29 +159,29 @@ void UCGameplayAbility::PushTargets(const TArray<AActor*>& Targets, const FVecto
 
 void UCGameplayAbility::PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel)
 {
-	TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
+	const TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargets(Targets, PushVel);
 }
 
 void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed)
 {
-	AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
+	const AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
 	if (!OwnerAvatarActor)
 		return;
 
-	FVector OwnerAvatarActorLocation = OwnerAvatarActor->GetActorLocation();
+	const FVector OwnerAvatarActorLocation = OwnerAvatarActor->GetActorLocation();
 	PushTargetsFromLocation(Targets, OwnerAvatarActorLocation, PushSpeed);
 }
 
 void UCGameplayAbility::PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed)
 {
-	TArray<AActor*> TargetActors = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
+	const TArray<AActor*> TargetActors = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargetsFromOwnerLocation(TargetActors, PushSpeed);
 }
 
 void UCGameplayAbility::PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed)
 {
-	TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
+	const TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargetsFromLocation(Targets, FromLocation, PushSpeed);
 }
 
@@ -211,14 +211,14 @@ void UCGameplayAbility::StopMontageAfterCurrentSection(UAnimMontage* MontageToSt
 	UAnimInstance* OwnerAnimInst = GetOwnerAnimInstance();
 	if (OwnerAnimInst)
 	{
-		FName CurrentSectionName = OwnerAnimInst->Montage_GetCurrentSection(MontageToStop);
+		const FName CurrentSectionName = OwnerAnimInst->Montage_GetCurrentSection(MontageToStop);
 		OwnerAnimInst->Montage_SetNextSection(CurrentSectionName, NAME_None, MontageToStop);
 	}
 }
 
 FGenericTeamId UCGameplayAbility::GetOwnerTeamId() const
 {
-	IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
+	const IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
 	if (OwnerTeamInterface)
 	{
 		return OwnerTeamInterface->GetGenericTeamId();
@@ -232,7 +232,7 @@ bool UCGameplayAbility::IsActorTeamAttitudeIs(const AActor* OtherActor, ETeamAtt
 	if (!OtherActor)
 		return false;
 
-	IGenericTeamAgentInterface* OwnerTeamAgentInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
+	const IGenericTeamAgentInterface* OwnerTeamAgentInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
 	if (OwnerTeamAgentInterface)
 	{
 		return OwnerTeamAgentInterface->GetTeamAttitudeTowards(*OtherActor) == TeamAttitude;
@@ -253,7 +253,7 @@ ACharacter* UCGameplayAbility::GetOwningAvatarCharacter()
 
 void UCGameplayAbility::ApplyGameplayEffectToHitResultActor(const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level)
 {
-	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffect, Level);
+	const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffect, Level);
 
 	FGameplayEffectContextHandle EffectContext = MakeEffectContext(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
 	EffectContext.AddHitResult(HitResult);

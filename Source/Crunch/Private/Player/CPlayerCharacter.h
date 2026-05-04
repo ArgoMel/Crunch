@@ -8,9 +8,13 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "CPlayerCharacter.generated.h"
 
-/**
- * 
- */
+class USpringArmComponent;
+class UCameraComponent;
+class UCHeroAttributeSet;
+class UInventoryComponent;
+class UInputAction;
+class UInputMappingContext;
+
 UCLASS()
 class ACPlayerCharacter : public ACCharacter
 {
@@ -18,59 +22,58 @@ class ACPlayerCharacter : public ACCharacter
 public:
 	ACPlayerCharacter();
 	virtual void PawnClientRestart() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	//pawn쪽 함수
 	virtual void GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const  override;
+	
 private:
-	UPROPERTY(VisibleDefaultsOnly, Category = "View")
-	class USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "View")
-	class UCameraComponent* ViewCam;
-
+	virtual void OnAimStateChanged(bool bIsAiming) override;
+	
+private:
 	FVector GetLookRightDir() const;
 	FVector GetLookFwdDir() const;
 	FVector GetMoveFwdDir() const;
-	/*************************************************************/
-	/*                       Gameplay Ability                    */
-	/*************************************************************/
-private:
-	virtual void OnAimStateChanged(bool bIsAimming) override;
-	UPROPERTY()
-	class UCHeroAttributeSet* HeroAttributeSet;
-
+	
 	/*************************************************************/
 	/*                           Input                           */
 	/*************************************************************/
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* JumpInputAction;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* LookInputAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* MoveInputAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* LearnAbilityLeaderAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* UseInventoryItemAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TMap<ECAbilityInputID, class UInputAction*> GameplayAbilityInputActions;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputMappingContext* GameplayInputMappingContext;
-
 	void HandleLookInput(const FInputActionValue& InputActionValue);
 	void HandleMoveInput(const FInputActionValue& InputActionValue);
-	void LearnAbiltiyLeaderDown(const FInputActionValue& InputActionValue);
-	void LearnAbiltiyLeaderUp(const FInputActionValue& InputActionValue);
+	void LearnAbilityLeaderDown(const FInputActionValue& InputActionValue);
+	void LearnAbilityLeaderUp(const FInputActionValue& InputActionValue);
 	void UseInventoryItem(const FInputActionValue& InputActionValue);
-	bool bIsLearnAbilityLeaderDown = false;
 	void HandleAbilityInput(const FInputActionValue& InputActionValue, ECAbilityInputID InputID);
 	void SetInputEnabledFromPlayerController(bool bEnabled);
+
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category = "View")
+	USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleDefaultsOnly, Category = "View")
+	UCameraComponent* ViewCam;
+	
+	bool bIsLearnAbilityLeaderDown = false;
+	
+	/*************************************************************/
+	/*                       Gameplay Ability                    */
+	/*************************************************************/
+	UPROPERTY()
+	UCHeroAttributeSet* HeroAttributeSet;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* JumpInputAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* LookInputAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* MoveInputAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* LearnAbilityLeaderAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* UseInventoryItemAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TMap<ECAbilityInputID, UInputAction*> GameplayAbilityInputActions;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputMappingContext* GameplayInputMappingContext;
+	
 	/*************************************************************/
 	/*                           Stun                            */
 	/*************************************************************/
@@ -83,16 +86,16 @@ private:
 	virtual void OnDead() override;
 	virtual void OnRespawn() override;
 	/*************************************************************/
-	/*                      Camer View                           */
+	/*                      Camera View                           */
 	/*************************************************************/
 private:
 	UPROPERTY(EditDefaultsOnly, Category = view)
 	FVector CameraAimLocalOffset;
 
 	UPROPERTY(EditDefaultsOnly, Category = view)
-	float CamerLerpSpeed = 20.f;
+	float CameraLerpSpeed = 20.f;
 	
-	FTimerHandle CamerLerpTimerHandle;
+	FTimerHandle CameraLerpTimerHandle;
 
 	void LerpCameraToLocalOffsetLocation(const FVector& Goal);
 	void TickCameraLocalOffsetLerp(FVector Goal);
@@ -102,5 +105,6 @@ private:
 	/*                      Inventory                            */
 	/*************************************************************/
 private:
-	class UInventoryComponent* InventoryComponent;
+	UPROPERTY()
+	UInventoryComponent* InventoryComponent;
 };

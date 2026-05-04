@@ -56,7 +56,7 @@ void ATargetActor_Around::ActorInDetectionRange(UPrimitiveComponent* OverlappedC
 	if (!OtherActor)
 		return;
 
-	AActor* AvatarActor = nullptr;
+	const AActor* AvatarActor = nullptr;
 	if (OwningAbility)
 	{
 		AvatarActor = OwningAbility->GetAvatarActorFromActorInfo();
