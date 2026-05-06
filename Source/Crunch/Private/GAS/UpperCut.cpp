@@ -44,13 +44,13 @@ FGameplayTag UUpperCut::GetUpperCutLaunchTag()
 	return FGameplayTag::RequestGameplayTag("ability.uppercut.launch");
 }
 
-const FGenericDamgeEffectDef* UUpperCut::GetDamageEffectDefForCurrentCombo() const
+const FGenericDamageEffectDef* UUpperCut::GetDamageEffectDefForCurrentCombo() const
 {
 	const UAnimInstance* OwnerAnimInstance = GetOwnerAnimInstance();
 	if (OwnerAnimInstance)
 	{
 		const FName CurrentComboName = OwnerAnimInstance->Montage_GetCurrentSection(UpperCutMontage);
-		const FGenericDamgeEffectDef* EffectDef = ComboDamageMap.Find(CurrentComboName);
+		const FGenericDamageEffectDef* EffectDef = ComboDamageMap.Find(CurrentComboName);
 		return EffectDef;
 	}
 
@@ -123,7 +123,7 @@ void UUpperCut::HandleComboDamageEvent(FGameplayEventData EventData)
 	if (K2_HasAuthority())
 	{
 		PushTarget(GetAvatarActorFromActorInfo(), FVector::UpVector * UpperComboHoldSpeed);
-		const FGenericDamgeEffectDef* EffectDef = GetDamageEffectDefForCurrentCombo();
+		const FGenericDamageEffectDef* EffectDef = GetDamageEffectDefForCurrentCombo();
 		if (!EffectDef)
 		{
 			return;

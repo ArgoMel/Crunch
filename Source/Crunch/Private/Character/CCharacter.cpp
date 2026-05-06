@@ -80,7 +80,6 @@ UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
 	return CAbilitySystemComponent;
 }
 
-
 FVector ACCharacter::GetCaptureLocalPosition() const
 {
 	return HeadshotCaptureLocalPosition;

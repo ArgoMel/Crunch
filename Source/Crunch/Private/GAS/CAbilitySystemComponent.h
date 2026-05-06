@@ -8,19 +8,20 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "CAbilitySystemComponent.generated.h"
 
-/**
- * 
- */
+class UPA_AbilitySystemGenerics;
+
 UCLASS()
 class UCAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 public:
 	UCAbilitySystemComponent();
+	
+public:
 	void InitializeBaseAttributes();
 	void ServerSideInit();
 	void ApplyFullStatEffect();
-	//Get the Abilities that is unique for the avatar actor, this do not include Generic/Basic ones
+	//Get the Abilities that is unique for the avatar actor, this does not include Generic/Basic ones
 	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const;
 	bool IsAtMaxLevel() const;
 
@@ -38,6 +39,7 @@ private:
 	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
 	void ExperienceUpdated(const FOnAttributeChangeData& ChangeData);
 
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Ability")
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> Abilities;
 
@@ -45,5 +47,5 @@ private:
 	TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>> BasicAbilities;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Ability")
-	class UPA_AbilitySystemGenerics* AbilitySystemGenerics;
+	UPA_AbilitySystemGenerics* AbilitySystemGenerics;
 };

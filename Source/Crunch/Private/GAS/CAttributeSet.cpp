@@ -1,9 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/CAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
+
+void UCAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Mana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, AttackDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveAcceleration, COND_None, REPNOTIFY_Always);
+}
 
 void UCAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
@@ -35,8 +48,9 @@ void UCAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackD
 void UCAttributeSet::RescaleHealth()
 {
 	if (!GetOwningActor()->HasAuthority())
+	{
 		return;
-
+	}
 	if (GetCachedHealthPercent() != 0 && GetHealth() != 0)
 	{
 		SetHealth(GetMaxHealth() * GetCachedHealthPercent());
@@ -46,63 +60,51 @@ void UCAttributeSet::RescaleHealth()
 void UCAttributeSet::RescaleMana()
 {
 	if (!GetOwningActor()->HasAuthority())
+	{
 		return;
-
+	}
 	if (GetCachedManaPercent() != 0 && GetMana() != 0)
 	{
 		SetMana(GetMaxMana() * GetCachedManaPercent());
 	}
 }
 
-void UCAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, Health, OldValue);
 }
 
-void UCAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, MaxHealth, OldValue);
 }
-void UCAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue)
+
+void UCAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, Mana, OldValue);
 }
 
-void UCAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, MaxMana, OldValue);
 }
 
-void UCAttributeSet::OnRep_AttackDamage(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_AttackDamage(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, AttackDamage, OldValue);
 }
 
-void UCAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, Armor, OldValue);
 }
 
-void UCAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, MoveSpeed, OldValue);
 }
 
-void UCAttributeSet::OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue)
+void UCAttributeSet::OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCAttributeSet, MoveAcceleration, OldValue);
-}
-
-void UCAttributeSet::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Mana, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
-
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, AttackDamage, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, Armor, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCAttributeSet, MoveAcceleration, COND_None, REPNOTIFY_Always);
 }

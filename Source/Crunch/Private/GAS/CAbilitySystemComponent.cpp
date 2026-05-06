@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/CAbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
@@ -21,7 +20,9 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 
 void UCAbilitySystemComponent::InitializeBaseAttributes()
 {
-	if (!AbilitySystemGenerics || ! AbilitySystemGenerics->GetBaseStatDataTable() || !GetOwner())
+	if (!AbilitySystemGenerics 
+		|| ! AbilitySystemGenerics->GetBaseStatDataTable() 
+		|| !GetOwner())
 	{
 		return;
 	}
@@ -76,12 +77,15 @@ void UCAbilitySystemComponent::ServerSideInit()
 
 void UCAbilitySystemComponent::ApplyInitialEffects()
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority())
+	if (!GetOwner() 
+		|| !GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	if (!AbilitySystemGenerics)
+	{
 		return;
-
+	}
 	for (const TSubclassOf<UGameplayEffect>& EffectClass : AbilitySystemGenerics->GetInitialEffects())
 	{
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(EffectClass, 1, MakeEffectContext());
@@ -91,9 +95,11 @@ void UCAbilitySystemComponent::ApplyInitialEffects()
 
 void UCAbilitySystemComponent::GiveInitialAbilities()
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority())
+	if (!GetOwner() 
+		|| !GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	for (const TPair<ECAbilityInputID,TSubclassOf<UGameplayAbility>>& AbilityPair : Abilities)
 	{
 		GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 0, static_cast<int32>(AbilityPair.Key), nullptr));
@@ -252,15 +258,19 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 
 void UCAbilitySystemComponent::ExperienceUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority())
+	if (!GetOwner() 
+		|| !GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	if (IsAtMaxLevel())
+	{
 		return;
-
+	}
 	if (!AbilitySystemGenerics)
+	{
 		return;
-
+	}
 	const float CurrentExp = ChangeData.NewValue;
 
 	const FRealCurve* ExperienceCurve = AbilitySystemGenerics->GetExperienceCurve();

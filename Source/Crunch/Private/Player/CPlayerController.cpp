@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/CPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -90,8 +89,9 @@ void ACPlayerController::Client_MatchFinished_Implementation(AActor* ViewTarget,
 void ACPlayerController::SpawnGameplayWidget()
 {
 	if (!IsLocalPlayerController())
+	{
 		return;
-
+	}
 	GameplayWidget = CreateWidget<UGameplayWidget>(this, GameplayWidgetClass);
 	if (GameplayWidget)
 	{
@@ -100,6 +100,7 @@ void ACPlayerController::SpawnGameplayWidget()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ACPlayerController::ToggleShop()
 {
 	if(GameplayWidget)

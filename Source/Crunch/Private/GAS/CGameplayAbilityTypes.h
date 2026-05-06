@@ -23,12 +23,12 @@ enum class ECAbilityInputID : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FGenericDamgeEffectDef
+struct FGenericDamageEffectDef
 {
 	GENERATED_BODY()
 
 public:
-	FGenericDamgeEffectDef();
+	FGenericDamageEffectDef();
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> DamageEffect;

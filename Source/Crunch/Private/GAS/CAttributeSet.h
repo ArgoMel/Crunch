@@ -12,9 +12,7 @@
  	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
  	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
  	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
-/**
- * 
- */
+
 UCLASS()
 class UCAttributeSet : public UAttributeSet
 {
@@ -40,7 +38,7 @@ public:
 	/**
 	 *	Called just before any modification happens to an attribute. This is lower level than PreAttributeModify/PostAttribute modify.
 	 *	There is no additional context provided here since anything can trigger this. Executed effects, duration based effects, effects being removed, immunity being applied, stacking rules changing, etc.
-	 *	This function is meant to enforce things like "Health = Clamp(Health, 0, MaxHealth)" and NOT things like "trigger this extra thing if damage is applied, etc".
+	 *	This function is meant to enforce things like "Health = Clamp(Health, 0, MaxHealth)" and NOT things like "trigger this extra thing if damage is applied, etc."
 	 *	
 	 *	NewValue is a mutable reference so you are able to clamp the newly applied value as well.
 	 */
@@ -48,10 +46,11 @@ public:
 	
 	/**
 	 *	Called just after a GameplayEffect is executed to modify the base value of an attribute. No more changes can be made.
-	 *	Note this is only called during an 'execute'. E.g., a modification to the 'base value' of an attribute. It is not called during an application of a GameplayEffect, such as a 5 ssecond +10 movement speed buff.
+	 *	Note this is only called during an 'execute'. E.g., a modification to the 'base value' of an attribute. It is not called during an application of a GameplayEffect, such as a 5 second +10 movement speed buff.
 	 */
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+public:
 	void RescaleHealth();
 	void RescaleMana();
 
@@ -87,26 +86,26 @@ private:
 	FGameplayAttributeData CachedManaPercent;
 
 	UFUNCTION()
-	void OnRep_Health(const FGameplayAttributeData& OldValue);
+	void OnRep_Health(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
+	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Mana(const FGameplayAttributeData& OldValue);
+	void OnRep_Mana(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MaxMana(const FGameplayAttributeData& OldValue);
+	void OnRep_MaxMana(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_AttackDamage(const FGameplayAttributeData& OldValue);
+	void OnRep_AttackDamage(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Armor(const FGameplayAttributeData& OldValue);
+	void OnRep_Armor(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+	void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue);
+	void OnRep_MoveAcceleration(const FGameplayAttributeData& OldValue) const;
 };

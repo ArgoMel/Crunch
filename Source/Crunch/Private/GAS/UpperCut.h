@@ -20,7 +20,7 @@ public:
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	TMap<FName, FGenericDamgeEffectDef> ComboDamageMap;
+	TMap<FName, FGenericDamageEffectDef> ComboDamageMap;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Launch")
 	TSubclassOf<UGameplayEffect> LaunchDamageEffect;
@@ -36,7 +36,7 @@ private:
 
 	static FGameplayTag GetUpperCutLaunchTag();
 
-	const FGenericDamgeEffectDef* GetDamageEffectDefForCurrentCombo() const;
+	const FGenericDamageEffectDef* GetDamageEffectDefForCurrentCombo() const;
 
 	UFUNCTION()
 	void StartLaunching(FGameplayEventData EventData);

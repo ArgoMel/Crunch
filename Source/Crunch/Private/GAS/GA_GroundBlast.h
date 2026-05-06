@@ -25,7 +25,7 @@ private:
 	float TargetAreaRadius = 300.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	FGenericDamgeEffectDef DamageEffectDef;
+	FGenericDamageEffectDef DamageEffectDef;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetTraceRange = 2000.f;
