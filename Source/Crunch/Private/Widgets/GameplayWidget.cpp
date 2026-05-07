@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/GameplayWidget.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/WidgetSwitcher.h"
@@ -13,16 +12,16 @@
 #include "Widgets/ValueGauge.h"
 #include "GAS/CAttributeSet.h"
 
-void UGameplayWidget::NativeConstruct()
+void UGameplayWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 
-	if (OwnerAbilitySystemComponent)
+	if (OwnerAbilitySystemComponent.IsValid())
 	{
-		HealthBar->SetAndBoundToGameplayAttribute(OwnerAbilitySystemComponent, UCAttributeSet::GetHealthAttribute(), UCAttributeSet::GetMaxHealthAttribute());
-		ManaBar->SetAndBoundToGameplayAttribute(OwnerAbilitySystemComponent, UCAttributeSet::GetManaAttribute(), UCAttributeSet::GetMaxManaAttribute());
+		HealthBar->SetAndBoundToGameplayAttribute(OwnerAbilitySystemComponent.Get(), UCAttributeSet::GetHealthAttribute(), UCAttributeSet::GetMaxHealthAttribute());
+		ManaBar->SetAndBoundToGameplayAttribute(OwnerAbilitySystemComponent.Get(), UCAttributeSet::GetManaAttribute(), UCAttributeSet::GetMaxManaAttribute());
 	}
 
 	SetShowMouseCursor(false);
@@ -33,7 +32,7 @@ void UGameplayWidget::NativeConstruct()
 	}
 }
 
-void UGameplayWidget::ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<class UGameplayAbility>>& Abilities)
+void UGameplayWidget::ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<class UGameplayAbility>>& Abilities) const
 {
 	AbilityListView->ConfigureAbilities(Abilities);
 }
@@ -82,7 +81,7 @@ void UGameplayWidget::ShowGameplayMenu()
 	SetFocusToGameAndUI();
 }
 
-void UGameplayWidget::SetGameplayMenuTitle(const FString& NewTitle)
+void UGameplayWidget::SetGameplayMenuTitle(const FString& NewTitle) const
 {
 	GameplayMenu->SetTitleText(NewTitle);
 }
@@ -99,7 +98,7 @@ void UGameplayWidget::PlayShopPopupAnimation(bool bPlayForward)
 	}
 }
 
-void UGameplayWidget::SetOwningPawnInputEnabled(bool bPawnInputEnabled)
+void UGameplayWidget::SetOwningPawnInputEnabled(bool bPawnInputEnabled) const
 {
 	if (bPawnInputEnabled)
 	{
@@ -111,12 +110,12 @@ void UGameplayWidget::SetOwningPawnInputEnabled(bool bPawnInputEnabled)
 	}
 }
 
-void UGameplayWidget::SetShowMouseCursor(bool bShowMouseCursor)
+void UGameplayWidget::SetShowMouseCursor(bool bShowMouseCursor) const
 {
 	GetOwningPlayer()->SetShowMouseCursor(bShowMouseCursor);
 }
 
-void UGameplayWidget::SetFocusToGameAndUI()
+void UGameplayWidget::SetFocusToGameAndUI() const
 {
 	FInputModeGameAndUI GameAndUIInputMode;
 	GameAndUIInputMode.SetHideCursorDuringCapture(false);
@@ -124,8 +123,8 @@ void UGameplayWidget::SetFocusToGameAndUI()
 	GetOwningPlayer()->SetInputMode(GameAndUIInputMode);
 }
 
-void UGameplayWidget::SetFocusToGameOnly()
+void UGameplayWidget::SetFocusToGameOnly() const
 {
 	const FInputModeGameOnly GameOnlyInputMode;
-	GetOwningPlayer() ->SetInputMode(GameOnlyInputMode);
+	GetOwningPlayer()->SetInputMode(GameOnlyInputMode);
 }

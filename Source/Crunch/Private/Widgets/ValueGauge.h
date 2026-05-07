@@ -8,23 +8,25 @@
 #include "GameplayEffectTypes.h"
 #include "ValueGauge.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UProgressBar;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UValueGauge : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
+protected:
 	virtual void NativePreConstruct() override;
+	
+public:
 	void SetAndBoundToGameplayAttribute(class UAbilitySystemComponent* AbilitySystemComponent, const FGameplayAttribute& Attribute, const FGameplayAttribute& MaxAttribute);
 	void SetValue(float NewValue, float NewMaxValue);
 
 private:
 	void ValueChanged(const FOnAttributeChangeData& ChangedData);
 	void MaxValueChanged(const FOnAttributeChangeData& ChangedData);
-
+	
+private:
 	float CachedValue;
 	float CachedMaxValue;
 
@@ -41,8 +43,8 @@ private:
 	bool bProgressBarVisible = true;
 
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
-	class UProgressBar* ProgressBar;
+	UProgressBar* ProgressBar;
 
 	UPROPERTY(VisibleAnywhere, meta=(BindWidget))
-	class UTextBlock* ValueText;
+	UTextBlock* ValueText;
 };

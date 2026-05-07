@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/ValueGauge.h"
 #include "Components/ProgressBar.h"
 #include "AbilitySystemComponent.h"
@@ -9,12 +8,17 @@
 void UValueGauge::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	ProgressBar->SetFillColorAndOpacity(BarColor);
+	if(ProgressBar)
+	{
+		ProgressBar->SetFillColorAndOpacity(BarColor);
+		ProgressBar->SetVisibility(bProgressBarVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	}
 
-	ValueText->SetFont(ValueTextFont);
-
-	ValueText->SetVisibility(bValueTextVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-	ProgressBar->SetVisibility(bProgressBarVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if(ValueText)
+	{
+		ValueText->SetFont(ValueTextFont);
+		ValueText->SetVisibility(bValueTextVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	}
 }
 
 void UValueGauge::SetAndBoundToGameplayAttribute(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayAttribute& Attribute, const FGameplayAttribute& MaxAttribute)
@@ -41,7 +45,7 @@ void UValueGauge::SetValue(float NewValue, float NewMaxValue)
 
 	if (NewMaxValue == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Value Guage: %s, NewMaxValue can't be 0"), *GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Value Gauge: %s, NewMaxValue can't be 0"), *GetName());
 		return;
 	}
 

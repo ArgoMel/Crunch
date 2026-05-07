@@ -7,9 +7,6 @@
 #include "GenericTeamAgentInterface.h"
 #include "CGameplayAbility.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UCGameplayAbility : public UGameplayAbility
 {
@@ -17,9 +14,10 @@ class UCGameplayAbility : public UGameplayAbility
 public:
 	UCGameplayAbility();
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+	
 protected:
 	AActor* GetAimTarget(float AimDistance, ETeamAttitude::Type TeamAttitude) const;
-	class UAnimInstance* GetOwnerAnimInstance() const;
+	UAnimInstance* GetOwnerAnimInstance() const;
 	TArray<FHitResult> GetHitResultFromSweepLocationTargetData(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float SphereSweepRadius = 30.f, ETeamAttitude::Type TargetTeam = ETeamAttitude::Hostile, bool bDrawDebug = false, bool bIgnoreSelf = true) const;
 	UFUNCTION()
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
@@ -40,10 +38,11 @@ protected:
 	ACharacter* GetOwningAvatarCharacter();
 	void ApplyGameplayEffectToHitResultActor(const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level = 1);
 	void SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Debug")
 	bool bShouldDrawDebug = false;
 
 	UPROPERTY()
-	class ACharacter* AvatarCharacter;
+	TWeakObjectPtr<ACharacter> AvatarCharacter;
 };

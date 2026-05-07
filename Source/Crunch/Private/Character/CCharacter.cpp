@@ -19,7 +19,7 @@
 ACCharacter::ACCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
@@ -121,7 +121,7 @@ bool ACCharacter::Server_SendGameplayEventToSelf_Validate(const FGameplayTag& Ev
 	return true;
 }
 
-void ACCharacter::UpgradeAbilityWithInputID(ECAbilityInputID InputID)
+void ACCharacter::UpgradeAbilityWithInputID(ECAbilityInputID InputID) const
 {
 	if (CAbilitySystemComponent)
 	{
@@ -195,17 +195,17 @@ void ACCharacter::OnAimStateChanged(bool bIsAiming)
 	//Override in child class
 }
 
-void ACCharacter::MoveSpeedUpdated(const FOnAttributeChangeData& Data)
+void ACCharacter::MoveSpeedUpdated(const FOnAttributeChangeData& Data) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
 }
 
-void ACCharacter::MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data)
+void ACCharacter::MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data) const
 {
 	GetCharacterMovement()->MaxAcceleration = Data.NewValue;
 }
 
-void ACCharacter::MaxHealthUpdated(const FOnAttributeChangeData& Data)
+void ACCharacter::MaxHealthUpdated(const FOnAttributeChangeData& Data) const
 {
 	if (IsValid(CAttributeSet))
 	{
@@ -213,7 +213,7 @@ void ACCharacter::MaxHealthUpdated(const FOnAttributeChangeData& Data)
 	}
 }
 
-void ACCharacter::MaxManaUpdated(const FOnAttributeChangeData& Data)
+void ACCharacter::MaxManaUpdated(const FOnAttributeChangeData& Data) const
 {
 	if (IsValid(CAttributeSet))
 	{
@@ -228,25 +228,23 @@ void ACCharacter::ConfigureOverHeadStatusWidget()
 		return;
 	}
 
-	IsPlayerControlled();
-
 	if (IsLocallyControlledByPlayer())
 	{
 		OverHeadWidgetComponent->SetHiddenInGame(true);
 		return;
 	}
 
-	UOverHeadStatsGauge* OverheadStatsGauge = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
+	const UOverHeadStatsGauge* OverheadStatsGauge = Cast<UOverHeadStatsGauge>(OverHeadWidgetComponent->GetUserWidgetObject());
 	if (OverheadStatsGauge)
 	{
 		OverheadStatsGauge->ConfigureWithASC(GetAbilitySystemComponent());
 		OverHeadWidgetComponent->SetHiddenInGame(false);
 		GetWorldTimerManager().ClearTimer(HeadStatGaugeVisibilityUpdateTimerHandle);
-		GetWorldTimerManager().SetTimer(HeadStatGaugeVisibilityUpdateTimerHandle, this, &ACCharacter::UpdateHeadGaugeVisibility, HeadStatGaugeVisibilityCheckUpdateGap, true);
+		GetWorldTimerManager().SetTimer(HeadStatGaugeVisibilityUpdateTimerHandle, this, &ThisClass::UpdateHeadGaugeVisibility, HeadStatGaugeVisibilityCheckUpdateGap, true);
 	}
 }
 
-void ACCharacter::UpdateHeadGaugeVisibility()
+void ACCharacter::UpdateHeadGaugeVisibility() const
 {
 	const APawn* LocalPlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if (LocalPlayerPawn)
@@ -285,13 +283,17 @@ bool ACCharacter::IsDead() const
 void ACCharacter::RespawnImmediately()
 {
 	if(HasAuthority())
+	{
 		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(UCAbilitySystemStatics::GetDeadStatTag()));
+	}
 }
 
 void ACCharacter::DeathMontageFinished()
 {
 	if(IsDead())
+	{
 		SetRagdollEnabled(true);
+	}
 }
 
 void ACCharacter::SetRagdollEnabled(bool bIsEnabled)

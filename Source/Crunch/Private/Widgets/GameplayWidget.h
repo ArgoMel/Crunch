@@ -2,91 +2,102 @@
 
 #pragma once
 
+class UValueGauge;
+class UAbilityListView;
+class UStatsGauge;
+class UShopWidget;
+class UInventoryWidget;
+class USkeletalMeshRenderWidget;
+class UMatchStatWidget;
+class UGameplayMenu;
+class UWidgetSwitcher;
+class UCanvasPanel;
+class UCrosshairWidget;
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "GAS/CGameplayAbilityTypes.h"
 #include "GameplayWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UGameplayWidget : public UUserWidget
 {
 	GENERATED_BODY()
+protected:
+	virtual void NativeOnInitialized() override;
+	
 public:
-	virtual void NativeConstruct() override;
-	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<class UGameplayAbility>>& Abilities);
+	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& Abilities) const;
 	void ToggleShop();
 
 	UFUNCTION()
 	void ToggleGameplayMenu();
 
 	void ShowGameplayMenu();
-	void SetGameplayMenuTitle(const FString& NewTitle);
+	void SetGameplayMenuTitle(const FString& NewTitle) const;
+	
+private:
+	void PlayShopPopupAnimation(bool bPlayForward);
+	void SetOwningPawnInputEnabled(bool bPawnInputEnabled) const;
+	void SetShowMouseCursor(bool bShowMouseCursor) const;
+	void SetFocusToGameAndUI() const;
+	void SetFocusToGameOnly() const;
 
 private:
 	UPROPERTY(meta=(BindWidget))
-	class UValueGauge* HealthBar;
+	UValueGauge* HealthBar;
 
 	UPROPERTY(meta=(BindWidget))
-	class UValueGauge* ManaBar;
+	UValueGauge* ManaBar;
 
 	UPROPERTY(meta=(BindWidget))
-	class UAbilityListView* AbilityListView;
+	UAbilityListView* AbilityListView;
 
 	UPROPERTY(meta=(BindWidget))
-	class UStatsGauge* AttackDamageGauge;
+	UStatsGauge* AttackDamageGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UStatsGauge* ArmorGauge;
+	UStatsGauge* ArmorGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UStatsGauge* MoveSpeedGauge;
+	UStatsGauge* MoveSpeedGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UStatsGauge* IntenlligenceGauge;
+	UStatsGauge* IntelligenceGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UStatsGauge* StrengthGauge;
+	UStatsGauge* StrengthGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UShopWidget* ShopWidget;
+	UShopWidget* ShopWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	class UInventoryWidget* InventoryWidget;
+	UInventoryWidget* InventoryWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	class USkeletalMeshRenderWidget* HeadshotWidget;
+	USkeletalMeshRenderWidget* HeadshotWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	class UMatchStatWidget* MatchStatWidget;
+	UMatchStatWidget* MatchStatWidget;
 
 	UPROPERTY(meta=(BindWidget))
-	class UGameplayMenu* GameplayMenu;
+	UGameplayMenu* GameplayMenu;
 
 	UPROPERTY(meta=(BindWidget))
-	class UWidgetSwitcher* MainSwitcher;
+	UWidgetSwitcher* MainSwitcher;
 
 	UPROPERTY(meta=(BindWidget))
-	class UCanvasPanel* GameplayWidgetRootPanel;
+	UCanvasPanel* GameplayWidgetRootPanel;
 
 	UPROPERTY(meta=(BindWidget))
-	class UCanvasPanel* GameplayMenuRootPanel;
+	UCanvasPanel* GameplayMenuRootPanel;
 
 	UPROPERTY(meta=(BindWidget))
-	class UCrosshairWidget* CrosshairWidget;
+	UCrosshairWidget* CrosshairWidget;
 
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
-	class UWidgetAnimation* ShopPopupAnimation;
-
-
-	void PlayShopPopupAnimation(bool bPlayForward);
-	void SetOwningPawnInputEnabled(bool bPawnInputEnabled);
-	void SetShowMouseCursor(bool bShowMouseCursor);
-	void SetFocusToGameAndUI();
-	void SetFocusToGameOnly();
+	UWidgetAnimation* ShopPopupAnimation;
 
 	UPROPERTY()
-	class UAbilitySystemComponent* OwnerAbilitySystemComponent;
+	TWeakObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
 };

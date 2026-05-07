@@ -111,8 +111,9 @@ void UCAbilitySystemComponent::GiveInitialAbilities()
 	}
 
 	if (!AbilitySystemGenerics)
+	{
 		return;
-
+	}
 	for (const TSubclassOf<UGameplayAbility>& PassiveAbility : AbilitySystemGenerics->GetPassiveAbilities())
 	{
 		GiveAbility(FGameplayAbilitySpec(PassiveAbility, 1, -1, nullptr));

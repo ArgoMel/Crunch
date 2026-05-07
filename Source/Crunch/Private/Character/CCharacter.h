@@ -57,7 +57,7 @@ public:
 	void Server_SendGameplayEventToSelf(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
 	FORCEINLINE bool GetIsInFocusMode() const { return bIsInFocusMode; }
 protected:
-	void UpgradeAbilityWithInputID(ECAbilityInputID InputID);
+	void UpgradeAbilityWithInputID(ECAbilityInputID InputID) const;
 private:
 	void BindGASChangeDelegates();
 	void DeathTagUpdated(const FGameplayTag Tag, int32 NewCount);
@@ -69,10 +69,10 @@ private:
 
 	void SetIsAiming(bool bIsAiming);
 	virtual void OnAimStateChanged(bool bIsAiming);
-	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
-	void MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data);
-	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
-	void MaxManaUpdated(const FOnAttributeChangeData& Data);
+	void MoveSpeedUpdated(const FOnAttributeChangeData& Data) const;
+	void MoveSpeedAccelerationUpdated(const FOnAttributeChangeData& Data) const;
+	void MaxHealthUpdated(const FOnAttributeChangeData& Data) const;
+	void MaxManaUpdated(const FOnAttributeChangeData& Data) const;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
 	class UCAbilitySystemComponent* CAbilitySystemComponent;
@@ -95,7 +95,7 @@ private:
 	
 	FTimerHandle HeadStatGaugeVisibilityUpdateTimerHandle;
 
-	void UpdateHeadGaugeVisibility();
+	void UpdateHeadGaugeVisibility() const;
 	void SetStatusGaugeEnabled(bool bIsEnabled);
 	/**********************************************************************/
 	/*                             Stun                                   */

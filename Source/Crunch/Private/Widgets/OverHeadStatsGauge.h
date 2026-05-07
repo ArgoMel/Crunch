@@ -6,19 +6,20 @@
 #include "Blueprint/UserWidget.h"
 #include "OverHeadStatsGauge.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UAbilitySystemComponent;
+class UValueGauge;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UOverHeadStatsGauge : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void ConfigureWithASC(class UAbilitySystemComponent* AbilitySystemComponent);
+	void ConfigureWithASC(UAbilitySystemComponent* AbilitySystemComponent) const;
+	
 private:
 	UPROPERTY(meta=(BindWidget))
-	class UValueGauge* HealthBar;
+	UValueGauge* HealthBar;
 
 	UPROPERTY(meta=(BindWidget))
-	class UValueGauge* ManaBar;
+	UValueGauge* ManaBar;
 };
