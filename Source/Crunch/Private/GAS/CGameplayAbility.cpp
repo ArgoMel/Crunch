@@ -73,56 +73,6 @@ UAnimInstance* UCGameplayAbility::GetOwnerAnimInstance() const
 	return nullptr;
 }
 
-TArray<FHitResult> UCGameplayAbility::GetHitResultFromSweepLocationTargetData(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float SphereSweepRadius, ETeamAttitude::Type TargetTeam, bool bDrawDebug, bool bIgnoreSelf) const
-{
-	TArray<FHitResult> OutResults;
-	TSet<AActor*> HitActors;
-
-	const IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
-
-	for (const TSharedPtr<FGameplayAbilityTargetData>& TargetData : TargetDataHandle.Data)
-	{
-		const FVector StartLoc = TargetData->GetOrigin().GetTranslation();
-		const FVector EndLoc = TargetData->GetEndPoint();
-
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-		TArray<AActor*> ActorsToIgnore;
-		if (bIgnoreSelf)
-		{
-			ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
-		}
-
-		const EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
-
-		TArray<FHitResult> Results;
-		UKismetSystemLibrary::SphereTraceMultiForObjects(this, StartLoc, EndLoc, SphereSweepRadius, ObjectTypes, false, ActorsToIgnore, DrawDebugTrace, Results, false);
-	
-		for (const FHitResult& Result : Results)
-		{
-			if (HitActors.Contains(Result.GetActor()))
-			{
-				continue;
-			}
-
-			if (OwnerTeamInterface)
-			{
-				const ETeamAttitude::Type OtherActorTeamAttitude = OwnerTeamInterface->GetTeamAttitudeTowards(*Result.GetActor());
-				if (OtherActorTeamAttitude != TargetTeam)
-				{
-					continue;
-				}
-			}
-
-			HitActors.Add(Result.GetActor());
-			OutResults.Add(Result);
-		}
-	}
-	
-	return OutResults;
-}
-
 void UCGameplayAbility::PushSelf(const FVector& PushVel)
 {
 	ACharacter* OwningAvatarCharacter = GetOwningAvatarCharacter();
@@ -250,7 +200,7 @@ ACharacter* UCGameplayAbility::GetOwningAvatarCharacter()
 	return AvatarCharacter.Get();
 }
 
-void UCGameplayAbility::ApplyGameplayEffectToHitResultActor(const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level)
+void UCGameplayAbility::ApplyGameplayEffectToHitResultActor(const FHitResult& HitResult, TSubclassOf<UGameplayEffect> GameplayEffect, int Level) const
 {
 	const FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffect, Level);
 
@@ -259,10 +209,10 @@ void UCGameplayAbility::ApplyGameplayEffectToHitResultActor(const FHitResult& Hi
 
 	EffectSpecHandle.Data->SetContext(EffectContext);
 
-	ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor()));
+	ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), EffectSpecHandle, UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(HitResult.GetActor()));
 }
 
-void UCGameplayAbility::SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData)
+void UCGameplayAbility::SendLocalGameplayEvent(const FGameplayTag& EventTag, const FGameplayEventData& EventData) const
 {
 	UAbilitySystemComponent* OwnerASC = GetAbilitySystemComponentFromActorInfo();
 	if (OwnerASC)

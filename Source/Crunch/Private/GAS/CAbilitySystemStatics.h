@@ -11,9 +11,6 @@ class UGameplayAbility;
 struct FGameplayAbilitySpec;
 class UAbilitySystemComponent;
 
-/**
- * 
- */
 UCLASS()
 class UCAbilitySystemStatics : public UBlueprintFunctionLibrary
 {

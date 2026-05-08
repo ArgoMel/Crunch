@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Animations/AN_SendTargetGroup.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
@@ -8,24 +7,40 @@
 #include "GameplayCueManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameplayEffectTypes.h"
+#include "GameplayTagsManager.h"
+
+FString UAN_SendTargetGroup::GetNotifyName_Implementation() const
+{
+	if (EventTag.IsValid())
+	{
+		TArray<FName> TagNames;
+		UGameplayTagsManager::Get().SplitGameplayTagFName(EventTag, TagNames);
+		return TagNames.Last().ToString();
+	}
+
+	return "SendTargetGroup";
+}
 
 void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
 	if (!MeshComp)
+	{
 		return;
-
+	}
 	if (TargetSocketNames.Num() <= 1)
+	{
 		return;
-
-	if (!MeshComp->GetOwner() || !UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(MeshComp->GetOwner()))
+	}
+	if (!MeshComp->GetOwner() 
+		|| !UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(MeshComp->GetOwner()))
 	{
 		return;
 	}
 
 	FGameplayEventData Data;
-	const TSet<AActor*> HitActors;
+	TSet<AActor*> HitActors;
 	AActor* OwnerActor = MeshComp->GetOwner();
 	const IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(OwnerActor);
 
@@ -46,9 +61,7 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 		const EDrawDebugTrace::Type DrawDebugTrace = bDrawDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
 
-		UKismetSystemLibrary::SphereTraceMultiForObjects(MeshComp, StartLoc, EndLoc, SphereSweepRadius, 
-			ObjectTypes, false, ActorsToIgnore, DrawDebugTrace, HitResults, false);
-
+		UKismetSystemLibrary::SphereTraceMultiForObjects(MeshComp, StartLoc, EndLoc, SphereSweepRadius, ObjectTypes, false, ActorsToIgnore, DrawDebugTrace, HitResults, false);
 		
 		for (const FHitResult& HitResult : HitResults)
 		{
@@ -65,6 +78,7 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 				}
 			}
 
+			HitActors.Add(HitResult.GetActor());
 			FGameplayAbilityTargetData_SingleTargetHit* TargetHit = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
 			Data.TargetData.Add(TargetHit);
 			SendLocalGameplayCue(HitResult);

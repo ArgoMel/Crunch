@@ -41,7 +41,7 @@ void UGA_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayComboMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, ComboMontage);
-		PlayComboMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		//PlayComboMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayComboMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
@@ -52,7 +52,7 @@ void UGA_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		WaitComboChangeEventTask->ReadyForActivation();
 	}
 
-	if (K2_HasAuthority())
+	if (HasAuthority(&ActivationInfo))
 	{
 		UAbilityTask_WaitGameplayEvent* WaitTargetingEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, GetComboTargetEventTag());
 		WaitTargetingEventTask->EventReceived.AddDynamic(this, &ThisClass::DoDamage);
@@ -76,7 +76,7 @@ void UGA_Combo::HandleInputPress(float TimeWaited)
 	TryCommitCombo();
 }
 
-void UGA_Combo::TryCommitCombo()
+void UGA_Combo::TryCommitCombo() const
 {
 	if (NextComboName == NAME_None)
 	{
@@ -124,6 +124,7 @@ void UGA_Combo::ComboChangedEventReceived(FGameplayEventData Data)
 	NextComboName = TagNames.Last();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UGA_Combo::DoDamage(FGameplayEventData Data)
 {
 	const int HitResultCount = UAbilitySystemBlueprintLibrary::GetDataCountFromTargetData(Data.TargetData);

@@ -25,7 +25,7 @@ private:
 	UFUNCTION()
 	void HandleInputPress(float TimeWaited);
 
-	void TryCommitCombo();
+	void TryCommitCombo() const;
 	TSubclassOf<UGameplayEffect> GetDamageEffectForCurrentCombo() const;
 
 	UFUNCTION()
