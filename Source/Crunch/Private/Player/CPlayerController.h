@@ -19,19 +19,22 @@ class ACPlayerController : public APlayerController, public IGenericTeamAgentInt
 public:
 	// only called on the client, also on the listening server.
 	virtual void AcknowledgePossession(APawn* NewPawn) override;
-	/** Assigns Team Agent to given TeamID */
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-	/** Retrieve team identifier in form of FGenericTeamId */
-	virtual FGenericTeamId GetGenericTeamId() const override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
 
-	void MatchFinished(AActor* ViewTarget, int WiningTeam);
-	
 protected:
 	// only called on the server
 	virtual void OnPossess(APawn* NewPawn) override;
 	virtual void SetupInputComponent() override;
-
+	
+public:
+	/** Assigns Team Agent to given TeamID */
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	/** Retrieve team identifier in form of FGenericTeamId */
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	
+public:
+	void MatchFinished(AActor* ViewTarget, int WiningTeam);
+	
 private:
 	UFUNCTION(Client, Reliable)
 	void Client_MatchFinished(AActor* ViewTarget, int WiningTeam);

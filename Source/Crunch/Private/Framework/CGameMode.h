@@ -27,7 +27,7 @@ private:
 	
 	AStormCore* GetStormCore() const;
 
-	void MatchFinished(AActor* ViewTarget, int WiningTeam);
+	void MatchFinished(AActor* ViewTarget, int WiningTeam) const;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Team")

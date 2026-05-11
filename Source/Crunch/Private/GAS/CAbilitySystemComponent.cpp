@@ -123,7 +123,9 @@ void UCAbilitySystemComponent::GiveInitialAbilities()
 void UCAbilitySystemComponent::ApplyFullStatEffect()
 {
 	if (!AbilitySystemGenerics)
+	{
 		return;
+	}
 	AuthApplyGameplayEffect(AbilitySystemGenerics->GetFullStatEffect());
 }
 
@@ -185,8 +187,10 @@ void UCAbilitySystemComponent::AuthApplyGameplayEffect(TSubclassOf<UGameplayEffe
 
 void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
-
+	if (!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		return;
+	}
 	bool bFound = false;
 	const float MaxHealth = GetGameplayAttributeValue(UCAttributeSet::GetMaxHealthAttribute(), bFound);
 	if (bFound && ChangeData.NewValue >= MaxHealth)
@@ -207,15 +211,16 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 		if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag()))
 		{
 			AddLooseGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag());
-
 			
 			if(AbilitySystemGenerics && AbilitySystemGenerics->GetDeathEffect())
+			{
 				AuthApplyGameplayEffect(AbilitySystemGenerics->GetDeathEffect());
-
+			}
 			FGameplayEventData DeadAbilityEventData;
 			if(ChangeData.GEModData)
+			{
 				DeadAbilityEventData.ContextHandle = ChangeData.GEModData->EffectSpec.GetContext();
-
+			}
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), UCAbilitySystemStatics::GetDeadStatTag(), DeadAbilityEventData);
 		}
 	}
@@ -227,8 +232,10 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 
 void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeData)
 {
-	if (!GetOwner() || !GetOwner()->HasAuthority()) return;
-
+	if (!GetOwner() || !GetOwner()->HasAuthority())
+	{
+		return;
+	}
 	bool bFound = false;
 	const float MaxMana = GetGameplayAttributeValue(UCAttributeSet::GetMaxManaAttribute(), bFound);
 	if (bFound && ChangeData.NewValue >= MaxMana)

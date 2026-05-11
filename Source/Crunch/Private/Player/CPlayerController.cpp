@@ -18,29 +18,10 @@ void ACPlayerController::AcknowledgePossession(APawn* NewPawn)
 	}
 }
 
-void ACPlayerController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamID = NewTeamID;
-}
-
-FGenericTeamId ACPlayerController::GetGenericTeamId() const
-{
-	return TeamID;
-}
-
 void ACPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ACPlayerController, TeamID);
-}
-
-void ACPlayerController::MatchFinished(AActor* ViewTarget, int WiningTeam)
-{
-	if (!HasAuthority())
-		return;
-
-	CPlayerCharacter->DisableInput(this);
-	Client_MatchFinished(ViewTarget, WiningTeam);
 }
 
 void ACPlayerController::OnPossess(APawn* NewPawn)
@@ -72,6 +53,26 @@ void ACPlayerController::SetupInputComponent()
 	}
 }
 
+void ACPlayerController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamID = NewTeamID;
+}
+
+FGenericTeamId ACPlayerController::GetGenericTeamId() const
+{
+	return TeamID;
+}
+
+void ACPlayerController::MatchFinished(AActor* ViewTarget, int WiningTeam)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+	CPlayerCharacter->DisableInput(this);
+	Client_MatchFinished(ViewTarget, WiningTeam);
+}
+
 void ACPlayerController::Client_MatchFinished_Implementation(AActor* ViewTarget, int WiningTeam)
 {
 	SetViewTargetWithBlend(ViewTarget, MatchFinishViewBlendTimeDuration);
@@ -83,7 +84,7 @@ void ACPlayerController::Client_MatchFinished_Implementation(AActor* ViewTarget,
 
 	GameplayWidget->SetGameplayMenuTitle(WinLoseMsg);
 	FTimerHandle ShowWinLoseStateTimerHandle;
-	GetWorldTimerManager().SetTimer(ShowWinLoseStateTimerHandle, this, &ACPlayerController::ShowWinLoseState, MatchFinishViewBlendTimeDuration);
+	GetWorldTimerManager().SetTimer(ShowWinLoseStateTimerHandle, this, &ThisClass::ShowWinLoseState, MatchFinishViewBlendTimeDuration);
 }
 
 void ACPlayerController::SpawnGameplayWidget()
@@ -109,6 +110,7 @@ void ACPlayerController::ToggleShop()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ACPlayerController::ToggleGameplayMenu()
 {
 	if (GameplayWidget)
@@ -117,6 +119,7 @@ void ACPlayerController::ToggleGameplayMenu()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ACPlayerController::ShowWinLoseState()
 {
 	if (GameplayWidget)

@@ -15,6 +15,7 @@
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
 #include "Widgets/OverHeadStatsGauge.h"
+
 // Sets default values
 ACCharacter::ACCharacter()
 {
@@ -34,7 +35,11 @@ ACCharacter::ACCharacter()
 	CAttributeSet = CreateDefaultSubobject<UCAttributeSet>("CAttribute Set");
 
 	PerceptionStimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>("Perception Stimuli Source Component");
-	
+}
+
+void ACCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 	BindGASChangeDelegates();
 }
 
@@ -72,7 +77,7 @@ void ACCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ACCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ACCharacter, TeamID);
+	DOREPLIFETIME(ThisClass, TeamID);
 }
 
 UAbilitySystemComponent* ACCharacter::GetAbilitySystemComponent() const
@@ -280,7 +285,7 @@ bool ACCharacter::IsDead() const
 	return GetAbilitySystemComponent()->HasMatchingGameplayTag(UCAbilitySystemStatics::GetDeadStatTag());
 }
 
-void ACCharacter::RespawnImmediately()
+void ACCharacter::RespawnImmediately() const
 {
 	if(HasAuthority())
 	{
@@ -288,6 +293,7 @@ void ACCharacter::RespawnImmediately()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ACCharacter::DeathMontageFinished()
 {
 	if(IsDead())
@@ -296,7 +302,7 @@ void ACCharacter::DeathMontageFinished()
 	}
 }
 
-void ACCharacter::SetRagdollEnabled(bool bIsEnabled)
+void ACCharacter::SetRagdollEnabled(bool bIsEnabled) const
 {
 	if (bIsEnabled)
 	{
@@ -318,7 +324,7 @@ void ACCharacter::PlayDeathAnimation()
 	if (DeathMontage)
 	{
 		const float MontageDuration = PlayAnimMontage(DeathMontage);
-		GetWorldTimerManager().SetTimer(DeathMontageTimerHandle, this, &ACCharacter::DeathMontageFinished, MontageDuration + DeathMontageFinishTimeShift);
+		GetWorldTimerManager().SetTimer(DeathMontageTimerHandle, this, &ThisClass::DeathMontageFinished, MontageDuration + DeathMontageFinishTimeShift);
 	}
 }
 

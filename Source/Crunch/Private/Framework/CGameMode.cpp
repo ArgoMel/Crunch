@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Framework/CGameMode.h"
 #include "EngineUtils.h"
 #include "Framework/StormCore.h"
@@ -35,7 +34,7 @@ void ACGameMode::StartPlay()
 	AStormCore* StormCore = GetStormCore();
 	if (StormCore)
 	{
-		StormCore->OnGoalReachedDelegate.AddUObject(this, &ACGameMode::MatchFinished);
+		StormCore->OnGoalReachedDelegate.AddUObject(this, &ThisClass::MatchFinished);
 	}
 }
 
@@ -50,6 +49,7 @@ UClass* ACGameMode::GetDefaultPawnClassForController_Implementation(AController*
 	return BackupPawn;
 }
 
+// ReSharper disable once CppParameterValueIsReassigned
 APawn* ACGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
 {
 	IGenericTeamAgentInterface* NewPlayerTeamInterface = Cast<IGenericTeamAgentInterface>(NewPlayer);
@@ -106,7 +106,7 @@ AStormCore* ACGameMode::GetStormCore() const
 	const UWorld* World = GetWorld();
 	if (World)
 	{
-		for (TActorIterator<AStormCore> It(World); It; ++It)
+		for (const TActorIterator<AStormCore> It(World); It;)
 		{
 			return *It;
 		}
@@ -115,7 +115,7 @@ AStormCore* ACGameMode::GetStormCore() const
 	return nullptr;
 }
 
-void ACGameMode::MatchFinished(AActor* ViewTarget, int WiningTeam)
+void ACGameMode::MatchFinished(AActor* ViewTarget, int WiningTeam) const
 {
 	const UWorld* World = GetWorld();
 	if (World)
@@ -125,6 +125,4 @@ void ACGameMode::MatchFinished(AActor* ViewTarget, int WiningTeam)
 			It->MatchFinished(ViewTarget, WiningTeam);
 		}
 	}
-
-	
 }

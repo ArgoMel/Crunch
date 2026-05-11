@@ -70,12 +70,10 @@ void UAN_SendTargetGroup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequence
 				continue;
 			}
 
-			if (OwnerTeamInterface)
+			if (OwnerTeamInterface
+				&&OwnerTeamInterface->GetTeamAttitudeTowards(*HitResult.GetActor()) != TargetTeam)
 			{
-				if (OwnerTeamInterface->GetTeamAttitudeTowards(*HitResult.GetActor()) != TargetTeam)
-				{
-					continue;
-				}
+				continue;
 			}
 
 			HitActors.Add(HitResult.GetActor());

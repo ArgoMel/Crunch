@@ -22,6 +22,7 @@ class ACCharacter  : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ACCharacter();
+	virtual void PostInitializeComponents() override;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -111,7 +112,7 @@ private:
 	/**********************************************************************/
 public:
 	bool IsDead() const;
-	void RespawnImmediately();
+	void RespawnImmediately() const;
 private:
 	FTransform MeshRelativeTransform;
 	UPROPERTY(EditDefaultsOnly, Category = "Death")
@@ -122,7 +123,7 @@ private:
 	FTimerHandle DeathMontageTimerHandle;
 
 	void DeathMontageFinished();
-	void SetRagdollEnabled(bool bIsEnabled);
+	void SetRagdollEnabled(bool bIsEnabled) const;
 
 	void PlayDeathAnimation();
 
