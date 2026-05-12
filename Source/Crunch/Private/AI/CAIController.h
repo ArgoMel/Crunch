@@ -2,37 +2,24 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AIController.h"
 #include "GameplayTagContainer.h"
 #include "CAIController.generated.h"
 
-/**
- * 
- */
+class UAISenseConfig_Sight;
+
 UCLASS()
 class ACAIController : public AAIController
 {
 	GENERATED_BODY()
-
 public:
 	ACAIController();
-
+	
+protected:
 	virtual void OnPossess(APawn* NewPawn) override;
 	virtual void BeginPlay() override;
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "AI Behavior")
-	FName TargetBlackboardKeyName = "Target";
-
-	UPROPERTY(EditDefaultsOnly, Category = "AI Behavior")
-	class UBehaviorTree* BehaviorTree;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = "Perception")
-	class UAIPerceptionComponent* AIPerceptionComponent;
 	
-	UPROPERTY(VisibleDefaultsOnly, Category = "Perception")
-	class UAISenseConfig_Sight* SightConfig;
-
+private:
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* TargetActor, FAIStimulus Stimulus);
 	UFUNCTION()
@@ -43,13 +30,23 @@ private:
 
 	AActor* GetNextPerceivedActor() const;
 
-	void ForgetActorIfDead(AActor* ActorToForget);
+	void ForgetActorIfDead(AActor* ActorToForget) const;
 
 	void ClearAndDisableAllSenses();
-	void EnableAllSenses();
+	void EnableAllSenses() const;
 
 	void PawnDeadTagUpdated(const FGameplayTag Tag, int32 Count);
-	void PawnStunTagUpdated(const FGameplayTag Tag, int32 Count);
+	void PawnStunTagUpdated(const FGameplayTag Tag, int32 Count) const;
+	
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "AI Behavior")
+	UBehaviorTree* BehaviorTree;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Perception")
+	UAIPerceptionComponent* AIPerceptionComponent;
+	
+	UPROPERTY(VisibleDefaultsOnly, Category = "Perception")
+	UAISenseConfig_Sight* SightConfig;
 
 	bool bIsPawnDead = false;
 };

@@ -7,15 +7,13 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "BTTask_SendInputToAbilitySystem.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UBTTask_SendInputToAbilitySystem : public UBTTaskNode
 {
 	GENERATED_BODY()
 public:	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "Ability")
 	ECAbilityInputID InputID;

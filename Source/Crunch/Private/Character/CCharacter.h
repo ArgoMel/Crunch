@@ -152,7 +152,7 @@ private:
 	/*                               AI                                 */
 	/**********************************************************************/
 private:
-	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled);
+	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled) const;
 	UPROPERTY()
 	class UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
 };

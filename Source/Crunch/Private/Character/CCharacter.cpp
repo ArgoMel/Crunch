@@ -393,7 +393,7 @@ void ACCharacter::OnRep_TeamID()
 	//override in child class
 }
 
-void ACCharacter::SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled)
+void ACCharacter::SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled) const
 {
 	if (!PerceptionStimuliSourceComponent)
 	{

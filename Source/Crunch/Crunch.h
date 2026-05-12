@@ -1,4 +1,11 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+/*
+ * lumen 끔
+ * AI System forget state actors false
+ * DefaultGame.ini 
+	[/Script/AIModule.AISense_Sight]
+	bAutoRegisterAllPawnsAsSources=false
+ * 
+ */
 
 #pragma once
 
@@ -7,3 +14,11 @@
 #define ECC_Target ECC_GameTraceChannel1
 #define ECC_SpringArm ECC_GameTraceChannel2
 
+namespace Crunch
+{
+	namespace AIKey
+	{
+		const FName Target("Target");
+		const FName Goal("Goal");
+	}
+}

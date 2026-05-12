@@ -7,22 +7,28 @@
 #include "GenericTeamAgentInterface.h"
 #include "MinionBarrack.generated.h"
 
+class AMinion;
+
 UCLASS()
 class AMinionBarrack : public AActor
 {
 	GENERATED_BODY()
-	
 public:	
 	// Sets default values for this actor's properties
 	AMinionBarrack();
-
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+private:
+	const APlayerStart* GetNextSpawnSpot();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void SpawnNewGroup();
+	void SpawnNewMinions(int Amt);
+	AMinion* GetNextAvailableMinion() const;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Spawn")
@@ -35,25 +41,18 @@ private:
 	float GroupSpawnInterval = 5.f;
 	
 	UPROPERTY()
-	TArray<class AMinion*> MinionPool;
+	TArray<AMinion*> MinionPool;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	AActor* Goal;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<class AMinion> MinionClass;
+	TSubclassOf<AMinion> MinionClass;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TArray<class APlayerStart*> SpawnSpots;
+	TArray<APlayerStart*> SpawnSpots;
 
 	int NextSpawnSpotIndex = -1;
 
-	const APlayerStart* GetNextSpawnSpot();
-
-	void SpawnNewGroup();
-	void SpawnNewMinions(int Amt);
-	AMinion* GetNextAvaliableMinion() const;
-
 	FTimerHandle SpawnIntervalTimerHandle;
-
 };
