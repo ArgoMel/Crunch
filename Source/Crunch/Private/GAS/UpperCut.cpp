@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/UpperCut.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -25,19 +24,18 @@ void UUpperCut::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayUpperCutMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, UpperCutMontage);
-		PlayUpperCutMontageTask->OnBlendOut.AddDynamic(this, &UUpperCut::K2_EndAbility);
+		//PlayUpperCutMontageTask->OnBlendOut.AddDynamic(this, &UUpperCut::K2_EndAbility);
 		PlayUpperCutMontageTask->OnCancelled.AddDynamic(this, &UUpperCut::K2_EndAbility);
 		PlayUpperCutMontageTask->OnInterrupted.AddDynamic(this, &UUpperCut::K2_EndAbility);
 		PlayUpperCutMontageTask->OnCompleted.AddDynamic(this, &UUpperCut::K2_EndAbility);
 		PlayUpperCutMontageTask->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitLaunchEventTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, GetUpperCutLaunchTag());
-		WaitLaunchEventTask->EventReceived.AddDynamic(this, &UUpperCut::StartLaunching);
+		WaitLaunchEventTask->EventReceived.AddDynamic(this, &ThisClass::StartLaunching);
 		WaitLaunchEventTask->ReadyForActivation();
 	}
 	NextComboName = NAME_None;
 }
-
 
 FGameplayTag UUpperCut::GetUpperCutLaunchTag()
 {
@@ -73,15 +71,15 @@ void UUpperCut::StartLaunching(FGameplayEventData EventData)
 	}
 
 	UAbilityTask_WaitGameplayEvent* WaitComboChangeEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UGA_Combo::GetComboChangedEventTag(), nullptr, false, false);
-	WaitComboChangeEvent->EventReceived.AddDynamic(this, &UUpperCut::HandleComboChangeEvent);
+	WaitComboChangeEvent->EventReceived.AddDynamic(this, &ThisClass::HandleComboChangeEvent);
 	WaitComboChangeEvent->ReadyForActivation();
 
 	UAbilityTask_WaitGameplayEvent* WaitComboCommitEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UCAbilitySystemStatics::GetBasicAttackInputPressedTag());
-	WaitComboCommitEvent->EventReceived.AddDynamic(this, &UUpperCut::HandleComboCommitEvent);
+	WaitComboCommitEvent->EventReceived.AddDynamic(this, &ThisClass::HandleComboCommitEvent);
 	WaitComboCommitEvent->ReadyForActivation();
 	
 	UAbilityTask_WaitGameplayEvent* WaitComboDamageEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UGA_Combo::GetComboTargetEventTag());
-	WaitComboDamageEvent->EventReceived.AddDynamic(this, &UUpperCut::HandleComboDamageEvent);
+	WaitComboDamageEvent->EventReceived.AddDynamic(this, &ThisClass::HandleComboDamageEvent);
 	WaitComboDamageEvent->ReadyForActivation();
 }
 
@@ -102,6 +100,7 @@ void UUpperCut::HandleComboChangeEvent(FGameplayEventData EventData)
 	UE_LOG(LogTemp, Warning, TEXT("Next Combo is: %s"), *NextComboName.ToString());
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UUpperCut::HandleComboCommitEvent(FGameplayEventData EventData)
 {
 	if (NextComboName == NAME_None)
@@ -118,6 +117,7 @@ void UUpperCut::HandleComboCommitEvent(FGameplayEventData EventData)
 	OwnerAnimInst->Montage_SetNextSection(OwnerAnimInst->Montage_GetCurrentSection(UpperCutMontage), NextComboName, UpperCutMontage);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UUpperCut::HandleComboDamageEvent(FGameplayEventData EventData)
 {
 	if (K2_HasAuthority())

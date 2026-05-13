@@ -4,6 +4,7 @@
 #include "Components/ProgressBar.h"
 #include "AbilitySystemComponent.h"
 #include "Components/TextBlock.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UValueGauge::NativePreConstruct()
 {
@@ -43,13 +44,7 @@ void UValueGauge::SetValue(float NewValue, float NewMaxValue)
 	CachedValue = NewValue;
 	CachedMaxValue = NewMaxValue;
 
-	if (NewMaxValue == 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Value Gauge: %s, NewMaxValue can't be 0"), *GetName());
-		return;
-	}
-
-	const float NewPercent = NewValue / NewMaxValue;
+	const float NewPercent = UKismetMathLibrary::SafeDivide(NewValue,NewMaxValue);
 	ProgressBar->SetPercent(NewPercent);
 
 	const FNumberFormattingOptions FormatOps = FNumberFormattingOptions().SetMaximumFractionalDigits(0);

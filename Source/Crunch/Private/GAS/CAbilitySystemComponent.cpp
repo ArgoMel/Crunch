@@ -224,7 +224,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), UCAbilitySystemStatics::GetDeadStatTag(), DeadAbilityEventData);
 		}
 	}
-	else
+	else if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag());
 	}
@@ -258,7 +258,7 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 			AddLooseGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag());
 		}
 	}
-	else
+	else if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag());
 	}

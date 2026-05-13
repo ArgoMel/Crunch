@@ -82,11 +82,12 @@ void UCGameplayAbility::PushSelf(const FVector& PushVel)
 	}
 }
 
-void UCGameplayAbility::PushTarget(AActor* Target, const FVector& PushVel)
+void UCGameplayAbility::PushTarget(AActor* Target, const FVector& PushVel) const
 {
 	if (!Target)
+	{
 		return;
-
+	}
 	FGameplayEventData EventData;
 
 	FGameplayAbilityTargetData_SingleTargetHit* HitData = new FGameplayAbilityTargetData_SingleTargetHit;
@@ -95,10 +96,10 @@ void UCGameplayAbility::PushTarget(AActor* Target, const FVector& PushVel)
 	HitData->HitResult = HitResult;
 	EventData.TargetData.Add(HitData);
 	
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Target,UGAP_Launched::GetLauchedAbilityActiationTag(), EventData);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Target,UGAP_Launched::GetLaunchedAbilityActivationTag(), EventData);
 }
 
-void UCGameplayAbility::PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel)
+void UCGameplayAbility::PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel) const
 {
 	for(AActor* Target : Targets)
 	{
@@ -106,7 +107,7 @@ void UCGameplayAbility::PushTargets(const TArray<AActor*>& Targets, const FVecto
 	}
 }
 
-void UCGameplayAbility::PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel)
+void UCGameplayAbility::PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel) const
 {
 	const TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargets(Targets, PushVel);

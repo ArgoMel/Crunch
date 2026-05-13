@@ -21,9 +21,9 @@ protected:
 	UFUNCTION()
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
 	void PushSelf(const FVector& PushVel);
-	void PushTarget(AActor* Target, const FVector& PushVel);
-	void PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel);
-	void PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel);
+	void PushTarget(AActor* Target, const FVector& PushVel) const;
+	void PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel) const;
+	void PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel) const;
 	void PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed);
 	void PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed);
 	void PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed);

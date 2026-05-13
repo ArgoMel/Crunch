@@ -179,8 +179,10 @@ void ACPlayerCharacter::OnStun()
 
 void ACPlayerCharacter::OnRecoverFromStun()
 {
-	if (IsDead()) return;
-
+	if (IsDead()) 
+	{
+		return;
+	}
 	SetInputEnabledFromPlayerController(true);
 }
 
@@ -188,6 +190,7 @@ void ACPlayerCharacter::OnDead()
 {
 	SetInputEnabledFromPlayerController(false);
 }
+
 void ACPlayerCharacter::OnRespawn()
 {
 	SetInputEnabledFromPlayerController(true);
