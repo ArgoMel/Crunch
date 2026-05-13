@@ -62,7 +62,7 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 		const float MaxExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
 		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxExp);
 
-		UE_LOG(LogTemp, Warning, TEXT("Max Level is: %d, max experience is: %f"), MaxLevel, MaxExp);
+		//UE_LOG(LogTemp, Warning, TEXT("Max Level is: %d, max experience is: %f"), MaxLevel, MaxExp);
 	}
 
 	ExperienceUpdated(FOnAttributeChangeData());
@@ -201,7 +201,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 			AddLooseGameplayTag(UCAbilitySystemStatics::GetHealthFullStatTag());
 		}
 	}
-	else
+	else if (HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthFullStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetHealthFullStatTag());
 	}
@@ -224,7 +224,7 @@ void UCAbilitySystemComponent::HealthUpdated(const FOnAttributeChangeData& Chang
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwner(), UCAbilitySystemStatics::GetDeadStatTag(), DeadAbilityEventData);
 		}
 	}
-	else if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag()))
+	else if (HasMatchingGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetHealthEmptyStatTag());
 	}
@@ -246,7 +246,7 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 			AddLooseGameplayTag(UCAbilitySystemStatics::GetManaFullStatTag());
 		}
 	}
-	else
+	else if (HasMatchingGameplayTag(UCAbilitySystemStatics::GetManaFullStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetManaFullStatTag());
 	}
@@ -258,7 +258,7 @@ void UCAbilitySystemComponent::ManaUpdated(const FOnAttributeChangeData& ChangeD
 			AddLooseGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag());
 		}
 	}
-	else if (!HasMatchingGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag()))
+	else if (HasMatchingGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag()))
 	{
 		RemoveLooseGameplayTag(UCAbilitySystemStatics::GetManaEmptyStatTag());
 	}
