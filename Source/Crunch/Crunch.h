@@ -21,4 +21,14 @@ namespace Crunch
 		const FName Target("Target");
 		const FName Goal("Goal");
 	}
+	namespace MatParam
+	{
+		const FName Icon("Icon");
+		const FName Level("Level");
+		const FName Percent("Percent");
+	}
+	namespace ConstValue
+	{
+		constexpr int32 MaxLevel= 4;
+	}
 }

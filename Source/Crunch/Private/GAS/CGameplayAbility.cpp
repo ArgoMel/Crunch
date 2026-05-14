@@ -7,7 +7,6 @@
 #include "GAS/GAP_Launched.h"
 #include "GAS/CAbilitySystemStatics.h"
 #include "GameFramework/Character.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 UCGameplayAbility::UCGameplayAbility()
 {

@@ -33,7 +33,7 @@ public:
 	UFUNCTION()
 	void ToggleGameplayMenu();
 
-	void ShowGameplayMenu();
+	void ShowGameplayMenu() const;
 	void SetGameplayMenuTitle(const FString& NewTitle) const;
 	
 private:

@@ -2,15 +2,17 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/IUserObjectListEntry.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayEffectTypes.h"
 #include "AbilityGauge.generated.h"
 
+class UTextBlock;
+class UImage;
 class UAbilitySystemComponent;
 struct FGameplayAbilitySpec;
+class UAbilityToolTip;
 
 USTRUCT(BlueprintType)
 struct FAbilityWidgetData : public FTableRowBase
@@ -18,7 +20,7 @@ struct FAbilityWidgetData : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class UGameplayAbility> AbilityClass;
+	TSubclassOf<UGameplayAbility> AbilityClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName AbilityName;
@@ -30,62 +32,64 @@ struct FAbilityWidgetData : public FTableRowBase
 	FText Description;
 };
 
-/**
- * 
- */
-UCLASS()
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UAbilityGauge : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	
+public:
 	void ConfigureWithWidgetData(const FAbilityWidgetData* WidgetData);
+	
+private:
+	void CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData);
+	
+	void AbilityCommitted(UGameplayAbility* Ability);
+
+	void StartCooldown(float CooldownTimeRemaining, float CooldownDuration);
+	
+	void CooldownFinished();
+	void UpdateCooldown();
+	
+	void AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec);
+	void UpdateCanCast();
+	void UpgradePointUpdated(const FOnAttributeChangeData& Data);
+	void ManaUpdated(const FOnAttributeChangeData& Data);
+	
+	const FGameplayAbilitySpec* GetAbilitySpec();
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
 	float CooldownUpdateInterval = 0.1f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName IconMaterialParamName = "Icon";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName CooldownPercentParamname = "Percent";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName AbilityLevelParamName = "Level";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
 	FName CanCastAbilityParamName = "CanCast";
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName UpgradePointAvaliableParamName = "UpgradeAvaliable";
+	FName UpgradePointAvailableParamName = "UpgradeAvailable";
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tool Tip")
-	TSubclassOf<class UAbilityToolTip> AbilityToolTipClass;
-
-	void CreateToolTipWidget(const FAbilityWidgetData* AbilityWidgetData);
+	TSubclassOf<UAbilityToolTip> AbilityToolTipClass;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* Icon;
+	UImage* Icon;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* LevelGauge;
+	UImage* LevelGauge;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CooldownCounterText;
+	UTextBlock* CooldownCounterText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CooldownDurationText;
+	UTextBlock* CooldownDurationText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CostText;
+	UTextBlock* CostText;
 
 	UPROPERTY()
-	class UGameplayAbility* AbilityCDO;
-
-	void AbilityCommitted(UGameplayAbility* Ability);
-
-	void StartCooldown(float CooldownTimeRemaining, float CooldownDuration);
+	UGameplayAbility* AbilityCDO;
 
 	float CachedCooldownDuration;
 	float CachedCooldownTimeRemaining;
@@ -93,22 +97,12 @@ private:
 	FTimerHandle CooldownTimerHandle;
 	FTimerHandle CooldownTimerUpdateHandle;
 
-	FNumberFormattingOptions WholeNumberFormattionOptions;
+	FNumberFormattingOptions WholeNumberFormattingOptions;
 	FNumberFormattingOptions TwoDigitNumberFormattingOptions;
 
-	void CooldownFinished();
-	void UpdateCooldown();
-
+	UPROPERTY()
 	const UAbilitySystemComponent* OwnerAbilitySystemComponent;
 	FGameplayAbilitySpecHandle CachedAbilitySpecHandle;
 
-	const FGameplayAbilitySpec* GetAbilitySpec();
-
-	bool bIsAbilityLeanred = false;
-
-	void AbilitySpecUpdated(const FGameplayAbilitySpec& AbilitySpec);
-	void UpdateCanCast();
-	void UpgradePointUpdated(const FOnAttributeChangeData& Data);
-	void ManaUpdated(const FOnAttributeChangeData& Data);
-
+	bool bIsAbilityLearned = false;
 };

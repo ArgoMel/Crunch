@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "GameplayCueManager.h"
+#include "Crunch/Crunch.h"
 
 FGameplayTag UCAbilitySystemStatics::GetBasicAttackAbilityTag()
 {
@@ -129,18 +130,20 @@ bool UCAbilitySystemStatics::ActorHasTag(const AActor* ActorToCheck, const FGame
 
 bool UCAbilitySystemStatics::IsAbilityAtMaxLevel(const FGameplayAbilitySpec& Spec)
 {
-	return Spec.Level >= 4;
+	return Spec.Level >= Crunch::ConstValue::MaxLevel;
 }
 
 float UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(const UGameplayAbility* Ability)
 {
 	if (!Ability)
+	{
 		return 0.f;
-	
+	}
 	const UGameplayEffect* CooldownEffect = Ability->GetCooldownGameplayEffect();
 	if (!CooldownEffect)
+	{
 		return 0.f;
-
+	}
 	float CooldownDuration = 0.f;
 
 	CooldownEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1, CooldownDuration);
@@ -150,12 +153,14 @@ float UCAbilitySystemStatics::GetStaticCooldownDurationForAbility(const UGamepla
 float UCAbilitySystemStatics::GetStaticCostForAbility(const UGameplayAbility* Ability)
 {
 	if (!Ability)
+	{
 		return 0.f;
-
+	}
 	const UGameplayEffect* CostEffect = Ability->GetCostGameplayEffect();
 	if (!CostEffect || CostEffect->Modifiers.Num() == 0)
+	{
 		return 0.f;
-
+	}
 	float Cost = 0.f;
 	CostEffect->Modifiers[0].ModifierMagnitude.GetStaticMagnitudeIfPossible(1, Cost);
 	return FMath::Abs(Cost);

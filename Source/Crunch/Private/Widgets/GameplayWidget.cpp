@@ -28,7 +28,7 @@ void UGameplayWidget::NativeOnInitialized()
 	SetFocusToGameOnly();
 	if (GameplayMenu)
 	{
-		GameplayMenu->GetResumeButtonClickedEventDelegate().AddDynamic(this, &UGameplayWidget::ToggleGameplayMenu);
+		GameplayMenu->GetResumeButtonClickedEventDelegate().AddDynamic(this, &ThisClass::ToggleGameplayMenu);
 	}
 }
 
@@ -58,6 +58,7 @@ void UGameplayWidget::ToggleShop()
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UGameplayWidget::ToggleGameplayMenu()
 {
 	if (MainSwitcher->GetActiveWidget() == GameplayMenuRootPanel)
@@ -73,7 +74,7 @@ void UGameplayWidget::ToggleGameplayMenu()
 	}
 }
 
-void UGameplayWidget::ShowGameplayMenu()
+void UGameplayWidget::ShowGameplayMenu() const
 {
 	MainSwitcher->SetActiveWidget(GameplayMenuRootPanel);
 	SetOwningPawnInputEnabled(false);

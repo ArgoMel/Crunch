@@ -7,21 +7,19 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "AbilityListView.generated.h"
 
-/**
- * 
- */
-UCLASS()
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UAbilityListView : public UListView
 {
 	GENERATED_BODY()
 public:
-	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<class UGameplayAbility>>& Abilities);
+	void ConfigureAbilities(const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& Abilities);
 
+private:
+	void AbilityGaugeGenerated(UUserWidget& Widget) const;
+
+	const struct FAbilityWidgetData* FindWidgetDataForAbility(const TSubclassOf<UGameplayAbility>& AbilityClass) const;
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "Data")
 	UDataTable* AbilityDataTable;
-
-	void AbilityGaugeGenerated(UUserWidget& Widget);
-
-	const struct FAbilityWidgetData* FindWidgetDataForAbility(const TSubclassOf<UGameplayAbility>& AbilityClass) const;
 };
