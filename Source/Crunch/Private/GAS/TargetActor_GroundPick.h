@@ -6,32 +6,32 @@
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include "TargetActor_GroundPick.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ATargetActor_GroundPick : public AGameplayAbilityTargetActor
 {
 	GENERATED_BODY()
 public:
 	ATargetActor_GroundPick();
+	virtual void Tick(float DeltaTime) override;
+	
+	virtual void ConfirmTargetingAndContinue() override;
 
+public:
 	void SetTargetAreaRadius(float NewRadius);
 	FORCEINLINE void SetTargetTraceRange(float NewRange) { TargetTraceRange = NewRange; }
-	virtual void ConfirmTargetingAndContinue() override;
-	void SetTargetOptions(bool bTargetFriendly, bool bTargetEnenmy = true);
+
+	void SetTargetOptions(bool bTargetFriendly, bool bTargetEnemy = true);
 	FORCEINLINE void SetShouldDrawDebug(bool bDrawDebug) { bShouldDrawDebug = bDrawDebug; }
 
 private:
+	FVector GetTargetPoint() const;
+	
+private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Visual")
-	class UDecalComponent* DecalComp;
+	UDecalComponent* DecalComp;
 
 	bool bShouldTargetEnemy = true;
 	bool bShouldTargetFriendly = false;
-
-	virtual void Tick(float DeltaTime) override;
-
-	FVector GetTargetPoint() const;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetAreaRadius = 300.f;

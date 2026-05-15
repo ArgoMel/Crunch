@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/TargetActor_GroundPick.h"
 #include "Abilities/GameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -16,14 +15,16 @@ ATargetActor_GroundPick::ATargetActor_GroundPick()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("Root Comp"));
 
 	DecalComp = CreateDefaultSubobject<UDecalComponent>("Decal Comp");
-
 	DecalComp->SetupAttachment(GetRootComponent());
 }
 
-void ATargetActor_GroundPick::SetTargetAreaRadius(float NewRadius)
+void ATargetActor_GroundPick::Tick(float DeltaTime)
 {
-	TargetAreaRadius = NewRadius;
-	DecalComp->DecalSize = FVector{NewRadius};
+	Super::Tick(DeltaTime);
+	if (PrimaryPC && PrimaryPC->IsLocalPlayerController())
+	{
+		SetActorLocation(GetTargetPoint());
+	}
 }
 
 void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
@@ -54,11 +55,13 @@ void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
 	for (const FOverlapResult& OverlapResult : OverlapResults)
 	{
 		if (OwnerTeamInterface && OwnerTeamInterface->GetTeamAttitudeTowards(*OverlapResult.GetActor()) == ETeamAttitude::Friendly && !bShouldTargetFriendly)
+		{
 			continue;
-
+		}
 		if (OwnerTeamInterface && OwnerTeamInterface->GetTeamAttitudeTowards(*OverlapResult.GetActor()) == ETeamAttitude::Hostile && !bShouldTargetEnemy)
+		{
 			continue;
-
+		}
 		TargetActors.Add(OverlapResult.GetActor());
 	}
 
@@ -72,28 +75,26 @@ void ATargetActor_GroundPick::ConfirmTargetingAndContinue()
 	TargetDataReadyDelegate.Broadcast(TargetData);
 }
 
-void ATargetActor_GroundPick::SetTargetOptions(bool bTargetFriendly, bool bTargetEnenmy)
+void ATargetActor_GroundPick::SetTargetAreaRadius(float NewRadius)
 {
-	bShouldTargetFriendly = bTargetFriendly;
-	bShouldTargetEnemy = bTargetEnenmy;
+	TargetAreaRadius = NewRadius;
+	DecalComp->DecalSize = FVector{NewRadius};
 }
 
-void ATargetActor_GroundPick::Tick(float DeltaTime)
+void ATargetActor_GroundPick::SetTargetOptions(bool bTargetFriendly, bool bTargetEnemy)
 {
-	Super::Tick(DeltaTime);
-	if (PrimaryPC && PrimaryPC->IsLocalPlayerController())
-	{
-		SetActorLocation(GetTargetPoint());
-	}
+	bShouldTargetFriendly = bTargetFriendly;
+	bShouldTargetEnemy = bTargetEnemy;
 }
 
 FVector ATargetActor_GroundPick::GetTargetPoint() const
 {
 	if (!PrimaryPC || !PrimaryPC->IsLocalPlayerController())
+	{
 		return GetActorLocation();
-
+	}
+	
 	FHitResult TraceResult;
-
 	FVector ViewLoc;
 	FRotator ViewRot;
 

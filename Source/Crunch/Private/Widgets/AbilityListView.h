@@ -7,7 +7,7 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "AbilityListView.generated.h"
 
-UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
+UCLASS(BlueprintType, meta = (DisableNaiveTick))
 class UAbilityListView : public UListView
 {
 	GENERATED_BODY()

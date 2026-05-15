@@ -24,7 +24,6 @@ ACCharacter::ACCharacter()
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_SpringArm, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Target, ECR_Ignore);
 
 	OverHeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("Over Head Widget Component");

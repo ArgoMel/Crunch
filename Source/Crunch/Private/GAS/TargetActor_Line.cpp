@@ -17,7 +17,6 @@ ATargetActor_Line::ATargetActor_Line()
 
 	TargetEndDetectionSphere = CreateDefaultSubobject<USphereComponent>("Target End Detection Sphere");
 	TargetEndDetectionSphere->SetupAttachment(GetRootComponent());
-	TargetEndDetectionSphere->SetCollisionResponseToChannel(ECC_SpringArm, ECR_Ignore);
 
 	LazerVFX = CreateDefaultSubobject<UNiagaraComponent>("Lazer VFX");
 	LazerVFX->SetupAttachment(GetRootComponent());

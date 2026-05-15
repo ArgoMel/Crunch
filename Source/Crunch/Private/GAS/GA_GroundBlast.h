@@ -7,16 +7,25 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "GA_GroundBlast.generated.h"
 
-/**
- * 
- */
+class ATargetActor_GroundPick;
+
 UCLASS()
 class UGA_GroundBlast : public UCGameplayAbility
 {
 	GENERATED_BODY()
 public:
 	UGA_GroundBlast();
+	
+protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+private:
+	UFUNCTION()
+	void TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+
+	UFUNCTION()
+	void TargetCanceled(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Cue")
 	FGameplayTag BlastGameplayCueTag;
@@ -31,17 +40,11 @@ private:
 	float TargetTraceRange = 2000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	TSubclassOf<class ATargetActor_GroundPick> TargetActorClass;
+	TSubclassOf<ATargetActor_GroundPick> TargetActorClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* TargettingMontage;
+	UAnimMontage* TargetingMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* CastMontage;
-
-	UFUNCTION()
-	void TargetConfirmed(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
-
-	UFUNCTION()
-	void TargetCanceled(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 };

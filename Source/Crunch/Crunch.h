@@ -4,7 +4,7 @@
  * DefaultGame.ini 
 	[/Script/AIModule.AISense_Sight]
 	bAutoRegisterAllPawnsAsSources=false
- * 
+ * TraceChannels Target
  */
 
 #pragma once
@@ -12,7 +12,6 @@
 #include "CoreMinimal.h"
 
 #define ECC_Target ECC_GameTraceChannel1
-#define ECC_SpringArm ECC_GameTraceChannel2
 
 namespace Crunch
 {
