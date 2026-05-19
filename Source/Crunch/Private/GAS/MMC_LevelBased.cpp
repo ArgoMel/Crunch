@@ -1,34 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/MMC_LevelBased.h"
 #include "GAS/CHeroAttributeSet.h"
 #include "AbilitySystemComponent.h"
 
 UMMC_LevelBased::UMMC_LevelBased()
 {
-	LevelCaptureDefination.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
-	LevelCaptureDefination.AttributeToCapture = UCHeroAttributeSet::GetLevelAttribute();
+	LevelCaptureDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
+	LevelCaptureDefinition.AttributeToCapture = UCHeroAttributeSet::GetLevelAttribute();
 
-	RelevantAttributesToCapture.Add(LevelCaptureDefination);
+	RelevantAttributesToCapture.Add(LevelCaptureDefinition);
 }
 
 float UMMC_LevelBased::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	const UAbilitySystemComponent* ASC = Spec.GetContext().GetInstigatorAbilitySystemComponent();
 	if (!ASC)
+	{
 		return 0.f;
-
+	}
 	float Level = 0;
 	FAggregatorEvaluateParameters EvalParams;
 	EvalParams.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	EvalParams.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
-	GetCapturedAttributeMagnitude(LevelCaptureDefination, Spec, EvalParams, Level);
+	GetCapturedAttributeMagnitude(LevelCaptureDefinition, Spec, EvalParams, Level);
 
 	bool bFound;
 	const float RateAttributeVal = ASC->GetGameplayAttributeValue(RateAttribute, bFound);
 	if (!bFound)
+	{
 		return 0.f;
-
+	}
 	return (Level - 1) * RateAttributeVal;
 }

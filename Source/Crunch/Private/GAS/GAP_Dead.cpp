@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/GAP_Dead.h"
 #include "GAS/CAbilitySystemStatics.h"
 #include "AbilitySystemComponent.h"
@@ -33,7 +32,7 @@ void UGAP_Dead::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		}
 
 		TArray<AActor*> RewardTargets = GetRewardTargets();
-		if (RewardTargets.Num() == 0 && !Killer)
+		if (RewardTargets.IsEmpty() && !Killer)
 		{
 			K2_EndAbility();
 			return;
@@ -98,7 +97,8 @@ TArray<AActor*> UGAP_Dead::GetRewardTargets() const
 		for (const FOverlapResult& OverlapResult : OverlapResults)
 		{
 			const IGenericTeamAgentInterface* OtherTeamInterface = Cast<IGenericTeamAgentInterface>(OverlapResult.GetActor());
-			if (!OtherTeamInterface || OtherTeamInterface->GetTeamAttitudeTowards(*AvatarActor) != ETeamAttitude::Hostile)
+			if (!OtherTeamInterface 
+				|| OtherTeamInterface->GetTeamAttitudeTowards(*AvatarActor) != ETeamAttitude::Hostile)
 			{
 				continue;
 			}

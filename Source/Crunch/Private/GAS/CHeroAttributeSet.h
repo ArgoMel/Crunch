@@ -12,9 +12,7 @@
  	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
  	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
  	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
-/**
- * 
- */
+
 UCLASS()
 class UCHeroAttributeSet : public UAttributeSet
 {
@@ -32,7 +30,9 @@ public:
     ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, Gold)
     ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, StrengthGrowthRate)
     ATTRIBUTE_ACCESSORS(UCHeroAttributeSet, IntelligenceGrowthRate)
+	
 	virtual void GetLifetimeReplicatedProps( TArray< class FLifetimeProperty > & OutLifetimeProps ) const override;
+	
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Intelligence)
 	FGameplayAttributeData Intelligence;
@@ -71,32 +71,32 @@ private:
 	FGameplayAttributeData Gold;
 
 	UFUNCTION()
-	void OnRep_Intelligence(const FGameplayAttributeData& OldValue);
+	void OnRep_Intelligence(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Strength(const FGameplayAttributeData& OldValue);
+	void OnRep_Strength(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Experience(const FGameplayAttributeData& OldValue);
+	void OnRep_Experience(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_PrevLevelExperience(const FGameplayAttributeData& OldValue);
+	void OnRep_PrevLevelExperience(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_NextLevelExperience(const FGameplayAttributeData& OldValue);
+	void OnRep_NextLevelExperience(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Level(const FGameplayAttributeData& OldValue);
+	void OnRep_Level(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_UpgradePoint(const FGameplayAttributeData& OldValue);
+	void OnRep_UpgradePoint(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MaxLevel(const FGameplayAttributeData& OldValue);
+	void OnRep_MaxLevel(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_MaxLevelExperience(const FGameplayAttributeData& OldValue);
+	void OnRep_MaxLevelExperience(const FGameplayAttributeData& OldValue) const;
 
 	UFUNCTION()
-	void OnRep_Gold(const FGameplayAttributeData& OldValue);
+	void OnRep_Gold(const FGameplayAttributeData& OldValue) const;
 };

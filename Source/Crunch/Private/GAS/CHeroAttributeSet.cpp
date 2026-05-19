@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/CHeroAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
@@ -21,52 +20,52 @@ void UCHeroAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME_CONDITION_NOTIFY(UCHeroAttributeSet, Gold, COND_None, REPNOTIFY_Always);
 }
 
-void UCHeroAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, Intelligence, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, Strength, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_Experience(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_Experience(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, Experience, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_PrevLevelExperience(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_PrevLevelExperience(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, PrevLevelExperience, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_NextLevelExperience(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_NextLevelExperience(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, NextLevelExperience, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_Level(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_Level(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, Level, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_UpgradePoint(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_UpgradePoint(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, UpgradePoint, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_MaxLevel(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_MaxLevel(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, MaxLevel, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_MaxLevelExperience(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_MaxLevelExperience(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, MaxLevelExperience, OldValue);
 }
 
-void UCHeroAttributeSet::OnRep_Gold(const FGameplayAttributeData& OldValue)
+void UCHeroAttributeSet::OnRep_Gold(const FGameplayAttributeData& OldValue) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UCHeroAttributeSet, Gold, OldValue);
 }

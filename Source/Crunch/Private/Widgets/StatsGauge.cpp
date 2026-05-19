@@ -1,28 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/StatsGauge.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-
 void UStatsGauge::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	Icon->SetBrushFromTexture(IconTexture);
+	if (Icon)
+	{
+		Icon->SetBrushFromTexture(IconTexture);
+	}
 }
 
-void UStatsGauge::NativeConstruct()
+void UStatsGauge::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	NumberFormattingOptions.MaximumFractionalDigits = 0;
-	APawn* OwnerPlayerPawn = GetOwningPlayerPawn();
-	if (!OwnerPlayerPawn)
-		return;
-
-	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OwnerPlayerPawn);
+	UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 
 	if (OwnerASC)
 	{
@@ -30,16 +27,16 @@ void UStatsGauge::NativeConstruct()
 		const float AttributeVal = OwnerASC->GetGameplayAttributeValue(Attribute, bFound);
 		SetValue(AttributeVal);
 
-		OwnerASC->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this, &UStatsGauge::AttributeChanged);
+		OwnerASC->GetGameplayAttributeValueChangeDelegate(Attribute).AddUObject(this, &ThisClass::AttributeChanged);
 	}
 }
 
-void UStatsGauge::SetValue(float NewVal)
+void UStatsGauge::SetValue(float NewVal) const
 {
 	AttributeText->SetText(FText::AsNumber(NewVal, &NumberFormattingOptions));
 }
 
-void UStatsGauge::AttributeChanged(const FOnAttributeChangeData& Data)
+void UStatsGauge::AttributeChanged(const FOnAttributeChangeData& Data) const
 {
 	SetValue(Data.NewValue);
 }

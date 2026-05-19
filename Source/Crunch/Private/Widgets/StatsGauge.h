@@ -8,23 +8,28 @@
 #include "GameplayEffectTypes.h"
 #include "StatsGauge.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UStatsGauge : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
+protected:
 	virtual void NativePreConstruct() override;
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	
+private:
+	void SetValue(float NewVal) const;
+	
+	void AttributeChanged(const FOnAttributeChangeData& Data) const;
+	
 private:
 	UPROPERTY(meta=(BindWidget))
-	class UImage* Icon;
+	UImage* Icon;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* AttributeText;
+	UTextBlock* AttributeText;
 
 	UPROPERTY(EditAnywhere, Category = "Attribute")
 	FGameplayAttribute Attribute;
@@ -32,9 +37,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Visual")
 	UTexture2D* IconTexture;
 
-	void SetValue(float NewVal);
 	FNumberFormattingOptions NumberFormattingOptions;
-
-	void AttributeChanged(const FOnAttributeChangeData& Data);
 };
 

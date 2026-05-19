@@ -8,9 +8,7 @@
 
 class UGameplayEffect;
 class UGameplayAbility;
-/**
- * 
- */
+
 UCLASS()
 class UPA_AbilitySystemGenerics : public UPrimaryDataAsset
 {
@@ -38,9 +36,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Base Stats")
 	UDataTable* BaseStatDataTable;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Level")
-	FName ExperienceRowName = "ExperieneNeededToReachLevel";
 
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
 	UCurveTable* ExperienceCurveTable;

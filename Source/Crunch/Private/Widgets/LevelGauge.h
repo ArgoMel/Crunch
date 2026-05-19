@@ -7,29 +7,27 @@
 #include "GameplayEffectTypes.h"
 #include "LevelGauge.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class ULevelGauge : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
 	
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName PercentMaterialParamName = "Percent";
+	void UpdateGauge(const FOnAttributeChangeData& Data) const;
+	
+private:
+	UPROPERTY(meta=(BindWidget))
+	UImage* LevelProgressImage;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* LevelProgressImage;
-
-	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* LevelText;
+	UTextBlock* LevelText;
 
 	FNumberFormattingOptions NumberFormattingOptions;
 
-	const class UAbilitySystemComponent* OwnerASC;
-
-	void UpdateGauge(const FOnAttributeChangeData& Data);
+	TWeakObjectPtr<UAbilitySystemComponent> OwnerASC;
 };

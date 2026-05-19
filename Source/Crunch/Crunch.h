@@ -30,4 +30,8 @@ namespace Crunch
 	{
 		constexpr int32 MaxLevel= 4;
 	}
+	namespace TableRowName
+	{
+		const FName ExperienceRowName("ExperienceNeededToReachLevel");
+	}
 }

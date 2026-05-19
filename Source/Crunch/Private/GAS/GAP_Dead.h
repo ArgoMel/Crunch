@@ -6,16 +6,19 @@
 #include "GAS/CGameplayAbility.h"
 #include "GAP_Dead.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UGAP_Dead : public UCGameplayAbility
 {
 	GENERATED_BODY()
 public:
 	UGAP_Dead();
+	
+protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+private:
+	TArray<AActor*> GetRewardTargets() const;
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Reward")
 	float RewardRange = 1000.f;
@@ -35,9 +38,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Reward")
 	float KillerRewardPortion = 0.5f;
 
-	TArray<AActor*> GetRewardTargets() const;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Reward")
 	TSubclassOf<UGameplayEffect> RewardEffect;
-	
 };
