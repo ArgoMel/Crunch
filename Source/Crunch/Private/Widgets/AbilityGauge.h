@@ -64,12 +64,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
 	float CooldownUpdateInterval = 0.1f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName CanCastAbilityParamName = "CanCast";
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName UpgradePointAvailableParamName = "UpgradeAvailable";
-
 	UPROPERTY(EditDefaultsOnly, Category = "Tool Tip")
 	TSubclassOf<UAbilityToolTip> AbilityToolTipClass;
 

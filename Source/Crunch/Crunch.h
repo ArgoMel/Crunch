@@ -25,6 +25,8 @@ namespace Crunch
 		const FName Icon("Icon");
 		const FName Level("Level");
 		const FName Percent("Percent");
+		const FName CanCast("CanCast");
+		const FName UpgradeAvailable("UpgradeAvailable");
 	}
 	namespace ConstValue
 	{

@@ -222,19 +222,21 @@ float UCAbilitySystemStatics::GetCooldownDurationFor(const UGameplayAbility* Abi
 float UCAbilitySystemStatics::GetCooldownRemainingFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC)
 {
 	if (!AbilityCDO)
+	{
 		return 0;
-
+	}
 	const UGameplayEffect* CooldownEffect = AbilityCDO->GetCooldownGameplayEffect();
 	if (!CooldownEffect)
+	{
 		return 0;
-
+	}
 	FGameplayEffectQuery CooldownEffectQuery;
 	CooldownEffectQuery.EffectDefinition = CooldownEffect->GetClass();
 
 	float CooldownRemaining = 0.f;
-	FJsonSerializableArrayFloat CooldownTimeRemainings = ASC.GetActiveEffectsTimeRemaining(CooldownEffectQuery);
+	FJsonSerializableArrayFloat CooldownTimeRemaining = ASC.GetActiveEffectsTimeRemaining(CooldownEffectQuery);
 
-	for (const float Remaining : CooldownTimeRemainings)
+	for (const float Remaining : CooldownTimeRemaining)
 	{
 		if (Remaining > CooldownRemaining)
 		{

@@ -147,12 +147,14 @@ void UCAbilitySystemComponent::Server_UpgradeAbilityWithID_Implementation(ECAbil
 	bool bFound = false;
 	const float UpgradePoint = GetGameplayAttributeValue(UCHeroAttributeSet::GetUpgradePointAttribute(), bFound);
 	if (!bFound || UpgradePoint <= 0)
+	{
 		return;
-
+	}
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromInputID(static_cast<int32>(InputID));
 	if (!AbilitySpec || UCAbilitySystemStatics::IsAbilityAtMaxLevel(*AbilitySpec))
+	{
 		return;
-
+	}
 	SetNumericAttributeBase(UCHeroAttributeSet::GetUpgradePointAttribute(), UpgradePoint - 1);
 	AbilitySpec->Level += 1;
 	MarkAbilitySpecDirty(*AbilitySpec);

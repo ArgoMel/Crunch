@@ -162,13 +162,14 @@ void UAbilityGauge::UpdateCanCast()
 	bool bCanCast = bIsAbilityLearned;
 	if (AbilitySpec)
 	{
-		if (OwnerAbilitySystemComponent && !UCAbilitySystemStatics::CheckAbilityCost(*AbilitySpec, *OwnerAbilitySystemComponent))
+		if (OwnerAbilitySystemComponent 
+			&& !UCAbilitySystemStatics::CheckAbilityCost(*AbilitySpec, *OwnerAbilitySystemComponent))
 		{
 			bCanCast = false;
 		}
 	}
 
-	Icon->GetDynamicMaterial()->SetScalarParameterValue(CanCastAbilityParamName, bCanCast ? 1 : 0);
+	Icon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::CanCast, bCanCast ? 1 : 0);
 }
 
 void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
@@ -179,11 +180,11 @@ void UAbilityGauge::UpgradePointUpdated(const FOnAttributeChangeData& Data)
 	{
 		if (UCAbilitySystemStatics::IsAbilityAtMaxLevel(*AbilitySpec))
 		{
-			Icon->GetDynamicMaterial()->SetScalarParameterValue(UpgradePointAvailableParamName, 0);
+			Icon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::UpgradeAvailable, 0);
 			return;
 		}
 	}
-	Icon->GetDynamicMaterial()->SetScalarParameterValue(UpgradePointAvailableParamName, HasUpgradePoint ? 1 : 0);
+	Icon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::UpgradeAvailable, HasUpgradePoint ? 1 : 0);
 }
 
 void UAbilityGauge::ManaUpdated(const FOnAttributeChangeData& Data)
