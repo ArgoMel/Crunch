@@ -24,12 +24,12 @@ protected:
 	void PushTarget(AActor* Target, const FVector& PushVel) const;
 	void PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel) const;
 	void PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel) const;
-	void PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed);
-	void PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed);
-	void PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed);
-	void PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation, float PushSpeed);
-	void PlayMontageLocally(UAnimMontage* MontageToPlay);
-	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop);
+	void PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed) const;
+	void PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed) const;
+	void PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed) const;
+	void PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation, float PushSpeed) const;
+	void PlayMontageLocally(UAnimMontage* MontageToPlay) const;
+	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop) const;
 	FGenericTeamId GetOwnerTeamId() const;
 
 	bool IsActorTeamAttitudeIs(const AActor* OtherActor, ETeamAttitude::Type TeamAttitude) const;

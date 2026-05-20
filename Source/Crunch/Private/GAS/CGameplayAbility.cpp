@@ -112,7 +112,7 @@ void UCGameplayAbility::PushTargets(const FGameplayAbilityTargetDataHandle& Targ
 	PushTargets(Targets, PushVel);
 }
 
-void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed)
+void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed) const
 {
 	const AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
 	if (!OwnerAvatarActor)
@@ -122,19 +122,19 @@ void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targ
 	PushTargetsFromLocation(Targets, OwnerAvatarActorLocation, PushSpeed);
 }
 
-void UCGameplayAbility::PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed)
+void UCGameplayAbility::PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed) const
 {
 	const TArray<AActor*> TargetActors = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargetsFromOwnerLocation(TargetActors, PushSpeed);
 }
 
-void UCGameplayAbility::PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed)
+void UCGameplayAbility::PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed) const
 {
 	const TArray<AActor*> Targets = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
 	PushTargetsFromLocation(Targets, FromLocation, PushSpeed);
 }
 
-void UCGameplayAbility::PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation, float PushSpeed)
+void UCGameplayAbility::PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation, float PushSpeed) const
 {
 	for (AActor* Target : Targets)
 	{
@@ -146,7 +146,7 @@ void UCGameplayAbility::PushTargetsFromLocation(const TArray<AActor*>& Targets, 
 	}
 }
 
-void UCGameplayAbility::PlayMontageLocally(UAnimMontage* MontageToPlay)
+void UCGameplayAbility::PlayMontageLocally(UAnimMontage* MontageToPlay) const
 {
 	UAnimInstance* OwnerAnimInst = GetOwnerAnimInstance();
 	if (OwnerAnimInst && !OwnerAnimInst->Montage_IsPlaying(MontageToPlay))
@@ -155,7 +155,7 @@ void UCGameplayAbility::PlayMontageLocally(UAnimMontage* MontageToPlay)
 	}
 }
 
-void UCGameplayAbility::StopMontageAfterCurrentSection(UAnimMontage* MontageToStop)
+void UCGameplayAbility::StopMontageAfterCurrentSection(UAnimMontage* MontageToStop) const
 {
 	UAnimInstance* OwnerAnimInst = GetOwnerAnimInstance();
 	if (OwnerAnimInst)
@@ -179,8 +179,9 @@ FGenericTeamId UCGameplayAbility::GetOwnerTeamId() const
 bool UCGameplayAbility::IsActorTeamAttitudeIs(const AActor* OtherActor, ETeamAttitude::Type TeamAttitude) const
 {
 	if (!OtherActor)
+	{
 		return false;
-
+	}
 	const IGenericTeamAgentInterface* OwnerTeamAgentInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
 	if (OwnerTeamAgentInterface)
 	{
