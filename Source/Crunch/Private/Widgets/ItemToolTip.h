@@ -7,27 +7,27 @@
 #include "ItemToolTip.generated.h"
 
 class UPA_ShopItem;
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UItemToolTip : public UUserWidget
 {
 	GENERATED_BODY()
-	
 public:
-	void SetItem(const UPA_ShopItem* Item);
-	void SetPrice(float newPrice);
+	void SetItem(const UPA_ShopItem* Item) const;
+	void SetPrice(float newPrice) const;
+	
 private:
 	UPROPERTY(meta=(BindWidget))
-	class UImage* IconImage;
+	UImage* IconImage;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* ItemTitleText;
+	UTextBlock* ItemTitleText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* ItemDescriptionText;
+	UTextBlock* ItemDescriptionText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* ItemPriceText;
+	UTextBlock* ItemPriceText;
 };

@@ -9,7 +9,7 @@
 #include "CPlayerState.generated.h"
 
 
-class UPA_CharacterDefination;
+class UPA_CharacterDefinition;
 /**
  * 
  */
@@ -25,7 +25,7 @@ public:
 	TSubclassOf<APawn> GetSelectedPawnClass() const;
 	FGenericTeamId GetTeamIdBasedOnSlot() const;
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetSelectedCharacterDefination(const UPA_CharacterDefination* NewDefination);
+	void Server_SetSelectedCharacterDefination(const UPA_CharacterDefinition* NewDefination);
 
 private:	
 	UPROPERTY(Replicated)

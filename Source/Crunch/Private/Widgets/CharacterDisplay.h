@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "CharacterDisplay.generated.h"
 
-class UPA_CharacterDefination;
+class UPA_CharacterDefinition;
 
 UCLASS()
 class ACharacterDisplay : public AActor
@@ -16,7 +16,7 @@ class ACharacterDisplay : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACharacterDisplay();
-	void ConfigureWithCharacterDefination(const UPA_CharacterDefination* CharacterDefination);
+	void ConfigureWithCharacterDefination(const UPA_CharacterDefinition* CharacterDefination);
 
 private:	
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character Display")

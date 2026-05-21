@@ -6,28 +6,28 @@
 #include "Inventory/PA_ShopItem.h"
 #include "CAssetManager.generated.h"
 
-class UPA_CharacterDefination;
-/**
- * 
- */
+class UPA_CharacterDefinition;
+
 UCLASS()
 class UCAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
 public:
 	static UCAssetManager& Get();
-	void LoadCharacterDefinations(const FStreamableDelegate& LoadFinishedCallback);
-	bool GetLoadedCharacterDefinations(TArray<UPA_CharacterDefination*>& LoadedCharacterDefinations) const;
+	void LoadCharacterDefinitions(const FStreamableDelegate& LoadFinishedCallback);
+	bool GetLoadedCharacterDefinitions(TArray<UPA_CharacterDefinition*>& LoadedCharacterDefinitions) const;
 
 	void LoadShopItems(const FStreamableDelegate& LoadFinishedCallback);
 	bool GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const;
 	const FItemCollection* GetCombinationForItem(const UPA_ShopItem* Item) const;
 	const FItemCollection* GetIngredientForItem(const UPA_ShopItem* Item) const;
+	
 private:
 	void ShopItemLoadFinished(FStreamableDelegate Callback);
 	void BuildItemMaps();
 	void AddToCombinationMap(const UPA_ShopItem* Ingredient, const UPA_ShopItem* CombinationItem);
 
+private:
 	UPROPERTY()
 	TMap<const UPA_ShopItem*, FItemCollection> CombinationMap;
 	UPROPERTY()

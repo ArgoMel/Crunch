@@ -2,7 +2,7 @@
 
 
 #include "Player/CPlayerState.h"
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 #include "Character/CCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Network/CNetStatics.h"
@@ -58,7 +58,7 @@ FGenericTeamId ACPlayerState::GetTeamIdBasedOnSlot() const
 	return PlayerSelection.GetPlayerSlot() < UCNetStatics::GetPlayerCountPerTeam() ? FGenericTeamId{ 0 } : FGenericTeamId{ 1 };
 }
 
-void ACPlayerState::Server_SetSelectedCharacterDefination_Implementation(const UPA_CharacterDefination* NewDefination)
+void ACPlayerState::Server_SetSelectedCharacterDefination_Implementation(const UPA_CharacterDefinition* NewDefination)
 {
 	if (!CGameState)
 		return;
@@ -78,7 +78,7 @@ void ACPlayerState::Server_SetSelectedCharacterDefination_Implementation(const U
 	CGameState->SetCharacterSelected(this, NewDefination);
 }
 
-bool ACPlayerState::Server_SetSelectedCharacterDefination_Validate(const UPA_CharacterDefination* NewDefination)
+bool ACPlayerState::Server_SetSelectedCharacterDefination_Validate(const UPA_CharacterDefinition* NewDefination)
 {
 	return true;
 }

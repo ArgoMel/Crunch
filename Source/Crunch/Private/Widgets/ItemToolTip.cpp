@@ -1,12 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/ItemToolTip.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Inventory/PA_ShopItem.h"
 
-void UItemToolTip::SetItem(const UPA_ShopItem* Item)
+void UItemToolTip::SetItem(const UPA_ShopItem* Item) const
 {
 	ItemTitleText->SetText(Item->GetItemName());
 	ItemDescriptionText->SetText(Item->GetItemDescription());
@@ -14,7 +13,7 @@ void UItemToolTip::SetItem(const UPA_ShopItem* Item)
 	IconImage->SetBrushFromTexture(Item->GetIcon());
 }
 
-void UItemToolTip::SetPrice(float newPrice)
+void UItemToolTip::SetPrice(float newPrice) const
 {
 	ItemPriceText->SetText(FText::AsNumber(static_cast<int>(newPrice)));
 }

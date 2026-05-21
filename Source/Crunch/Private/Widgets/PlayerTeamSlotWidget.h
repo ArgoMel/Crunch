@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerTeamSlotWidget.generated.h"
 
-class UPA_CharacterDefination;
+class UPA_CharacterDefinition;
 /**
  * 
  */
@@ -16,7 +16,7 @@ class UPlayerTeamSlotWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
-	void UpdateSlot(const FString& PlayerName, const UPA_CharacterDefination* CharacterDefination);
+	void UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefination);
 
 	virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual void NativeOnMouseLeave( const FPointerEvent& InMouseEvent ) override;

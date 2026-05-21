@@ -3,7 +3,7 @@
 
 #include "Widgets/CharacterDisplay.h"
 #include "Camera/CameraComponent.h"
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -20,7 +20,7 @@ ACharacterDisplay::ACharacterDisplay()
 	ViewCameraComponent->SetupAttachment(GetRootComponent());
 }
 
-void ACharacterDisplay::ConfigureWithCharacterDefination(const UPA_CharacterDefination* CharacterDefination)
+void ACharacterDisplay::ConfigureWithCharacterDefination(const UPA_CharacterDefinition* CharacterDefination)
 {
 	if (!CharacterDefination)
 		return;

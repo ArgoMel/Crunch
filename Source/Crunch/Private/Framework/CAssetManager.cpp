@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Framework/CAssetManager.h"
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 
 UCAssetManager& UCAssetManager::Get()
 {
@@ -12,24 +11,24 @@ UCAssetManager& UCAssetManager::Get()
 		return *Singleton;
 	}
 
-	UE_LOG(LogLoad, Fatal, TEXT("Asset Manager Needs to be of the type CAssetMaanger"));
+	UE_LOG(LogLoad, Fatal, TEXT("Asset Manager Needs to be of the type CAssetManager"));
 	return (*NewObject<UCAssetManager>());
 }
 
-void UCAssetManager::LoadCharacterDefinations(const FStreamableDelegate& LoadFinishedCallback)
+void UCAssetManager::LoadCharacterDefinitions(const FStreamableDelegate& LoadFinishedCallback)
 {
-	LoadPrimaryAssetsWithType(UPA_CharacterDefination::GetCharacterDefinationAssetType(), TArray<FName>(), LoadFinishedCallback);
+	LoadPrimaryAssetsWithType(UPA_CharacterDefinition::GetCharacterDefinationAssetType(), TArray<FName>(), LoadFinishedCallback);
 }
 
-bool UCAssetManager::GetLoadedCharacterDefinations(TArray<UPA_CharacterDefination*>& LoadedCharacterDefinations) const
+bool UCAssetManager::GetLoadedCharacterDefinitions(TArray<UPA_CharacterDefinition*>& LoadedCharacterDefinitions) const
 {
 	TArray<UObject*> LoadedObjects;
-	const bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefination::GetCharacterDefinationAssetType(), LoadedObjects);
+	const bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefinition::GetCharacterDefinationAssetType(), LoadedObjects);
 	if (bLoaded)
 	{
 		for (UObject* LoadedObject : LoadedObjects)
 		{
-			LoadedCharacterDefinations.Add(Cast<UPA_CharacterDefination>(LoadedObject));
+			LoadedCharacterDefinitions.Add(Cast<UPA_CharacterDefinition>(LoadedObject));
 		}
 	}
 
@@ -38,7 +37,7 @@ bool UCAssetManager::GetLoadedCharacterDefinations(TArray<UPA_CharacterDefinatio
 
 void UCAssetManager::LoadShopItems(const FStreamableDelegate& LoadFinishedCallback)
 {
-	LoadPrimaryAssetsWithType(UPA_ShopItem::GetShopItemAssetType(), TArray<FName>(), FStreamableDelegate::CreateUObject(this, &UCAssetManager::ShopItemLoadFinished, LoadFinishedCallback));
+	LoadPrimaryAssetsWithType(UPA_ShopItem::GetShopItemAssetType(), TArray<FName>(), FStreamableDelegate::CreateUObject(this, &ThisClass::ShopItemLoadFinished, LoadFinishedCallback));
 }
 
 bool UCAssetManager::GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const
@@ -80,7 +79,7 @@ void UCAssetManager::BuildItemMaps()
 	{
 		for (const UPA_ShopItem* Item : LoadedItems)
 		{
-			if (Item->GetIngredients().Num() == 0)
+			if (Item->GetIngredients().IsEmpty())
 			{
 				continue;
 			}
@@ -104,7 +103,9 @@ void UCAssetManager::AddToCombinationMap(const UPA_ShopItem* Ingredient, const U
 	if (Combinations)
 	{
 		if (!Combinations->Contains(CombinationItem))
+		{
 			Combinations->AddItem(CombinationItem);
+		}
 	}
 	else
 	{

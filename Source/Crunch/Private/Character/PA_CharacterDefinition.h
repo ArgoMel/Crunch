@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GAS/CGameplayAbilityTypes.h"
-#include "PA_CharacterDefination.generated.h"
+#include "PA_CharacterDefinition.generated.h"
 
 class ACCharacter;
 class UGameplayAbility;
@@ -13,7 +13,7 @@ class UGameplayAbility;
  * 
  */
 UCLASS()
-class UPA_CharacterDefination : public UPrimaryDataAsset
+class UPA_CharacterDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:

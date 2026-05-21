@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 #include "Character/CCharacter.h"
 
-FPrimaryAssetId UPA_CharacterDefination::GetPrimaryAssetId() const
+FPrimaryAssetId UPA_CharacterDefinition::GetPrimaryAssetId() const
 {
 	return FPrimaryAssetId(GetCharacterDefinationAssetType(), GetFName());
 }
 
-FPrimaryAssetType UPA_CharacterDefination::GetCharacterDefinationAssetType()
+FPrimaryAssetType UPA_CharacterDefinition::GetCharacterDefinationAssetType()
 {
 	return FPrimaryAssetType("CharacterDefination");
 }
 
-UTexture2D* UPA_CharacterDefination::LoadIcon() const
+UTexture2D* UPA_CharacterDefinition::LoadIcon() const
 {
 	CharacterIcon.LoadSynchronous();
 	if (CharacterIcon.IsValid())
@@ -23,7 +23,7 @@ UTexture2D* UPA_CharacterDefination::LoadIcon() const
 	return nullptr;
 }
 
-TSubclassOf<ACCharacter> UPA_CharacterDefination::LoadCharacterClass() const
+TSubclassOf<ACCharacter> UPA_CharacterDefinition::LoadCharacterClass() const
 {
 	CharacterClass.LoadSynchronous();
 	if (CharacterClass.IsValid())
@@ -33,7 +33,7 @@ TSubclassOf<ACCharacter> UPA_CharacterDefination::LoadCharacterClass() const
 
 }
 
-TSubclassOf<UAnimInstance> UPA_CharacterDefination::LoadDisplayAnimationBP() const
+TSubclassOf<UAnimInstance> UPA_CharacterDefinition::LoadDisplayAnimationBP() const
 {
 	DisplayAnimBP.LoadSynchronous();
 	if (DisplayAnimBP.IsValid())
@@ -42,7 +42,7 @@ TSubclassOf<UAnimInstance> UPA_CharacterDefination::LoadDisplayAnimationBP() con
 	return TSubclassOf<UAnimInstance>();
 }
 
-USkeletalMesh* UPA_CharacterDefination::LoadDisplayMesh() const
+USkeletalMesh* UPA_CharacterDefinition::LoadDisplayMesh() const
 {
 	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
 	if (!LoadedCharaterClass)
@@ -55,7 +55,7 @@ USkeletalMesh* UPA_CharacterDefination::LoadDisplayMesh() const
 	return Character->GetMesh()->GetSkeletalMeshAsset();
 }
 
-const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* UPA_CharacterDefination::GetAbilities() const
+const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* UPA_CharacterDefinition::GetAbilities() const
 {
 	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
 	if (!LoadedCharaterClass)

@@ -7,7 +7,7 @@
 #include "Blueprint/IUserObjectListEntry.h"
 #include "CharacterEntryWidget.generated.h"
 
-class UPA_CharacterDefination;
+class UPA_CharacterDefinition;
 /**
  * 
  */
@@ -18,7 +18,7 @@ class UCharacterEntryWidget : public UUserWidget, public IUserObjectListEntry
 public:
 	
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
-	FORCEINLINE const UPA_CharacterDefination* GetCharacterDefination() const { return CharacterDefination; }
+	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefination() const { return CharacterDefination; }
 	void SetSelected(bool bIsSelected);
 private:	
 	UPROPERTY(meta=(BindWidget))
@@ -34,5 +34,5 @@ private:
 	FName SaturationMatParamName = "Saturation";
 
 	UPROPERTY()
-	const UPA_CharacterDefination* CharacterDefination;
+	const UPA_CharacterDefinition* CharacterDefination;
 };

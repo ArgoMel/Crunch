@@ -10,31 +10,32 @@ class UPA_ShopItem;
 class UTileView;
 class UInventoryComponent;
 class UShopItemWidget;
-/**
- * 
- */
-UCLASS()
+class UItemTreeWidget;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UShopWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
+	
+private:
+	void LoadShopItems();
+	void ShopItemLoadFinished() const;
+	void ShopItemWidgetGenerated(UUserWidget& NewWidget);
+	
+	void ShowItemCombination(const UShopItemWidget* ItemWidget) const;
+	
 private:
 	UPROPERTY(meta=(BindWidget))
 	UTileView* ShopItemList;
 
 	UPROPERTY(meta=(BindWidget))
-	class UItemTreeWidget* CombinationTree;
-
-	void LoadShopItems();
-	void ShopItemLoadFinished();
-	void ShopItemWidgetGenerated(UUserWidget& NewWidget);
+	UItemTreeWidget* CombinationTree;
 
 	UPROPERTY()
 	TMap<const UPA_ShopItem*, const UShopItemWidget*> ItemsMap;
 
 	UPROPERTY()
 	UInventoryComponent* OwnerInventoryComponent;
-
-	void ShowItemCombination(const UShopItemWidget* ItemWidget);
 };

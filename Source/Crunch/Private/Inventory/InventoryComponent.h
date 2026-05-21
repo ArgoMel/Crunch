@@ -15,18 +15,16 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemRemovedDelegate, const FInventoryItem
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemStackCountChangeDelegate, const FInventoryItemHandle&, int /*NewCount*/);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemAbilityCommitted, const FInventoryItemHandle&, float /*CooldownDuration*/, float /*CooldownTimeRemaining*/);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
 public:	
 	// Sets default values for this component's properties
 	UInventoryComponent();
-	FOnItemAddedDelegate OnItemAdded;
-	FOnItemRemovedDelegate OnItemRemoved;
-	FOnItemStackCountChangeDelegate OnItemStackCountChanged;
-	FOnItemAbilityCommitted OnItemAbilityCommitted;
+	virtual void BeginPlay() override;
+	
+public:	
 	void TryActivateItem(const FInventoryItemHandle& ItemHandle);
 	void TryPurchase(const UPA_ShopItem* ItemToPurchase);
 	void SellItem(const FInventoryItemHandle& ItemHandle);
@@ -39,26 +37,19 @@ public:
 	bool IsFullFor(const UPA_ShopItem* Item) const;
 
 	bool IsAllSlotOccupied() const;
-	UInventoryItem* GetAvaliableStackForItem(const UPA_ShopItem* Item) const;
+	UInventoryItem* GetAvailableStackForItem(const UPA_ShopItem* Item) const;
 	bool FindIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients, const TArray<const UPA_ShopItem*>& IngredientToIgnore = TArray<const UPA_ShopItem*>{});
 	UInventoryItem* TryGetItemForShopItem(const UPA_ShopItem* Item) const;
 	void TryActivateItemInSlot(int SlotNumber);
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	
+public:
+	FOnItemAddedDelegate OnItemAdded;
+	FOnItemRemovedDelegate OnItemRemoved;
+	FOnItemStackCountChangeDelegate OnItemStackCountChanged;
+	FOnItemAbilityCommitted OnItemAbilityCommitted;
 
 private:	
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-	int Capacity = 6;
-
-	UPROPERTY()
-	UAbilitySystemComponent* OwnerAbilitySystemComponent;
-
-	UPROPERTY()
-	TMap<FInventoryItemHandle, UInventoryItem*> InventoryMap;
-
-	void AbilityCommitted(class UGameplayAbility* CommittedAbility);
+	void AbilityCommitted(UGameplayAbility* CommittedAbility);
 	/*********************************************************/
 	/*                   Server                              */
 	/*********************************************************/
@@ -78,7 +69,6 @@ private:
 	/*********************************************************/
 	/*                   Client                              */
 	/*********************************************************/
-private:
 	UFUNCTION(Client, Reliable)
 	void Client_ItemAdded(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item, FGameplayAbilitySpecHandle GrantedAbilitySpecHandle);
 
@@ -87,4 +77,13 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void Client_ItemStackCountChanged(FInventoryItemHandle Handle, int NewCount);
+	
+private:	
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	int Capacity = 6;
+	
+	TWeakObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
+
+	UPROPERTY()
+	TMap<FInventoryItemHandle, UInventoryItem*> InventoryMap;
 };

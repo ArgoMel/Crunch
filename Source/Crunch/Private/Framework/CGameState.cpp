@@ -27,7 +27,7 @@ void ACGameState::RequestPlayerSelectionChange(const APlayerState* RequestingPla
 	OnPlayerSelectionUpdated.Broadcast(PlayerSelectionArray);
 }
 
-void ACGameState::SetCharacterSelected(const APlayerState* SelectingPlayer, const UPA_CharacterDefination* SelectedDefination)
+void ACGameState::SetCharacterSelected(const APlayerState* SelectingPlayer, const UPA_CharacterDefinition* SelectedDefination)
 {
 	if (IsDefiniationSelected(SelectedDefination))
 		return;
@@ -59,7 +59,7 @@ bool ACGameState::IsSlotOccupied(uint8 SlotId) const
 	return false;
 }
 
-bool ACGameState::IsDefiniationSelected(const UPA_CharacterDefination* Definiation) const
+bool ACGameState::IsDefiniationSelected(const UPA_CharacterDefinition* Definiation) const
 {
 	const FPlayerSelection* FoundPlayerSelection = PlayerSelectionArray.FindByPredicate(
 		[&](const FPlayerSelection& PlayerSelection)
@@ -71,7 +71,7 @@ bool ACGameState::IsDefiniationSelected(const UPA_CharacterDefination* Definiati
 	return FoundPlayerSelection != nullptr;
 }
 
-void ACGameState::SetCharacterDeselected(const UPA_CharacterDefination* DefiniationToDeselect)
+void ACGameState::SetCharacterDeselected(const UPA_CharacterDefinition* DefiniationToDeselect)
 {
 	if (!DefiniationToDeselect)
 		return;

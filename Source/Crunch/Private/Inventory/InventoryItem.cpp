@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Inventory/InventoryItem.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -56,6 +55,11 @@ uint32 GetTypeHash(const FInventoryItemHandle& Key)
 	return Key.GetHandleId();
 }
 
+UInventoryItem::UInventoryItem()
+	:StackCount{1}
+{
+}
+
 bool UInventoryItem::AddStackCount()
 {
 	if (IsStackFull())
@@ -102,7 +106,7 @@ bool UInventoryItem::IsForItem(const UPA_ShopItem* Item) const
 	return GetShopItem() == Item;
 }
 
-bool UInventoryItem::IsGrantintAbility(TSubclassOf<class UGameplayAbility> AbilityClass) const
+bool UInventoryItem::IsGrantingAbility(TSubclassOf<class UGameplayAbility> AbilityClass) const
 {
 	if (!ShopItem)
 		return false;
@@ -119,11 +123,6 @@ bool UInventoryItem::IsGrantingAnyAbility() const
 	return ShopItem->GetGrantedAbility() != nullptr;
 }
 
-UInventoryItem::UInventoryItem()
-	:StackCount{1}
-{
-}
-
 bool UInventoryItem::IsValid() const
 {
 	return ShopItem != nullptr;
@@ -135,18 +134,21 @@ void UInventoryItem::InitItem(const FInventoryItemHandle& NewHandle, const UPA_S
 	ShopItem = NewShopItem;
 
 	OwnerAbilitySystemComponent = AbilitySystemComponent;
-	if (OwnerAbilitySystemComponent)
+	if (OwnerAbilitySystemComponent.IsValid())
+	{
 		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(this, &UInventoryItem::ManaUpdated);
+	}
 	ApplyGASModifications();
 }
 
 
 bool UInventoryItem::TryActivateGrantedAbility()
 {
-	if (!GrantedAbiltiySpecHandle.IsValid())
+	if (!GrantedAbilitySpecHandle.IsValid())
 		return false;
 
-	if (OwnerAbilitySystemComponent && OwnerAbilitySystemComponent->TryActivateAbility(GrantedAbiltiySpecHandle))
+	if (OwnerAbilitySystemComponent.IsStale()
+		&& OwnerAbilitySystemComponent->TryActivateAbility(GrantedAbilitySpecHandle))
 		return true;
 
 	return false;
@@ -166,38 +168,43 @@ void UInventoryItem::ApplyConsumeEffect()
 
 void UInventoryItem::RemoveGASModifications()
 {
-	if (!OwnerAbilitySystemComponent)
+	if (!OwnerAbilitySystemComponent.IsValid())
+	{
 		return;
-
+	}
 	OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).RemoveAll(this);
 	if (OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
 	{
-		if (AppliedEquipedEffectHandle.IsValid())
-			OwnerAbilitySystemComponent->RemoveActiveGameplayEffect(AppliedEquipedEffectHandle);
+		if (AppliedEquippedEffectHandle.IsValid())
+			OwnerAbilitySystemComponent->RemoveActiveGameplayEffect(AppliedEquippedEffectHandle);
 
-		if (GrantedAbiltiySpecHandle.IsValid())
-			OwnerAbilitySystemComponent->SetRemoveAbilityOnEnd(GrantedAbiltiySpecHandle);
+		if (GrantedAbilitySpecHandle.IsValid())
+			OwnerAbilitySystemComponent->SetRemoveAbilityOnEnd(GrantedAbilitySpecHandle);
 	}
 }
 
 void UInventoryItem::ApplyGASModifications()
 {
-	if (!GetShopItem() || !OwnerAbilitySystemComponent)
+	if (!GetShopItem() 
+		|| !OwnerAbilitySystemComponent.IsValid())
+	{
 		return;
-
-	if (!OwnerAbilitySystemComponent->GetOwner() || !OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
+	}
+	if (!OwnerAbilitySystemComponent->GetOwner() 
+		|| !OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	const TSubclassOf<UGameplayEffect> EquipEffect = GetShopItem()->GetEquippedEffect();
 	if (EquipEffect)
 	{
-		 AppliedEquipedEffectHandle = OwnerAbilitySystemComponent->BP_ApplyGameplayEffectToSelf(EquipEffect, 1, OwnerAbilitySystemComponent->MakeEffectContext());
+		 AppliedEquippedEffectHandle = OwnerAbilitySystemComponent->BP_ApplyGameplayEffectToSelf(EquipEffect, 1, OwnerAbilitySystemComponent->MakeEffectContext());
 	}
 
 	const TSubclassOf<UGameplayAbility> GrantedAbility = GetShopItem()->GetGrantedAbility();
 	if (GrantedAbility)
 	{
-		GrantedAbiltiySpecHandle = OwnerAbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrantedAbility));
+		GrantedAbilitySpecHandle = OwnerAbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrantedAbility));
 	}
 }
 
@@ -237,10 +244,12 @@ float UInventoryItem::GetAbilityManaCost() const
 
 bool UInventoryItem::CanCastAbility() const
 {
-	if (!IsGrantingAnyAbility() || !OwnerAbilitySystemComponent)
+	if (!IsGrantingAnyAbility() 
+		|| !OwnerAbilitySystemComponent.IsValid())
+	{
 		return false;
-
-	const FGameplayAbilitySpec* Spec = OwnerAbilitySystemComponent->FindAbilitySpecFromHandle(GrantedAbiltiySpecHandle);
+	}
+	const FGameplayAbilitySpec* Spec = OwnerAbilitySystemComponent->FindAbilitySpecFromHandle(GrantedAbilitySpecHandle);
 	if (Spec)
 	{
 		return UCAbilitySystemStatics::CheckAbilityCost(*Spec, *OwnerAbilitySystemComponent);

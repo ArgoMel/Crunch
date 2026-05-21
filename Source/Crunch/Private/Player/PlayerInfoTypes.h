@@ -7,7 +7,7 @@
 
 
 class APlayerState;
-class UPA_CharacterDefination;
+class UPA_CharacterDefinition;
 USTRUCT()
 struct FPlayerSelection
 {
@@ -20,8 +20,8 @@ public:
 	FORCEINLINE uint8 GetPlayerSlot() const { return Slot; }
 	FORCEINLINE FUniqueNetIdRepl GetPLayerUniqueId() const { return PlayerUniqueId; }
 	FORCEINLINE FString GetPlayerNickName() const { return PlayerNickName; }
-	FORCEINLINE const UPA_CharacterDefination* GetCharacterDefination() const { return CharacterDefination; }
-	FORCEINLINE void SetCharacterDefination(const UPA_CharacterDefination* NewCharacterDefination) { CharacterDefination = NewCharacterDefination; }
+	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefination() const { return CharacterDefination; }
+	FORCEINLINE void SetCharacterDefination(const UPA_CharacterDefinition* NewCharacterDefination) { CharacterDefination = NewCharacterDefination; }
 
 	bool IsForPlayer(const APlayerState* PlayerState) const;
 	bool IsValid() const;
@@ -38,5 +38,5 @@ private:
 	FString PlayerNickName;
 
 	UPROPERTY()
-	const UPA_CharacterDefination* CharacterDefination;
+	const UPA_CharacterDefinition* CharacterDefination;
 };

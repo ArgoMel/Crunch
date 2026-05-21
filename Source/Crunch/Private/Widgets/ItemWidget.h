@@ -6,33 +6,34 @@
 #include "Blueprint/UserWidget.h"
 #include "ItemWidget.generated.h"
 
-
 class UItemToolTip;
 class UPA_ShopItem;
-/**
- * 
- */
-UCLASS()
+class UImage;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual void NativeConstruct() override;
+	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	
+public:
 	virtual void SetIcon(UTexture2D* IconTexture);
+	
 protected:
 	UItemToolTip* SetToolTipWidget(const UPA_ShopItem* Item);
-	class UImage* GetItemIcon() const { return ItemIcon; }
+	UImage* GetItemIcon() const { return ItemIcon; }
 
 private:
+	virtual void RightButtonClicked();
+	virtual void LeftButtonClicked();
+	
+private:
 	UPROPERTY(meta=(BindWidget))
-	class UImage* ItemIcon;
+	UImage* ItemIcon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "ToolTip")
 	TSubclassOf<UItemToolTip> ItemToolTipClass;
-
-	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
-	virtual FReply NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
-
-	virtual void RightButtonClicked();
-	virtual void LeftButtonClicked();
 };

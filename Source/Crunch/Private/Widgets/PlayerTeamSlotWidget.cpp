@@ -2,7 +2,7 @@
 
 
 #include "Widgets/PlayerTeamSlotWidget.h"
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
@@ -13,7 +13,7 @@ void UPlayerTeamSlotWidget::NativeConstruct()
 	CachedCharacterNameStr = "";
 }
 
-void UPlayerTeamSlotWidget::UpdateSlot(const FString& PlayerName, const UPA_CharacterDefination* CharacterDefination)
+void UPlayerTeamSlotWidget::UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefination)
 {
 	CachedPlayerNameStr = PlayerName;
 

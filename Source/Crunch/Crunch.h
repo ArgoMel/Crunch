@@ -5,6 +5,9 @@
 	[/Script/AIModule.AISense_Sight]
 	bAutoRegisterAllPawnsAsSources=false
  * TraceChannels Target
+ * 에셋매니저 클래스 변경
+ * 게임플레이큐 경로
+ * 에셋매니저 프리머리 에셋 추가
  */
 
 #pragma once

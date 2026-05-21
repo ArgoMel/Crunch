@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "GameplayEffectTypes.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "InventoryItem.generated.h"
@@ -26,42 +25,40 @@ public:
 	uint32 GetHandleId() const { return HandleId; }
 private:
 	explicit FInventoryItemHandle(uint32 Id);
-
-	UPROPERTY()
-	uint32 HandleId;
-
+	
 	static uint32 GenerateNextId();
 	static uint32 GetInvalidId();
+private:
+	UPROPERTY()
+	uint32 HandleId;
 };
 
 bool operator==(const FInventoryItemHandle& Lhs, const FInventoryItemHandle& Rhs);
 uint32 GetTypeHash(const FInventoryItemHandle& Key);
 
-/**
- * 
- */
 UCLASS()
 class UInventoryItem : public UObject
 {
 	GENERATED_BODY()
 public:
-	FOnAbilityCanCastUpdatedDelegate OnAbilityCanCastUpdated;
-	// return true is was able to add
+	UInventoryItem();
+	
+public:
+	// return true it was able to add
 	bool AddStackCount();
 
 	// returns true if the stack is not empty after reducing
 	bool ReduceStackCount();
 
-	// retruns true if was able to set
+	// returns true if was able to set
 	bool SetStackCount(int NewStackCount);
 
 	bool IsStackFull() const;
 
 	bool IsForItem(const UPA_ShopItem* Item) const;
-	bool IsGrantintAbility(TSubclassOf<class UGameplayAbility> AbilityClass) const;
+	bool IsGrantingAbility(TSubclassOf<UGameplayAbility> AbilityClass) const;
 	bool IsGrantingAnyAbility() const;
-
-	UInventoryItem();
+	
 	bool IsValid() const;
 	void InitItem(const FInventoryItemHandle& NewHandle, const UPA_ShopItem* NewShopItem, UAbilitySystemComponent* AbilitySystemComponent);
 	const UPA_ShopItem* GetShopItem() const { return ShopItem; }
@@ -78,18 +75,24 @@ public:
 	float GetAbilityCooldownDuration() const;
 	float GetAbilityManaCost() const;
 	bool CanCastAbility() const;
-	FGameplayAbilitySpecHandle GetGrantedAbilitySpecHandle() const { return GrantedAbiltiySpecHandle; }
-	void SetGrantedAbilitySpecHandle(FGameplayAbilitySpecHandle SpecHandle) { GrantedAbiltiySpecHandle = SpecHandle; }
+	FGameplayAbilitySpecHandle GetGrantedAbilitySpecHandle() const { return GrantedAbilitySpecHandle; }
+	void SetGrantedAbilitySpecHandle(FGameplayAbilitySpecHandle SpecHandle) { GrantedAbilitySpecHandle = SpecHandle; }
+	
 private:
 	void ApplyGASModifications();
-	UAbilitySystemComponent* OwnerAbilitySystemComponent;
+	TWeakObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
 	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
+	
+public:
+	FOnAbilityCanCastUpdatedDelegate OnAbilityCanCastUpdated;
+	
+private:
 	UPROPERTY()
 	const UPA_ShopItem* ShopItem;
 	FInventoryItemHandle Handle;
 	int StackCount;
 	int Slot;
 
-	FActiveGameplayEffectHandle AppliedEquipedEffectHandle;
-	FGameplayAbilitySpecHandle GrantedAbiltiySpecHandle;
+	FActiveGameplayEffectHandle AppliedEquippedEffectHandle;
+	FGameplayAbilitySpecHandle GrantedAbilitySpecHandle;
 };

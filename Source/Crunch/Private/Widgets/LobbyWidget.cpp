@@ -2,7 +2,7 @@
 
 
 #include "Widgets/LobbyWidget.h"
-#include "Character/PA_CharacterDefination.h"
+#include "Character/PA_CharacterDefinition.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Components/TileView.h"
@@ -36,7 +36,7 @@ void ULobbyWidget::NativeConstruct()
 	StartMatchButton->SetIsEnabled(false);
 	StartMatchButton->OnClicked.AddDynamic(this, &ULobbyWidget::StartMatchButtonClicked);
 
-	UCAssetManager::Get().LoadCharacterDefinations(FStreamableDelegate::CreateUObject(this, &ULobbyWidget::CharacterDefinationLoaded));
+	UCAssetManager::Get().LoadCharacterDefinitions(FStreamableDelegate::CreateUObject(this, &ULobbyWidget::CharacterDefinationLoaded));
 	if (CharacterSelectionTileView)
 	{
 		CharacterSelectionTileView->OnItemSelectionChanged().AddUObject(this, &ULobbyWidget::CharacterSelected);
@@ -158,8 +158,8 @@ void ULobbyWidget::SwitchToHeroSelection()
 
 void ULobbyWidget::CharacterDefinationLoaded()
 {
-	TArray<UPA_CharacterDefination*> LoadedCharacterDefinations;
-	if (UCAssetManager::Get().GetLoadedCharacterDefinations(LoadedCharacterDefinations))
+	TArray<UPA_CharacterDefinition*> LoadedCharacterDefinations;
+	if (UCAssetManager::Get().GetLoadedCharacterDefinitions(LoadedCharacterDefinations))
 	{
 		CharacterSelectionTileView->SetListItems(LoadedCharacterDefinations);
 	}
@@ -175,7 +175,7 @@ void ULobbyWidget::CharacterSelected(UObject* SelectedUObject)
 	if (!CPlayerState)
 		return;
 
-	if (const UPA_CharacterDefination* CharacterDefination = Cast<UPA_CharacterDefination>(SelectedUObject))
+	if (const UPA_CharacterDefinition* CharacterDefination = Cast<UPA_CharacterDefinition>(SelectedUObject))
 	{
 		CPlayerState->Server_SetSelectedCharacterDefination(CharacterDefination);
 	}
