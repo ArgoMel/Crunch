@@ -9,99 +9,87 @@
 
 class UInventoryItem;
 class UInventoryItemWidget;
+class UTextBlock;
+class UInventoryItemDragDropOp;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemDropped, UInventoryItemWidget* /*DestionationWidget*/, UInventoryItemWidget* /*SourceWidget*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemDropped, UInventoryItemWidget* /*DestinationWidget*/, UInventoryItemWidget* /*SourceWidget*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnButtonClick, const FInventoryItemHandle& /*ItemHandle*/);
-/**
- * 
- */
-UCLASS()
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UInventoryItemWidget : public UItemWidget
 {
 	GENERATED_BODY()
 public:
-	FOnInventoryItemDropped OnInventoryItemDropped;
-	FOnButtonClick OnLeftBttonClicked;
-	FOnButtonClick OnRightBttonClicked;
+	virtual void SetIcon(UTexture2D* IconTexture) override;
+protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeOnDragDetected( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation ) override;
+	virtual bool NativeOnDrop( const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation ) override;
+private:
+	virtual void RightButtonClicked() override;
+	virtual void LeftButtonClicked() override;
+	
+public:
 	bool IsEmpty() const;
 	void SetSlotNumber(int NewSlotNumber);
 	void UpdateInventoryItem(const UInventoryItem* Item);
 	void EmptySlot();
 	FORCEINLINE int GetSlotNumber() const { return SlotNumber; }
-	void UpdateStackCount();
+	void UpdateStackCount() const;
 
 	UTexture2D* GetIconTexture() const;
 	FORCEINLINE const UInventoryItem* GetInventoryItem() const { return InventoryItem; }
 	FInventoryItemHandle GetItemHandle() const;
+	
+	void StartCooldown(float CooldownDuration, float TimeRemaining);
 
 private:
+	void UpdateCanCastDisplay(bool bCanCast) const;
+	
+	void BindCanCastAbilityDelegate();
+	void UnBindCanCastAbilityDelegate() const;
 
-	void UpdateCanCastDisplay(bool bCanCast);
-
+	void CooldownFinished();
+	void UpdateCooldown();
+	void ClearCooldown();
+	
+public:
+	FOnInventoryItemDropped OnInventoryItemDropped;
+	FOnButtonClick OnLeftButtonClicked;
+	FOnButtonClick OnRightButtonClicked;
+	
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "Visual")
 	UTexture2D* EmptyTexture;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* StackCountText;
+	UTextBlock* StackCountText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CooldownCountText;
+	UTextBlock* CooldownCountText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CooldownDurationText;
+	UTextBlock* CooldownDurationText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* ManaCostText;
+	UTextBlock* ManaCostText;
 
 	UPROPERTY()
 	const UInventoryItem* InventoryItem;
 
 	int SlotNumber;
-
-	virtual void RightButtonClicked() override;
-	virtual void LeftButtonClicked() override;
-	/******************************************/
-	/*           Drag Drop                    */
-	/******************************************/
-private:
-	virtual void NativeOnDragDetected( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation ) override;
-	virtual bool NativeOnDrop( const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation ) override;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Drag Drop")
-	TSubclassOf<class UInventoryItemDragDropOp> DragDropOpClass;
-	/******************************************/
-	/*            GAS                         */
-	/******************************************/
-
-public:
-	void StartCooldown(float CooldownDuration, float TimeRemaining);
-private:
+	TSubclassOf<UInventoryItemDragDropOp> DragDropOpClass;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
 	float CooldownUpdateInterval = 0.1f;
-
-	void BindCanCastAbilityDelegate();
-	void UnBindCanCastAbilityDelegate();
-
-	void CooldownFinished();
-	void UpdateCooldown();
-	void ClearCooldown();
-
+	
 	FTimerHandle CooldownDurationTimerHandle;
 	FTimerHandle CooldownUpdateTimerHandle;
 
 	float CooldownTimeRemaining = 0.f;
 	float CooldownTimeDuration = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
-	FName CooldownAmtDynamicMaterialParamName = "Percent";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
-	FName IconTextureDynamicMaterialParamName = "Icon";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Cooldown")
-	FName CanCastDynamicMaterialParamName = "CanCast";
-
-	virtual void SetIcon(UTexture2D* IconTexture) override;
+	
 	FNumberFormattingOptions CooldownDisplayFormattingOptions;
 };

@@ -22,7 +22,7 @@ TArray<const ITreeNodeInterface*> UShopItemWidget::GetInputs() const
 	return TArray<const ITreeNodeInterface*>{};
 }
 
-TArray<const ITreeNodeInterface*> UShopItemWidget::GetOuputs() const
+TArray<const ITreeNodeInterface*> UShopItemWidget::GetOutputs() const
 {
 	const FItemCollection* Collection = UCAssetManager::Get().GetIngredientForItem(GetShopItem());
 	if (Collection)

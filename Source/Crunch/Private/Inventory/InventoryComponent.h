@@ -31,14 +31,14 @@ public:
 	float GetGold() const;
 	FORCEINLINE int GetCapacity() const { return Capacity; }
 
-	void ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber);
+	void ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber) const;
 	UInventoryItem* GetInventoryItemByHandle(const FInventoryItemHandle& Handle) const;
 
 	bool IsFullFor(const UPA_ShopItem* Item) const;
 
 	bool IsAllSlotOccupied() const;
 	UInventoryItem* GetAvailableStackForItem(const UPA_ShopItem* Item) const;
-	bool FindIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients, const TArray<const UPA_ShopItem*>& IngredientToIgnore = TArray<const UPA_ShopItem*>{});
+	bool FindIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients, TArray<const UPA_ShopItem*>& IngredientToIgnore) const;
 	UInventoryItem* TryGetItemForShopItem(const UPA_ShopItem* Item) const;
 	void TryActivateItemInSlot(int SlotNumber);
 	

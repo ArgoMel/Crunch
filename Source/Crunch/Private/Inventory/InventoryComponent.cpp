@@ -19,7 +19,7 @@ void UInventoryComponent::BeginPlay()
 	OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
 	if (OwnerAbilitySystemComponent.IsValid())
 	{
-		OwnerAbilitySystemComponent->AbilityCommittedCallbacks.AddUObject(this, &UInventoryComponent::AbilityCommitted);
+		OwnerAbilitySystemComponent->AbilityCommittedCallbacks.AddUObject(this, &ThisClass::AbilityCommitted);
 	}
 }
 
@@ -27,8 +27,9 @@ void UInventoryComponent::TryActivateItem(const FInventoryItemHandle& ItemHandle
 {
 	const UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem)
+	{
 		return;
-
+	}
 	Server_ActivateItem(ItemHandle);
 }
 
@@ -61,7 +62,7 @@ float UInventoryComponent::GetGold() const
 	return 0.f;
 }
 
-void UInventoryComponent::ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber)
+void UInventoryComponent::ItemSlotChanged(const FInventoryItemHandle& Handle, int NewSlotNumber) const
 {
 	if (UInventoryItem* FoundItem = GetInventoryItemByHandle(Handle))
 	{
@@ -102,11 +103,14 @@ bool UInventoryComponent::IsAllSlotOccupied() const
 UInventoryItem* UInventoryComponent::GetAvailableStackForItem(const UPA_ShopItem* Item) const
 {
 	if (!Item->GetIsStackable())
+	{
 		return nullptr;
-
+	}
 	for (const TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
 	{
-		if (ItemPair.Value && ItemPair.Value->IsForItem(Item) && !ItemPair.Value->IsStackFull())
+		if (ItemPair.Value 
+			&& ItemPair.Value->IsForItem(Item) 
+			&& !ItemPair.Value->IsStackFull())
 		{
 			return ItemPair.Value;
 		}
@@ -115,18 +119,21 @@ UInventoryItem* UInventoryComponent::GetAvailableStackForItem(const UPA_ShopItem
 	return nullptr;
 }
 
-bool UInventoryComponent::FindIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients, const TArray<const UPA_ShopItem*>& IngredientToIgnore)
+bool UInventoryComponent::FindIngredientForItem(const UPA_ShopItem* Item, TArray<UInventoryItem*>& OutIngredients, TArray<const UPA_ShopItem*>& IngredientToIgnore) const
 {
 	const FItemCollection* Ingredients = UCAssetManager::Get().GetIngredientForItem(Item);
 	if (!Ingredients)
+	{
 		return false;
-
+	}
 	bool bAllFound = true;
 	for (const UPA_ShopItem* Ingredient : Ingredients->GetItems())
 	{
 		if (IngredientToIgnore.Contains(Ingredient))
+		{
+			IngredientToIgnore.RemoveSingle(Ingredient);
 			continue;
-
+		}
 		UInventoryItem* FoundItem = TryGetItemForShopItem(Ingredient);
 		if (!FoundItem)
 		{
@@ -143,11 +150,13 @@ bool UInventoryComponent::FindIngredientForItem(const UPA_ShopItem* Item, TArray
 UInventoryItem* UInventoryComponent::TryGetItemForShopItem(const UPA_ShopItem* Item) const
 {
 	if (!Item)
+	{
 		return nullptr;
-
+	}
 	for (const TPair<FInventoryItemHandle, UInventoryItem*>& ItemHandlePair : InventoryMap)
 	{
-		if (ItemHandlePair.Value && ItemHandlePair.Value->GetShopItem() == Item)
+		if (ItemHandlePair.Value 
+			&& ItemHandlePair.Value->GetShopItem() == Item)
 		{
 			return ItemHandlePair.Value;
 		}
@@ -171,8 +180,9 @@ void UInventoryComponent::TryActivateItemInSlot(int SlotNumber)
 void UInventoryComponent::AbilityCommitted(UGameplayAbility* CommittedAbility)
 {
 	if (!CommittedAbility)
+	{
 		return;
-
+	}
 	float CooldownTimeRemaining = 0.f;
 	float CooldownDuration = 0.f;
 
@@ -186,8 +196,9 @@ void UInventoryComponent::AbilityCommitted(UGameplayAbility* CommittedAbility)
 	for (TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
 	{
 		if (!ItemPair.Value)
+		{
 			continue;
-
+		}
 		if (ItemPair.Value->IsGrantingAbility(CommittedAbility->GetClass()))
 		{
 			OnItemAbilityCommitted.Broadcast(ItemPair.Key, CooldownDuration, CooldownTimeRemaining);
@@ -227,8 +238,9 @@ void UInventoryComponent::Server_ActivateItem_Implementation(FInventoryItemHandl
 {
 	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem)
+	{
 		return;
-
+	}
 	InventoryItem->TryActivateGrantedAbility();
 	const UPA_ShopItem* Item = InventoryItem->GetShopItem();
 	if (Item->GetIsConsumable())
@@ -246,8 +258,9 @@ void UInventoryComponent::Server_SellItem_Implementation(FInventoryItemHandle It
 {
 	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem || !InventoryItem->IsValid())
+	{
 		return;
-
+	}
 	const float SellPrice = InventoryItem->GetShopItem()->GetSellPrice();
 	OwnerAbilitySystemComponent->ApplyModToAttribute(UCHeroAttributeSet::GetGoldAttribute(), EGameplayModOp::Additive, SellPrice * InventoryItem->GetStackCount());
 	RemoveItem(InventoryItem);
@@ -261,8 +274,9 @@ bool UInventoryComponent::Server_SellItem_Validate(FInventoryItemHandle ItemHand
 void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 {
 	if (!GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	if (UInventoryItem* StackItem = GetAvailableStackForItem(NewItem))
 	{
 		StackItem->AddStackCount();
@@ -272,14 +286,15 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 	else
 	{
 		if (TryItemCombination(NewItem))
+		{
 			return;
-
+		}
 		UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
 		const FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();
 		InventoryItem->InitItem(NewHandle, NewItem, OwnerAbilitySystemComponent.Get());
 		InventoryMap.Add(NewHandle, InventoryItem);
 		OnItemAdded.Broadcast(InventoryItem);
-		UE_LOG(LogTemp, Warning, TEXT("Server Adding Shop Item: %s, with Id: %d"), *(InventoryItem->GetShopItem()->GetItemName().ToString()), NewHandle.GetHandleId());
+		//UE_LOG(LogTemp, Warning, TEXT("Server Adding Shop Item: %s, with Id: %d"), *(InventoryItem->GetShopItem()->GetItemName().ToString()), NewHandle.GetHandleId());
 		const FGameplayAbilitySpecHandle GrantedAbilitySpecHandle = InventoryItem->GetGrantedAbilitySpecHandle();
 		Client_ItemAdded(NewHandle, NewItem, GrantedAbilitySpecHandle);
 	}
@@ -288,11 +303,13 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 void UInventoryComponent::ConsumeItem(UInventoryItem* Item)
 {
 	if (!GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	if (!Item)
+	{
 		return;
-
+	}
 	Item->ApplyConsumeEffect();
 	if (!Item->ReduceStackCount())
 	{
@@ -308,8 +325,9 @@ void UInventoryComponent::ConsumeItem(UInventoryItem* Item)
 void UInventoryComponent::RemoveItem(UInventoryItem* Item)
 {
 	if (!GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	Item->RemoveGASModifications();
 	OnItemRemoved.Broadcast(Item->GetHandle());
 	InventoryMap.Remove(Item->GetHandle());
@@ -319,18 +337,22 @@ void UInventoryComponent::RemoveItem(UInventoryItem* Item)
 bool UInventoryComponent::TryItemCombination(const UPA_ShopItem* NewItem)
 {
 	if (!GetOwner()->HasAuthority())
+	{
 		return false;
-
+	}
 	const FItemCollection* CombinationItems = UCAssetManager::Get().GetCombinationForItem(NewItem);
 	if (!CombinationItems)
+	{
 		return false;
-
+	}
 	for (const UPA_ShopItem* CombinationItem : CombinationItems->GetItems())
 	{
 		TArray<UInventoryItem*> Ingredients;
-		if (!FindIngredientForItem(CombinationItem, Ingredients, TArray<const UPA_ShopItem*>{NewItem}))
+		TArray<const UPA_ShopItem*> ignoreItems{NewItem};
+		if (!FindIngredientForItem(CombinationItem, Ingredients, ignoreItems))
+		{
 			continue;
-
+		}
 		for (UInventoryItem* Ingredient : Ingredients)
 		{
 			RemoveItem(Ingredient);
@@ -342,14 +364,31 @@ bool UInventoryComponent::TryItemCombination(const UPA_ShopItem* NewItem)
 	return false;
 }
 
+void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item,  FGameplayAbilitySpecHandle GrantedAbilitySpecHandle)
+{
+	if (GetOwner()->HasAuthority())
+	{
+		return;
+	}
+	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+	InventoryItem->InitItem(AssignedHandle, Item, OwnerAbilitySystemComponent.Get());
+	InventoryItem->SetGrantedAbilitySpecHandle(GrantedAbilitySpecHandle);
+	InventoryMap.Add(AssignedHandle, InventoryItem);
+	OnItemAdded.Broadcast(InventoryItem);
+	//UE_LOG(LogTemp, Warning, TEXT("Client Adding Shop Item: %s, with Id: %d"), *(InventoryItem->GetShopItem()->GetItemName().ToString()), AssignedHandle.GetHandleId());
+}
+
 void UInventoryComponent::Client_ItemRemoved_Implementation(FInventoryItemHandle ItemHandle)
 {
 	if (GetOwner()->HasAuthority())
+	{
 		return;
-
-	UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
+	}
+	const UInventoryItem* InventoryItem = GetInventoryItemByHandle(ItemHandle);
 	if (!InventoryItem)
+	{
 		return;
+	}
 	InventoryItem->RemoveGASModifications();
 
 	OnItemRemoved.Broadcast(ItemHandle);
@@ -359,8 +398,9 @@ void UInventoryComponent::Client_ItemRemoved_Implementation(FInventoryItemHandle
 void UInventoryComponent::Client_ItemStackCountChanged_Implementation(FInventoryItemHandle Handle, int NewCount)
 {
 	if (GetOwner()->HasAuthority())
+	{
 		return;
-
+	}
 	UInventoryItem* FoundItem = GetInventoryItemByHandle(Handle);
 	if (FoundItem)
 	{
@@ -368,19 +408,3 @@ void UInventoryComponent::Client_ItemStackCountChanged_Implementation(FInventory
 		OnItemStackCountChanged.Broadcast(Handle, NewCount);
 	}
 }
-
-void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle AssignedHandle, const UPA_ShopItem* Item,  FGameplayAbilitySpecHandle GrantedAbilitySpecHandle)
-{
-	if (GetOwner()->HasAuthority())
-		return;
-
-	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
-	InventoryItem->InitItem(AssignedHandle, Item, OwnerAbilitySystemComponent.Get());
-	InventoryItem->SetGrantedAbilitySpecHandle(GrantedAbilitySpecHandle);
-	InventoryMap.Add(AssignedHandle, InventoryItem);
-	OnItemAdded.Broadcast(InventoryItem);
-	UE_LOG(LogTemp, Warning, TEXT("Client Adding Shop Item: %s, with Id: %d"), *(InventoryItem->GetShopItem()->GetItemName().ToString()), AssignedHandle.GetHandleId());
-}
-
-
-

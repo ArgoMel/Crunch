@@ -64,9 +64,9 @@ public:
 	const UPA_ShopItem* GetShopItem() const { return ShopItem; }
 	FInventoryItemHandle GetHandle() const { return Handle; }
 
-	bool TryActivateGrantedAbility();
-	void ApplyConsumeEffect();
-	void RemoveGASModifications();
+	bool TryActivateGrantedAbility() const;
+	void ApplyConsumeEffect() const;
+	void RemoveGASModifications() const;
 	FORCEINLINE int GetStackCount() const { return StackCount; }
 	void SetSlot(int NewSlot);
 	int GetItemSlot() const { return Slot; }
@@ -81,7 +81,7 @@ public:
 private:
 	void ApplyGASModifications();
 	TWeakObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
-	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
+	void ManaUpdated(const FOnAttributeChangeData& ChangeData) const;
 	
 public:
 	FOnAbilityCanCastUpdatedDelegate OnAbilityCanCastUpdated;

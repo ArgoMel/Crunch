@@ -7,32 +7,34 @@
 #include "Widgets/TreeNodeInterface.h"
 #include "ItemTreeWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UCanvasPanel;
+class UCanvasPanelSlot;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UItemTreeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
 	void DrawFromNode(const ITreeNodeInterface* NodeInterface);
+	
 private:
 	void DrawStream(
 		bool bUpperStream, 
-		const ITreeNodeInterface* StartingNodeInteface,
+		const ITreeNodeInterface* StartingNodeInterface,
 		UUserWidget* StartingNodeWidget, 
-		class UCanvasPanelSlot* StartingNodeSlot,
+		UCanvasPanelSlot* StartingNodeSlot,
 		int StartingNodeDepth,
 		float& NextLeafXPosition,
 		TArray<UCanvasPanelSlot*>& OutStreamSlots
 	);
-	void ClearTree();
-	UUserWidget* CreateWidgetForNode(const ITreeNodeInterface* Node, class UCanvasPanelSlot*& OutCanvasSlot);
-	void CreateConnection(const UUserWidget* From, UUserWidget* To);
+	void ClearTree() const;
+	UUserWidget* CreateWidgetForNode(const ITreeNodeInterface* Node, UCanvasPanelSlot*& OutCanvasSlot) const;
+	void CreateConnection(const UUserWidget* From, UUserWidget* To) const;
 
+private:
 	UPROPERTY(meta=(BindWidget))
-	class UCanvasPanel* RootPanel;
-	const UObject* CurrentCenterItem;
+	UCanvasPanel* RootPanel;
+	TWeakObjectPtr<const UObject> CurrentCenterItem;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tree")
 	FVector2D NodeSize = FVector2D{ 60.f };
@@ -47,7 +49,7 @@ private:
 	float ConnectionThickness = 3.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tree")
-	FVector2D SourePortLocalPos = FVector2D{ 0.5f, 0.9f };
+	FVector2D SourcePortLocalPos = FVector2D{ 0.5f, 0.9f };
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tree")
 	FVector2D DestinationPortLocalPos = FVector2D{ 0.5f, 0.1f };

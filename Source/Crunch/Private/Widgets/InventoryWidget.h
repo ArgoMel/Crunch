@@ -9,23 +9,18 @@
 
 class UInventoryItemWidget;
 class UInventoryContextMenuWidget;
-/**
- * 
- */
-UCLASS()
+class UWrapBox;
+class UInventoryComponent;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent) override;
+	
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-	TSubclassOf<UInventoryContextMenuWidget> ContextMenuWidgetClass;
-
-	UPROPERTY()
-	UInventoryContextMenuWidget* ContextMenuWidget;
-
 	void SpawnContextMenu();
 
 	UFUNCTION()
@@ -34,30 +29,38 @@ private:
 	UFUNCTION()
 	void UseFocusedItem();
 
-	void SetContextMenuVisible(bool bContextMenuVisible);
+	void SetContextMenuVisible(bool bContextMenuVisible) const;
 	void ToggleContextMenu(const FInventoryItemHandle& ItemHandle);
 	void ClearContextMenu();
-	FInventoryItemHandle CurrentFocusedItemHandle;
-
-
-	UPROPERTY(meta=(BindWidget))
-	class UWrapBox* ItemList;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
-	TSubclassOf<UInventoryItemWidget> ItemWidgetClass;
-
-	UPROPERTY()
-	class UInventoryComponent* InventoryComponent;
-
-	TArray<UInventoryItemWidget*> ItemWidgets;
-	TMap<FInventoryItemHandle, UInventoryItemWidget*> PopulatedItemEntryWidgets;
-
+	
 	void ItemAdded(const UInventoryItem* InventoryItem);
 	void ItemStackCountChanged(const FInventoryItemHandle& Handle, int NewCount);
 
-	UInventoryItemWidget* GetNextAvaliableSlot() const;
+	UInventoryItemWidget* GetNextAvailableSlot() const;
 
 	void HandleItemDragDrop(UInventoryItemWidget* DestinationWidget, UInventoryItemWidget* SourceWidget);
 	void ItemRemoved(const FInventoryItemHandle& ItemHandle);
 	void ItemAbilityCommitted(const FInventoryItemHandle& ItemHandle, float CooldownDuration, float CooldownTimeRemaining);
+	
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	TSubclassOf<UInventoryContextMenuWidget> ContextMenuWidgetClass;
+
+	UPROPERTY()
+	UInventoryContextMenuWidget* ContextMenuWidget;
+	
+	FInventoryItemHandle CurrentFocusedItemHandle;
+
+	UPROPERTY(meta=(BindWidget))
+	UWrapBox* ItemList;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
+	TSubclassOf<UInventoryItemWidget> ItemWidgetClass;
+	
+	TWeakObjectPtr<UInventoryComponent> InventoryComponent;
+
+	UPROPERTY()
+	TArray<UInventoryItemWidget*> ItemWidgets;
+	UPROPERTY()
+	TMap<FInventoryItemHandle, UInventoryItemWidget*> PopulatedItemEntryWidgets;
 };

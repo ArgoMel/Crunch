@@ -22,7 +22,7 @@ class UShopItemWidget : public UItemWidget, public IUserObjectListEntry, public 
 public:
 	virtual UUserWidget* GetWidget() const override;
 	virtual TArray<const ITreeNodeInterface*> GetInputs() const override;
-	virtual TArray<const ITreeNodeInterface*> GetOuputs() const override;
+	virtual TArray<const ITreeNodeInterface*> GetOutputs() const override;
 	virtual const UObject* GetItemObject() const override;
 protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;

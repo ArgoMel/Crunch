@@ -13,17 +13,12 @@ class UTreeNodeInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
 class ITreeNodeInterface
 {
 	GENERATED_BODY()
-
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual UUserWidget* GetWidget() const = 0;
 	virtual TArray<const ITreeNodeInterface*> GetInputs() const = 0;
-	virtual TArray<const ITreeNodeInterface*> GetOuputs() const = 0;
+	virtual TArray<const ITreeNodeInterface*> GetOutputs() const = 0;
 	virtual const UObject* GetItemObject() const = 0;
 };

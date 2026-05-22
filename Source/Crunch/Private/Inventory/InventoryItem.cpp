@@ -84,7 +84,8 @@ bool UInventoryItem::ReduceStackCount()
 
 bool UInventoryItem::SetStackCount(int NewStackCount)
 {
-	if (NewStackCount > 0 && NewStackCount <= GetShopItem()->GetMaxStackCount())
+	if (NewStackCount > 0 
+		&& NewStackCount <= GetShopItem()->GetMaxStackCount())
 	{
 		StackCount = NewStackCount;
 		return true;
@@ -101,16 +102,18 @@ bool UInventoryItem::IsStackFull() const
 bool UInventoryItem::IsForItem(const UPA_ShopItem* Item) const
 {
 	if (!Item)
+	{
 		return false;
-
+	}
 	return GetShopItem() == Item;
 }
 
-bool UInventoryItem::IsGrantingAbility(TSubclassOf<class UGameplayAbility> AbilityClass) const
+bool UInventoryItem::IsGrantingAbility(TSubclassOf<UGameplayAbility> AbilityClass) const
 {
 	if (!ShopItem)
+	{
 		return false;
-
+	}
 	const TSubclassOf<UGameplayAbility> GrantedAbility = ShopItem->GetGrantedAbility();
 	return GrantedAbility == AbilityClass;
 }
@@ -118,8 +121,9 @@ bool UInventoryItem::IsGrantingAbility(TSubclassOf<class UGameplayAbility> Abili
 bool UInventoryItem::IsGrantingAnyAbility() const
 {
 	if (!ShopItem)
+	{
 		return false;
-
+	}
 	return ShopItem->GetGrantedAbility() != nullptr;
 }
 
@@ -136,37 +140,40 @@ void UInventoryItem::InitItem(const FInventoryItemHandle& NewHandle, const UPA_S
 	OwnerAbilitySystemComponent = AbilitySystemComponent;
 	if (OwnerAbilitySystemComponent.IsValid())
 	{
-		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(this, &UInventoryItem::ManaUpdated);
+		OwnerAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCAttributeSet::GetManaAttribute()).AddUObject(this, &ThisClass::ManaUpdated);
 	}
 	ApplyGASModifications();
 }
 
-
-bool UInventoryItem::TryActivateGrantedAbility()
+bool UInventoryItem::TryActivateGrantedAbility() const
 {
 	if (!GrantedAbilitySpecHandle.IsValid())
+	{
 		return false;
-
-	if (OwnerAbilitySystemComponent.IsStale()
+	}
+	if (OwnerAbilitySystemComponent.IsValid()
 		&& OwnerAbilitySystemComponent->TryActivateAbility(GrantedAbilitySpecHandle))
+	{
 		return true;
-
+	}
 	return false;
 }
 
-void UInventoryItem::ApplyConsumeEffect()
+void UInventoryItem::ApplyConsumeEffect() const
 {
 	if (!ShopItem)
+	{
 		return;
-
+	}
 	const TSubclassOf<UGameplayEffect> ConsumeEffect = ShopItem->GetConsumeEffect();
 	if (!ConsumeEffect)
+	{
 		return;
-
+	}
 	OwnerAbilitySystemComponent->BP_ApplyGameplayEffectToSelf(ConsumeEffect, 1, OwnerAbilitySystemComponent->MakeEffectContext());
 }
 
-void UInventoryItem::RemoveGASModifications()
+void UInventoryItem::RemoveGASModifications() const
 {
 	if (!OwnerAbilitySystemComponent.IsValid())
 	{
@@ -176,10 +183,13 @@ void UInventoryItem::RemoveGASModifications()
 	if (OwnerAbilitySystemComponent->GetOwner()->HasAuthority())
 	{
 		if (AppliedEquippedEffectHandle.IsValid())
+		{
 			OwnerAbilitySystemComponent->RemoveActiveGameplayEffect(AppliedEquippedEffectHandle);
-
+		}
 		if (GrantedAbilitySpecHandle.IsValid())
+		{
 			OwnerAbilitySystemComponent->SetRemoveAbilityOnEnd(GrantedAbilitySpecHandle);
+		}
 	}
 }
 
@@ -208,7 +218,7 @@ void UInventoryItem::ApplyGASModifications()
 	}
 }
 
-void UInventoryItem::ManaUpdated(const FOnAttributeChangeData& ChangeData)
+void UInventoryItem::ManaUpdated(const FOnAttributeChangeData& ChangeData) const
 {
 	OnAbilityCanCastUpdated.Broadcast(CanCastAbility());
 }
@@ -221,24 +231,27 @@ void UInventoryItem::SetSlot(int NewSlot)
 float UInventoryItem::GetAbilityCooldownTimeRemaining() const
 {
 	if (!IsGrantingAnyAbility())
+	{
 		return 0.f;
-
+	}
 	return UCAbilitySystemStatics::GetCooldownRemainingFor(GetShopItem()->GetGrantedAbilityCDO(), *OwnerAbilitySystemComponent);
 }
 
 float UInventoryItem::GetAbilityCooldownDuration() const
 {
 	if (!IsGrantingAnyAbility())
+	{
 		return 0.f;
-
+	}
 	return UCAbilitySystemStatics::GetCooldownDurationFor(GetShopItem()->GetGrantedAbilityCDO(), *OwnerAbilitySystemComponent, 1);
 }
 
 float UInventoryItem::GetAbilityManaCost() const
 {
 	if (!IsGrantingAnyAbility())
+	{
 		return 0.f;
-
+	}
 	return UCAbilitySystemStatics::GetManaCostFor(GetShopItem()->GetGrantedAbilityCDO(), *OwnerAbilitySystemComponent, 1);
 }
 

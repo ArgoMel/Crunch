@@ -8,9 +8,7 @@
 
 class UInventoryItemWidget;
 class UItemWidget;
-/**
- * 
- */
+
 UCLASS()
 class UInventoryItemDragDropOp : public UDragDropOperation
 {

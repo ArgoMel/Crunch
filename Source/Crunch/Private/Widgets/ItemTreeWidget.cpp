@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/ItemTreeWidget.h"
 #include "Widgets/SplineWidget.h"
 #include "Components/CanvasPanel.h"
@@ -9,18 +8,21 @@
 void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
 {
 	if (!NodeInterface)
+	{
 		return;
-	
+	}
 	if (CurrentCenterItem == NodeInterface->GetItemObject())
+	{
 		return;
-
+	}
 	ClearTree();
 	CurrentCenterItem = NodeInterface->GetItemObject();
 
 	float NextLeafXPos = 0.f;
 	UCanvasPanelSlot* CenterWidgetPanelSlot = nullptr;
 	UUserWidget* CenterWidget = CreateWidgetForNode(NodeInterface, CenterWidgetPanelSlot);
-	TArray<UCanvasPanelSlot*> LowerStreamSlots, UpperStreamSlots;
+	TArray<UCanvasPanelSlot*> LowerStreamSlots;
+	TArray<UCanvasPanelSlot*> UpperStreamSlots;
 
 	DrawStream(false, NodeInterface, CenterWidget, CenterWidgetPanelSlot, 0, NextLeafXPos, LowerStreamSlots);
 	const float LowerStreamXMax = NextLeafXPos - NodeSize.X - NodeGap.X;
@@ -44,12 +46,12 @@ void UItemTreeWidget::DrawFromNode(const ITreeNodeInterface* NodeInterface)
 	CenterWidgetPanelSlot->SetPosition(FVector2D::Zero());
 }
 
-void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* StartingNodeInteface, UUserWidget* StartingNodeWidget, UCanvasPanelSlot* StartingNodeSlot, int StartingNodeDepth, float& NextLeafXPosition, TArray<UCanvasPanelSlot*>& OutStreamSlots)
+void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* StartingNodeInterface, UUserWidget* StartingNodeWidget, UCanvasPanelSlot* StartingNodeSlot, int StartingNodeDepth, float& NextLeafXPosition, TArray<UCanvasPanelSlot*>& OutStreamSlots)
 {
-	TArray<const ITreeNodeInterface*> NextTreeNodeInterfaces = bUpperStream ? StartingNodeInteface->GetInputs() : StartingNodeInteface->GetOuputs();
+	TArray<const ITreeNodeInterface*> NextTreeNodeInterfaces = bUpperStream ? StartingNodeInterface->GetInputs() : StartingNodeInterface->GetOutputs();
 	const float StartingNodeYPos = (NodeSize.Y + NodeGap.Y) * StartingNodeDepth * (bUpperStream ? -1 : 1);
 
-	if (NextTreeNodeInterfaces.Num() == 0)
+	if (NextTreeNodeInterfaces.IsEmpty())
 	{
 		StartingNodeSlot->SetPosition(FVector2D{NextLeafXPosition, StartingNodeYPos});
 		NextLeafXPosition += NodeSize.X + NodeGap.X;
@@ -57,10 +59,10 @@ void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* St
 	}
 
 	float NextNodeXPosSum = 0;
-	for (const ITreeNodeInterface* NextTreeNodeInteface : NextTreeNodeInterfaces)
+	for (const ITreeNodeInterface* NextTreeNodeInterface : NextTreeNodeInterfaces)
 	{
 		UCanvasPanelSlot* NextWidgetSlot;
-		UUserWidget* NextWidget = CreateWidgetForNode(NextTreeNodeInteface, NextWidgetSlot);
+		UUserWidget* NextWidget = CreateWidgetForNode(NextTreeNodeInterface, NextWidgetSlot);
 		OutStreamSlots.Add(NextWidgetSlot);
 		if (bUpperStream)
 		{
@@ -71,7 +73,7 @@ void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* St
 			CreateConnection(StartingNodeWidget, NextWidget);
 		}
 
-		DrawStream(bUpperStream, NextTreeNodeInteface, NextWidget, NextWidgetSlot, StartingNodeDepth + 1, NextLeafXPosition, OutStreamSlots);
+		DrawStream(bUpperStream, NextTreeNodeInterface, NextWidget, NextWidgetSlot, StartingNodeDepth + 1, NextLeafXPosition, OutStreamSlots);
 		NextNodeXPosSum += NextWidgetSlot->GetPosition().X;
 	}
 
@@ -79,16 +81,17 @@ void UItemTreeWidget::DrawStream(bool bUpperStream, const ITreeNodeInterface* St
 	StartingNodeSlot->SetPosition(FVector2D{StartingNodeXPos, StartingNodeYPos});
 }
 
-void UItemTreeWidget::ClearTree()
+void UItemTreeWidget::ClearTree() const
 {
 	RootPanel->ClearChildren();
 }
 
-UUserWidget* UItemTreeWidget::CreateWidgetForNode(const ITreeNodeInterface* Node, UCanvasPanelSlot*& OutCanvasSlot)
+UUserWidget* UItemTreeWidget::CreateWidgetForNode(const ITreeNodeInterface* Node, UCanvasPanelSlot*& OutCanvasSlot) const
 {
 	if (!Node)
+	{
 		return nullptr;
-
+	}
 	UUserWidget* NodeWidget = Node->GetWidget();
 	OutCanvasSlot = RootPanel->AddChildToCanvas(NodeWidget);
 	if (OutCanvasSlot)
@@ -102,11 +105,12 @@ UUserWidget* UItemTreeWidget::CreateWidgetForNode(const ITreeNodeInterface* Node
 	return NodeWidget;
 }
 
-void UItemTreeWidget::CreateConnection(const UUserWidget* From, UUserWidget* To)
+void UItemTreeWidget::CreateConnection(const UUserWidget* From, UUserWidget* To) const
 {
 	if (!From || !To)
+	{
 		return;
-
+	}
 	USplineWidget* Connection = CreateWidget<USplineWidget>(GetOwningPlayer());
 	UCanvasPanelSlot* ConnectionPanelSlot = RootPanel->AddChildToCanvas(Connection);
 
@@ -118,6 +122,6 @@ void UItemTreeWidget::CreateConnection(const UUserWidget* From, UUserWidget* To)
 		ConnectionPanelSlot->SetZOrder(0);
 	}
 	
-	Connection->SetupSpline(From, To, SourePortLocalPos, DestinationPortLocalPos, SourcePortDirection, DestinationPortDirection);
+	Connection->SetupSpline(From, To, SourcePortLocalPos, DestinationPortLocalPos, SourcePortDirection, DestinationPortDirection);
 	Connection->SetSplineStyle(ConnectionColor, ConnectionThickness);
 }
