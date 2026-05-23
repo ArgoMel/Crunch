@@ -1,32 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/RenderActorWidget.h"
 #include "Components/SizeBox.h"
 #include "Components/Image.h"
+#include "Crunch/Crunch.h"
 #include "Widgets/RenderActor.h"
 #include "Engine/TextureRenderTarget2D.h"
 
-void URenderActorWidget::NativePreConstruct()
+void URenderActorWidget::NativeOnInitialized()
 {
-	Super::NativePreConstruct();
-	RenderSizeBox->SetWidthOverride(RenderSize.X);
-	RenderSizeBox->SetHeightOverride(RenderSize.Y);
-}
-
-void URenderActorWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	SpawnRenderActor();
 	ConfigureRenderActor();
 	BeginRenderCapture();
 }
 
-void URenderActorWidget::BeginDestroy()
+void URenderActorWidget::NativePreConstruct()
 {
+	Super::NativePreConstruct();
+	if (RenderSizeBox)
+	{
+		RenderSizeBox->SetWidthOverride(RenderSize.X);
+		RenderSizeBox->SetHeightOverride(RenderSize.Y);
+	}
+}
+
+void URenderActorWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
 	StopRenderCapture();
-	Super::BeginDestroy();
 }
 
 void URenderActorWidget::ConfigureRenderActor()
@@ -39,13 +42,13 @@ void URenderActorWidget::ConfigureRenderActor()
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	RenderTarget->InitAutoFormat(static_cast<int>(RenderSize.X), static_cast<int>(RenderSize.Y));
-	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8_SRGB;
+	RenderTarget->RenderTargetFormat = RTF_RGBA8_SRGB;
 	GetRenderActor()->SetRenderTarget(RenderTarget);
 
 	UMaterialInstanceDynamic* DisplayImageDynamicMaterial = DisplayImage->GetDynamicMaterial();
 	if (DisplayImageDynamicMaterial)
 	{
-		DisplayImageDynamicMaterial->SetTextureParameterValue(DisplayImageRenderTargetParamName, RenderTarget);
+		DisplayImageDynamicMaterial->SetTextureParameterValue(Crunch::MatParam::RenderTarget, RenderTarget);
 	}
 }
 
@@ -55,10 +58,11 @@ void URenderActorWidget::BeginRenderCapture()
 	const UWorld* World = GetWorld();
 	if (World)
 	{
-		World->GetTimerManager().SetTimer(RenderTimerHandle, this, &URenderActorWidget::UpdateRender, RenderTickInterval, true);
+		World->GetTimerManager().SetTimer(RenderTimerHandle, this, &ThisClass::UpdateRender, RenderTickInterval, true);
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void URenderActorWidget::UpdateRender()
 {
 	if (GetRenderActor())
@@ -67,10 +71,8 @@ void URenderActorWidget::UpdateRender()
 	}
 }
 
-
 void URenderActorWidget::StopRenderCapture()
 {
-
 	const UWorld* World = GetWorld();
 	if (World)
 	{

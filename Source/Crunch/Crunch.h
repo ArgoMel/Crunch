@@ -30,6 +30,7 @@ namespace Crunch
 		const FName Percent("Percent");
 		const FName CanCast("CanCast");
 		const FName UpgradeAvailable("UpgradeAvailable");
+		const FName RenderTarget("RenderTarget");
 	}
 	namespace ConstValue
 	{

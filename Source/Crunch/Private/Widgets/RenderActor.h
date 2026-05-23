@@ -10,23 +10,21 @@ UCLASS()
 class ARenderActor : public AActor
 {
 	GENERATED_BODY()
-	
 public:	
-	// Sets default values for this actor's properties
 	ARenderActor();
-	void SetRenderTarget(class UTextureRenderTarget2D* RenderTarget);
-	void UpdateRender();
-	FORCEINLINE class USceneCaptureComponent2D* GetCaptureComponent() const { return CaptureComponent; }
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+public:	
+	void SetRenderTarget(UTextureRenderTarget2D* RenderTarget) const;
+	void UpdateRender() const;
+	FORCEINLINE USceneCaptureComponent2D* GetCaptureComponent() const { return CaptureComponent; }
 
 private:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Render Actor")
-	class USceneComponent* RootComp;
+	USceneComponent* RootComp;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Render Actor")
-	class USceneCaptureComponent2D* CaptureComponent;
-
+	USceneCaptureComponent2D* CaptureComponent;
 };

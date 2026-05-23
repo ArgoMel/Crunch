@@ -6,21 +6,22 @@
 #include "Widgets/RenderActorWidget.h"
 #include "SkeletalMeshRenderWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class ASkeletalMeshRenderActor;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class USkeletalMeshRenderWidget : public URenderActorWidget
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual void NativeConstruct() override;
 private:
 	virtual void SpawnRenderActor() override; 
 	virtual ARenderActor* GetRenderActor() const override;
+	
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "SKeletal Mesh Render")
-	TSubclassOf<class ASkeletalMeshRenderActor> SKeletalMeshRenderActorClass;
+	TSubclassOf<ASkeletalMeshRenderActor> SkeletalMeshRenderActorClass;
 
 	UPROPERTY()
-	ASkeletalMeshRenderActor* SkeletalMeshRenderActor;
+	TWeakObjectPtr<ASkeletalMeshRenderActor> SkeletalMeshRenderActor;
 };

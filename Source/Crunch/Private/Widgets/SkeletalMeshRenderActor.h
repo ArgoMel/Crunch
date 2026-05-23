@@ -6,19 +6,19 @@
 #include "Widgets/RenderActor.h"
 #include "SkeletalMeshRenderActor.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ASkeletalMeshRenderActor : public ARenderActor
 {
 	GENERATED_BODY()
 public:
 	ASkeletalMeshRenderActor();
-	void ConfigureSkeletalMesh(USkeletalMesh* MeshAsset, TSubclassOf<UAnimInstance> AnimBlueprint);
+protected:
 	virtual void BeginPlay() override;
-
+	
+public:
+	void ConfigureSkeletalMesh(USkeletalMesh* MeshAsset, TSubclassOf<UAnimInstance> AnimBlueprint) const;
+	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Skeletal Mesh Renderer")
-	class USkeletalMeshComponent* MeshComp;
+	USkeletalMeshComponent* MeshComp;
 };

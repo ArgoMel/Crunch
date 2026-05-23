@@ -7,17 +7,17 @@
 #include "RenderActorWidget.generated.h"
 
 class ARenderActor;
-/**
- * 
- */
-UCLASS(Abstract)
+class UImage;
+class USizeBox;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class URenderActorWidget : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativePreConstruct() override;
-	virtual void NativeConstruct() override;
-	virtual void BeginDestroy() override;
+	virtual void NativeDestruct() override;
 
 private:
 	void ConfigureRenderActor();
@@ -28,14 +28,12 @@ private:
 	void UpdateRender();
 	void StopRenderCapture();
 
+private:
 	UPROPERTY(meta=(BindWidget))
-	class UImage* DisplayImage;
+	UImage* DisplayImage;
 
 	UPROPERTY(meta=(BindWidget))
-	class USizeBox* RenderSizeBox;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Render Actor")
-	FName DisplayImageRenderTargetParamName = "RenderTarget";
+	USizeBox* RenderSizeBox;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Render Actor")
 	FVector2D RenderSize;
