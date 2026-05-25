@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "StormCore.generated.h"
 
+class USphereComponent;
+class UCameraComponent;
+
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGoalReachedDelegate, AActor* /*ViewTarget*/, int /*WiningTeam*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FonTeamInfluncerCountUpdatedDelegate, int /*TeamOneInfluencerCount*/, int /*TeamTwoInfluencerCount*/);
 
@@ -13,31 +16,41 @@ UCLASS()
 class AStormCore : public ACharacter
 {
 	GENERATED_BODY()
-
 public:
-	FOnGoalReachedDelegate OnGoalReachedDelegate;
-	FonTeamInfluncerCountUpdatedDelegate OnTeamInfluenceCountUpdated;
-	// Sets default values for this character's properties
 	AStormCore();
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	float GetProgress() const;
-
-protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
-
-public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+	
+public:	
+	float GetProgress() const;
+	
+private:
+	UFUNCTION()
+	void NewInfluencerInRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void InfluencerLeftRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void UpdateTeamWeight();
+	void UpdateGoal() const;
+	
+	UFUNCTION()
+	void OnRep_CoreToCapture();
+
+	void GoalReached(int WiningTeam);
+
+	void CaptureCore();
+	void ExpandFinished();
 	 
+public:
+	FOnGoalReachedDelegate OnGoalReachedDelegate;
+	FonTeamInfluncerCountUpdatedDelegate OnTeamInfluenceCountUpdated;
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Move")
 	UAnimMontage* ExpandMontage;
@@ -52,22 +65,13 @@ private:
 	float MaxMoveSpeed = 500.f;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Detection")
-	class USphereComponent* InfluenceRange;
+	USphereComponent* InfluenceRange;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Detection")
-	class UDecalComponent* GroundDecalComponent;
+	UDecalComponent* GroundDecalComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Detection")
-	class UCameraComponent* ViewCam;
-
-	UFUNCTION()
-	void NewInfluenerInRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
-	UFUNCTION()
-	void InfluencerLeftRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	void UpdateTeamWeight();
-	void UpdateGoal();
+	UCameraComponent* ViewCam;
 
 	UPROPERTY(EditAnywhere, Category = "Team")
 	AActor* TeamOneGoal;
@@ -87,16 +91,8 @@ private:
 	float CoreCaptureSpeed = 0.f;
 	float TravelLength = 0.f;
 
-	UFUNCTION()
-	void OnRep_CoreToCapture();
-
-	void GoalReached(int WiningTeam);
-
-	void CaptureCore();
-	void ExpandFinished();
-
-	int TeamOneInfluncerCount = 0;
-	int TeamTwoInfluncerCount = 0;
+	int TeamOneInfluencerCount = 0;
+	int TeamTwoInfluencerCount = 0;
 
 	float TeamWeight = 0.f;
 

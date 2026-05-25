@@ -6,38 +6,37 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchStatWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+class AStormCore;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UMatchStatWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
+	
+private:
+	void UpdateTeamInfluence(int TeamOneCount, int TeamTwoCount) const;
+
+	void MatchFinished(AActor* ViewTarget, int WinningTeam);
+	void UpdateProgress();
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Match Stat")
 	float ProgressUpdateInterval = 0.5f;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Match Stat")
-	FName ProgressDynamicMaterialParamName = "Progress";
+	UPROPERTY(meta=(BindWidget))
+	UImage* ProgressImage;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* ProgressImage;
+	UTextBlock* TeamOneCountText;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* TeamOneCountText;
-
-	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* TeamTwoCountText;
-
-	UPROPERTY()
-	class AStormCore* StormCore;
-
-	void UpdateTeamInfluence(int TeamOneCount, int TeamTwoCount);
-
-	void MatchFinished(AActor* ViewTarget, int WinningTeam);
-	void UpdateProgress();
+	UTextBlock* TeamTwoCountText;
+	
+	TWeakObjectPtr<AStormCore> StormCore;
 
 	FTimerHandle UpdateProgressTimerHandle;
 };

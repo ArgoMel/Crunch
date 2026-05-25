@@ -7,33 +7,36 @@
 #include "Components/Button.h"
 #include "GameplayMenu.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UGameplayMenu : public UUserWidget
 {
 	GENERATED_BODY()
+protected:
+	virtual void NativeOnInitialized() override;
+	
 public:
-	virtual void NativeConstruct() override;
-	FOnButtonClickedEvent& GetResumeButtonClickedEventDelegate();
-	void SetTitleText(const FString& NewTitle);
+	FOnButtonClickedEvent& GetResumeButtonClickedEventDelegate() const;
+	void SetTitleText(const FString& NewTitle) const;
+	
 private:
-	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* MenuTitle;
-
-	UPROPERTY(meta=(BindWidget))
-	class UButton* ResumeBtn;
-
-	UPROPERTY(meta=(BindWidget))
-	class UButton* MainMenuBtn;
-
-	UPROPERTY(meta=(BindWidget))
-	class UButton* QuitGameBtn;
-
 	UFUNCTION()
 	void BackToMainMenu();
 
 	UFUNCTION()
 	void QuitGame();
+	
+private:
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock* MenuTitle;
+
+	UPROPERTY(meta=(BindWidget))
+	UButton* ResumeBtn;
+
+	UPROPERTY(meta=(BindWidget))
+	UButton* MainMenuBtn;
+
+	UPROPERTY(meta=(BindWidget))
+	UButton* QuitGameBtn;
 };

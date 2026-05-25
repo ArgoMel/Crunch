@@ -31,6 +31,7 @@ namespace Crunch
 		const FName CanCast("CanCast");
 		const FName UpgradeAvailable("UpgradeAvailable");
 		const FName RenderTarget("RenderTarget");
+		const FName Progress("Progress");
 	}
 	namespace ConstValue
 	{
@@ -39,5 +40,9 @@ namespace Crunch
 	namespace TableRowName
 	{
 		const FName ExperienceRowName("ExperienceNeededToReachLevel");
+	}
+	namespace SocketName
+	{
+		const FName Root("root");
 	}
 }
