@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/CrosshairWidget.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -9,17 +8,17 @@
 #include "GAS/CAbilitySystemStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 
-void UCrosshairWidget::NativeConstruct()
+void UCrosshairWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
-	CrosshairImage->SetVisibility(ESlateVisibility::Hidden);
+	CrosshairImage->SetVisibility(ESlateVisibility::Collapsed);
 
 	UAbilitySystemComponent* OwnerAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwningPlayerPawn());
 	if (OwnerAbilitySystemComponent)
 	{
-		OwnerAbilitySystemComponent->RegisterGameplayTagEvent(UCAbilitySystemStatics::GetCrosshairTag()).AddUObject(this, &UCrosshairWidget::CrosshairTagUpdated);
-		OwnerAbilitySystemComponent->GenericGameplayEventCallbacks.Add(UCAbilitySystemStatics::GetTargetUpdatedTag()).AddUObject(this, &UCrosshairWidget::TargetUpdated);
+		OwnerAbilitySystemComponent->RegisterGameplayTagEvent(UCAbilitySystemStatics::GetCrosshairTag()).AddUObject(this, &ThisClass::CrosshairTagUpdated);
+		OwnerAbilitySystemComponent->GenericGameplayEventCallbacks.Add(UCAbilitySystemStatics::GetTargetUpdatedTag()).AddUObject(this, &ThisClass::TargetUpdated);
 	}
 	CachedPlayerController = GetOwningPlayer();
 
@@ -33,22 +32,23 @@ void UCrosshairWidget::NativeConstruct()
 void UCrosshairWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	if (CrosshairImage->GetVisibility() == ESlateVisibility::Visible)
+	if (CrosshairImage->GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
 		UpdateCrosshairPosition();
 	}
 }
 
-void UCrosshairWidget::CrosshairTagUpdated(const FGameplayTag Tag, int32 NewCount)
+void UCrosshairWidget::CrosshairTagUpdated(const FGameplayTag Tag, int32 NewCount) const
 {
-	CrosshairImage->SetVisibility(NewCount > 0 ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	CrosshairImage->SetVisibility(NewCount > 0 ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 }
 
-void UCrosshairWidget::UpdateCrosshairPosition()
+void UCrosshairWidget::UpdateCrosshairPosition() const
 {
 	if (!CachedPlayerController || !CrosshairCanvasPanelSlot)
+	{
 		return;
-
+	}
 	const float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(this);
 	int32 SizeX, SizeY;
 	CachedPlayerController->GetViewportSize(SizeX, SizeY);
@@ -61,7 +61,10 @@ void UCrosshairWidget::UpdateCrosshairPosition()
 
 	FVector2D TargetScreenPosition;
 	CachedPlayerController->ProjectWorldLocationToScreen(AimTarget->GetActorLocation(), TargetScreenPosition);
-	if (TargetScreenPosition.X > 0 && TargetScreenPosition.X < SizeX && TargetScreenPosition.Y > 0 && TargetScreenPosition.Y < SizeY)
+	if (TargetScreenPosition.X > 0 
+		&& TargetScreenPosition.X < SizeX 
+		&& TargetScreenPosition.Y > 0 
+		&& TargetScreenPosition.Y < SizeY)
 	{
 		CrosshairCanvasPanelSlot->SetPosition(TargetScreenPosition / ViewportScale);
 	}

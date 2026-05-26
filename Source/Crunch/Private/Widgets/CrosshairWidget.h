@@ -7,16 +7,22 @@
 #include "GameplayTagContainer.h"
 #include "CrosshairWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UCanvasPanelSlot;
+
+UCLASS(Abstract, BlueprintType)
 class UCrosshairWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+private:
+	void CrosshairTagUpdated(const FGameplayTag Tag, int32 NewCount) const;
+	void UpdateCrosshairPosition() const;
+	void TargetUpdated(const struct FGameplayEventData* EventData);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "View")
 	FLinearColor HasTargetColor = FLinearColor::Red;
@@ -25,20 +31,14 @@ private:
 	FLinearColor NoTargetColor = FLinearColor::White;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* CrosshairImage;
-
-	void CrosshairTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	UImage* CrosshairImage;
 
 	UPROPERTY()
-	class UCanvasPanelSlot* CrosshairCanvasPanelSlot;
+	UCanvasPanelSlot* CrosshairCanvasPanelSlot;
 
 	UPROPERTY()
-	class APlayerController* CachedPlayerController;
-
-	void UpdateCrosshairPosition();
+	APlayerController* CachedPlayerController;
 
 	UPROPERTY()
 	const AActor* AimTarget;
-
-	void TargetUpdated(const struct FGameplayEventData* EventData);
 };

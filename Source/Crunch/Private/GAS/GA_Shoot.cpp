@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/GA_Shoot.h"
 #include "GAS/CAbilitySystemStatics.h"
 #include "GameplayTagsManager.h"
@@ -16,6 +15,12 @@ UGA_Shoot::UGA_Shoot()
 	ActivationOwnedTags.AddTag(UCAbilitySystemStatics::GetCrosshairTag());
 }
 
+void UGA_Shoot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Shoot Ability Ended"));
+	K2_EndAbility();
+}
+
 void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	if (!K2_CommitAbility())
@@ -29,23 +34,17 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_WaitGameplayEvent* WaitStartShootingEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UCAbilitySystemStatics::GetBasicAttackInputPressedTag());
-		WaitStartShootingEvent->EventReceived.AddDynamic(this, &UGA_Shoot::StartShooting);
+		WaitStartShootingEvent->EventReceived.AddDynamic(this, &ThisClass::StartShooting);
 		WaitStartShootingEvent->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitStopShootingEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UCAbilitySystemStatics::GetBasicAttackInputReleasedTag());
-		WaitStopShootingEvent->EventReceived.AddDynamic(this, &UGA_Shoot::StopShooting);
+		WaitStopShootingEvent->EventReceived.AddDynamic(this, &ThisClass::StopShooting);
 		WaitStopShootingEvent->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitShootProjectileEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, GetShootTag(), nullptr, false, false);
-		WaitShootProjectileEvent->EventReceived.AddDynamic(this, &UGA_Shoot::ShootProjectile);
+		WaitShootProjectileEvent->EventReceived.AddDynamic(this, &ThisClass::ShootProjectile);
 		WaitShootProjectileEvent->ReadyForActivation();
 	}
-}
-
-void UGA_Shoot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Shoot Ability Ended"));
-	K2_EndAbility();
 }
 
 void UGA_Shoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -94,14 +93,15 @@ void UGA_Shoot::StopShooting(FGameplayEventData Payload)
 	StopAimTargetCheckTimer();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shoot Projectile"));
+	//UE_LOG(LogTemp, Warning, TEXT("Shoot Projectile"));
 	if (K2_HasAuthority())
 	{
-		AActor* OwnerAvaterActor = GetAvatarActorFromActorInfo();
+		AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = OwnerAvaterActor;
+		SpawnParams.Owner = OwnerAvatarActor;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		FVector SocketLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
@@ -110,14 +110,14 @@ void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 		{
 			TArray<FName> OutNames;
 			UGameplayTagsManager::Get().SplitGameplayTagFName(Payload.EventTag, OutNames);
-			if (OutNames.Num() != 0)
+			if (!OutNames.IsEmpty())
 			{
 				const FName SocketName = OutNames.Last();
 				SocketLocation = MeshComp->GetSocketLocation(SocketName);
 			}
 		}
 
-		AProjectileActor* Projectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SocketLocation, OwnerAvaterActor->GetActorRotation(), SpawnParams);
+		AProjectileActor* Projectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SocketLocation, OwnerAvatarActor->GetActorRotation(), SpawnParams);
 		if (Projectile)
 		{
 			Projectile->ShootProjectile(ShootProjectileSpeed, ShootProjectileRange, GetAimTargetIfValid(), GetOwnerTeamId(), MakeOutgoingGameplayEffectSpec(ProjectileHitEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)));
@@ -128,16 +128,18 @@ void UGA_Shoot::ShootProjectile(FGameplayEventData Payload)
 AActor* UGA_Shoot::GetAimTargetIfValid() const
 {
 	if (HasValidTarget())
+	{
 		return AimTarget;
-
+	}
 	return nullptr;
 }
 
 void UGA_Shoot::FindAimTarget()
 {
 	if (HasValidTarget())
+	{
 		return;
-
+	}
 	if (AimTargetAbilitySystemComponent)
 	{
 		AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(UCAbilitySystemStatics::GetDeadStatTag()).RemoveAll(this);
@@ -150,7 +152,7 @@ void UGA_Shoot::FindAimTarget()
 		AimTargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(AimTarget);
 		if (AimTargetAbilitySystemComponent)
 		{
-			AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(UCAbilitySystemStatics::GetDeadStatTag()).AddUObject(this, &UGA_Shoot::TargetDeadTagUpdated);
+			AimTargetAbilitySystemComponent->RegisterGameplayTagEvent(UCAbilitySystemStatics::GetDeadStatTag()).AddUObject(this, &ThisClass::TargetDeadTagUpdated);
 		}
 	}
 
@@ -164,7 +166,7 @@ void UGA_Shoot::StartAimTargetCheckTimer()
 	const UWorld* World = GetWorld();
 	if (World)
 	{
-		World->GetTimerManager().SetTimer(AimTargetCheckTimerHandle, this, &UGA_Shoot::FindAimTarget, AimTargetCheckTimeInterval, true);
+		World->GetTimerManager().SetTimer(AimTargetCheckTimerHandle, this, &ThisClass::FindAimTarget, AimTargetCheckTimeInterval, true);
 	}
 }
 
@@ -180,22 +182,26 @@ void UGA_Shoot::StopAimTargetCheckTimer()
 bool UGA_Shoot::HasValidTarget() const
 {
 	if (!AimTarget)
+	{
 		return false;
-
+	}
 	if (UCAbilitySystemStatics::IsActorDead(AimTarget))
+	{
 		return false;
-
+	}
 	if (!IsTargetInRange())
+	{
 		return false;
-
+	}
 	return true;
 }
 
 bool UGA_Shoot::IsTargetInRange() const
 {
 	if (!AimTarget)
+	{
 		return false;
-
+	}
 	const float Distance = FVector::Distance(AimTarget->GetActorLocation(), GetAvatarActorFromActorInfo()->GetActorLocation());
 	return Distance <= ShootProjectileRange;
 }

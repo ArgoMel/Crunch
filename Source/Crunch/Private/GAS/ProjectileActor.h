@@ -12,26 +12,28 @@ UCLASS()
 class AProjectileActor : public AActor, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
-	
 public:	
-	// Sets default values for this actor's properties
 	AProjectileActor();
-	void ShootProjectile(
-		float InSpeed,
-		float InMaxDistance,
-		const AActor* InTarget,
-		FGenericTeamId InTeamId,
-		FGameplayEffectSpecHandle InHitEffectHandle
-	);
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
 	/** Retrieve team identifier in form of FGenericTeamId */
 	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
-
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	
+public:	
+	void ShootProjectile(
+	float InSpeed,
+	float InMaxDistance,
+	const AActor* InTarget,
+	FGenericTeamId InTeamId,
+	FGameplayEffectSpecHandle InHitEffectHandle
+);
+	
+private:
+	void TravelMaxDistanceReached();
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Cue")
 	FGameplayTag HitGameplayCueTag;
@@ -50,15 +52,4 @@ private:
 
 	FGameplayEffectSpecHandle HitEffectSpecHandle;
 	FTimerHandle ShootTimerHandle;
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-private:
-	void TravelMaxDIstanceReached();
-	void SendLocalGameplayCue(AActor* CueTargetActor, const FHitResult& HitResult);
 };

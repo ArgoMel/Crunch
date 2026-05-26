@@ -116,8 +116,9 @@ void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targ
 {
 	const AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
 	if (!OwnerAvatarActor)
+	{
 		return;
-
+	}
 	const FVector OwnerAvatarActorLocation = OwnerAvatarActor->GetActorLocation();
 	PushTargetsFromLocation(Targets, OwnerAvatarActorLocation, PushSpeed);
 }
