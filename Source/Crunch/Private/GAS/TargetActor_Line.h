@@ -7,31 +7,39 @@
 #include "GenericTeamAgentInterface.h"
 #include "TargetActor_Line.generated.h"
 
-/**
- * 
- */
+class UNiagaraComponent;
+class USphereComponent;
+
 UCLASS()
 class ATargetActor_Line : public AGameplayAbilityTargetActor, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
 	ATargetActor_Line();
-	void ConfigureTargetSetting(
-		float NewTargetRange,
-		float NewDetectionCylinderRadius,
-		float NewTargetingInterval,
-		FGenericTeamId OwnerTeamId,
-		bool bShouldDrawDebug
-	);
-
-	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
-	
-	/** Retrieve team identifier in form of FGenericTeamId */
-	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginDestroy() override;
+	
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	/** Retrieve team identifier in form of FGenericTeamId */
+	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
+	
+public:
+	void ConfigureTargetSetting(
+	float NewTargetRange,
+	float NewDetectionCylinderRadius,
+	float NewTargetingInterval,
+	FGenericTeamId OwnerTeamId,
+	bool bShouldDrawDebug);
+	
+private:
+	void DoTargetCheckAndReport();
+
+	void UpdateTargetTrace();
+
+	bool ShouldReportActorAsTarget(const AActor* ActorToCheck) const;
+	
 private:
 	UPROPERTY(Replicated)
 	float TargetRange;
@@ -51,24 +59,15 @@ private:
 	UPROPERTY(Replicated)
 	const AActor* AvatarActor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	FName LazerFXLengthParamName = "Length";
+	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
+	USceneComponent* RootComp;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class USceneComponent* RootComp;
+	UNiagaraComponent* LazerVFX;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class UNiagaraComponent* LazerVFX;
+	USphereComponent* TargetEndDetectionSphere;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class USphereComponent* TargetEndDetectionSphere;
-
-	FTimerHandle PeoridicalTargetingTimerHandle;
-
-	void DoTargetCheckAndReport();
-
-	void UpdateTargetTrace();
-
-	bool ShouldReportActorAsTarget(const AActor* ActorToCheck) const;
+	FTimerHandle PeriodicalTargetingTimerHandle;
 };
 

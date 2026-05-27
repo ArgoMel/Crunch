@@ -6,17 +6,27 @@
 #include "GAS/CGameplayAbility.h"
 #include "GA_Lazer.generated.h"
 
-/**
- * 
- */
+class ATargetActor_Line;
+
 UCLASS()
 class UGA_Lazer : public UCGameplayAbility
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
+public:
 	static FGameplayTag GetShootTag();
+	
+private:
+	UFUNCTION()
+	void ShootLazer(FGameplayEventData Payload);
+	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
+
+	UFUNCTION()
+	void TargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetRange = 4000;
@@ -34,23 +44,13 @@ private:
 	float HitPushSpeed = 3000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	TSubclassOf<UGameplayEffect> OnGoingConsumtionEffect;
+	TSubclassOf<UGameplayEffect> OnGoingConsumeEffect;
 
-	FActiveGameplayEffectHandle OnGoingConsumtionEffectHandle;
+	FActiveGameplayEffectHandle OnGoingConsumeEffectHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Anim")
-	class UAnimMontage* LazerMontage;
+	UAnimMontage* LazerMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	FName TargetActorAttachSocketName = "Lazer";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	TSubclassOf<class ATargetActor_Line> LazerTargetActorClass;
-
-	UFUNCTION()
-	void ShootLazer(FGameplayEventData Payload);
-	void ManaUpdated(const FOnAttributeChangeData& ChangeData);
-
-	UFUNCTION()
-	void TargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	TSubclassOf<ATargetActor_Line> LazerTargetActorClass;
 };

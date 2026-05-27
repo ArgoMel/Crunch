@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/TargetActor_Line.h"
 #include "Crunch/Crunch.h"
 #include "Components/SphereComponent.h"
@@ -12,6 +11,12 @@
 
 ATargetActor_Line::ATargetActor_Line()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	ShouldProduceTargetDataOnServer = true;
+	
+	AvatarActor = nullptr;
+	
 	RootComp = CreateDefaultSubobject<USceneComponent>("Root Comp");
 	SetRootComponent(RootComp);
 
@@ -20,47 +25,28 @@ ATargetActor_Line::ATargetActor_Line()
 
 	LazerVFX = CreateDefaultSubobject<UNiagaraComponent>("Lazer VFX");
 	LazerVFX->SetupAttachment(GetRootComponent());
-
-	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
-	ShouldProduceTargetDataOnServer = true;
-
-	AvatarActor = nullptr;
-}
-
-void ATargetActor_Line::ConfigureTargetSetting(float NewTargetRange, float NewDetectionCylinderRadius, float NewTargetingInterval, FGenericTeamId OwnerTeamId, bool bShouldDrawDebug)
-{
-	TargetRange = NewTargetRange;
-	DetectionCylinderRadius = NewDetectionCylinderRadius;
-	TargetingInterval = NewTargetingInterval;
-	SetGenericTeamId(OwnerTeamId);
-	bDrawDebug = bShouldDrawDebug;
-}
-
-void ATargetActor_Line::SetGenericTeamId(const FGenericTeamId& NewTeamID)
-{
-	TeamId = NewTeamID;
 }
 
 void ATargetActor_Line::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ATargetActor_Line, TeamId);
-	DOREPLIFETIME(ATargetActor_Line, TargetRange);
-	DOREPLIFETIME(ATargetActor_Line, DetectionCylinderRadius);
-	DOREPLIFETIME(ATargetActor_Line, AvatarActor);
+	DOREPLIFETIME(ThisClass, TeamId);
+	DOREPLIFETIME(ThisClass, TargetRange);
+	DOREPLIFETIME(ThisClass, DetectionCylinderRadius);
+	DOREPLIFETIME(ThisClass, AvatarActor);
 }
 
 void ATargetActor_Line::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
 	if (!OwningAbility)
+	{
 		return;
-
+	}
 	AvatarActor = OwningAbility->GetAvatarActorFromActorInfo();
 	if (HasAuthority())
 	{
-		GetWorldTimerManager().SetTimer(PeoridicalTargetingTimerHandle, this, &ATargetActor_Line::DoTargetCheckAndReport, TargetingInterval, true);
+		GetWorldTimerManager().SetTimer(PeriodicalTargetingTimerHandle, this, &ThisClass::DoTargetCheckAndReport, TargetingInterval, true);
 	}
 }
 
@@ -72,19 +58,35 @@ void ATargetActor_Line::Tick(float DeltaTime)
 
 void ATargetActor_Line::BeginDestroy()
 {
-	if (GetWorld() && PeoridicalTargetingTimerHandle.IsValid())
+	if (GetWorld() && PeriodicalTargetingTimerHandle.IsValid())
 	{
-		GetWorldTimerManager().ClearTimer(PeoridicalTargetingTimerHandle);
+		GetWorldTimerManager().ClearTimer(PeriodicalTargetingTimerHandle);
 	}
 
 	Super::BeginDestroy();
 }
 
+void ATargetActor_Line::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	TeamId = NewTeamID;
+}
+
+void ATargetActor_Line::ConfigureTargetSetting(float NewTargetRange, float NewDetectionCylinderRadius, float NewTargetingInterval, FGenericTeamId OwnerTeamId, bool bShouldDrawDebug)
+{
+	TargetRange = NewTargetRange;
+	DetectionCylinderRadius = NewDetectionCylinderRadius;
+	TargetingInterval = NewTargetingInterval;
+	SetGenericTeamId(OwnerTeamId);
+	bDrawDebug = bShouldDrawDebug;
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ATargetActor_Line::DoTargetCheckAndReport()
 {
 	if (!HasAuthority())
+	{
 		return;
-
+	}
 	TSet<AActor*> OverlappingActorSet;
 	TargetEndDetectionSphere->GetOverlappingActors(OverlappingActorSet);
 
@@ -149,23 +151,27 @@ void ATargetActor_Line::UpdateTargetTrace()
 	TargetEndDetectionSphere->SetWorldLocation(LineEndLocation);
 	if (LazerVFX)
 	{
-		LazerVFX->SetVariableFloat(LazerFXLengthParamName, LineLength/100.f);
+		LazerVFX->SetVariableFloat(Crunch::VFXParam::Length, LineLength/100.f);
 	}
 }
 
 bool ATargetActor_Line::ShouldReportActorAsTarget(const AActor* ActorToCheck) const
 {
 	if (!ActorToCheck)
+	{
 		return false;
-
+	}
 	if (ActorToCheck == AvatarActor)
+	{
 		return false;
-
+	}
 	if (ActorToCheck == this)
+	{
 		return false;
-
+	}
 	if (GetTeamAttitudeTowards(*ActorToCheck) != ETeamAttitude::Hostile)
+	{
 		return false;
-
+	}
 	return true;
 }

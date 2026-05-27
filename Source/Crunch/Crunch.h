@@ -33,6 +33,10 @@ namespace Crunch
 		const FName RenderTarget("RenderTarget");
 		const FName Progress("Progress");
 	}
+	namespace VFXParam
+	{
+		const FName Length("Length");
+	}
 	namespace ConstValue
 	{
 		constexpr int32 MaxLevel= 4;
@@ -44,5 +48,6 @@ namespace Crunch
 	namespace SocketName
 	{
 		const FName Root("root");
+		const FName Lazer("Lazer");
 	}
 }
