@@ -6,35 +6,51 @@
 #include "GAS/CGameplayAbility.h"
 #include "GA_Blackhole.generated.h"
 
-/**
- * 
- */
+class ATargetActor_GroundPick;
+class ATA_Blackhole;
+class UAbilityTask_PlayMontageAndWait;
+class UAbilityTask_WaitTargetData;
+
 UCLASS()
 class UGA_Blackhole : public UCGameplayAbility
 {
 	GENERATED_BODY()
-public:	
+protected:	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
+private:
+	UFUNCTION()
+	void PlaceBlackHole(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	UFUNCTION()
+	void PlacementCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	UFUNCTION()
+	void FinalTargetsReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+
+	void AddAimEffect();
+	void RemoveAimEffect();
+
+	void AddFocusEffect();
+	void RemoveFocusEffect();
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetAreaRadius = 1000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	float BlackholePullSpeed = 3000.f;
+	float BlackHolePullSpeed = 3000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
 	float TargetTraceRange = 2000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	float BlackholeDuration = 6.f;
+	float BlackHoleDuration = 6.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* TargettingMontage;
+	UAnimMontage* TargetingMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* HoldBlackholeMontage;
+	UAnimMontage* HoldBlackHoleMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UAnimMontage* FinalBlowMontage;
@@ -50,10 +66,10 @@ private:
 	FActiveGameplayEffectHandle FocusEffectHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	TSubclassOf<class ATargetActor_GroundPick> TargetActorClass;
+	TSubclassOf<ATargetActor_GroundPick> TargetActorClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	TSubclassOf<class ATA_Blackhole> BlackholeTargetActorClass;
+	TSubclassOf<ATA_Blackhole> BlackHoleTargetActorClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	TSubclassOf<UGameplayEffect> FinalBlowDamageEffect;
@@ -65,21 +81,8 @@ private:
 	FGameplayTag FinalBlowCueTag;
 
 	UPROPERTY()
-	class UAbilityTask_PlayMontageAndWait* PlayCastBlackholeMontageTask;
+	UAbilityTask_PlayMontageAndWait* PlayCastBlackHoleMontageTask;
 
 	UPROPERTY()
-	class UAbilityTask_WaitTargetData* BlackholeTargetingTask;
-
-	UFUNCTION()
-	void PlaceBlackhole(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
-	UFUNCTION()
-	void PlacementCancelled(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
-	UFUNCTION()
-	void FinalTargetsReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
-
-	void AddAimEffect();
-	void RemoveAimEffect();
-
-	void AddFocusEffect();
-	void RemoveFocusEffect();
+	UAbilityTask_WaitTargetData* BlackHoleTargetingTask;
 };

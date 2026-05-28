@@ -8,11 +8,9 @@
 #include "GenericTeamAgentInterface.h"
 #include "CPlayerState.generated.h"
 
-
 class UPA_CharacterDefinition;
-/**
- * 
- */
+class ACGameState;
+
 UCLASS()
 class ACPlayerState : public APlayerState
 {
@@ -20,19 +18,23 @@ class ACPlayerState : public APlayerState
 public:
 	ACPlayerState();
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
+protected:
 	virtual void BeginPlay() override;
 	virtual void CopyProperties(APlayerState* PlayerState) override;
+	
+public:
 	TSubclassOf<APawn> GetSelectedPawnClass() const;
 	FGenericTeamId GetTeamIdBasedOnSlot() const;
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetSelectedCharacterDefination(const UPA_CharacterDefinition* NewDefination);
+	void Server_SetSelectedCharacterDefinition(const UPA_CharacterDefinition* NewDefinition);
 
+private:	
+	void PlayerSelectionUpdated(const TArray<FPlayerSelection>& NewPlayerSelections);
+	
 private:	
 	UPROPERTY(Replicated)
 	FPlayerSelection PlayerSelection;
 
 	UPROPERTY()	
-	class ACGameState* CGameState;
-
-	void PlayerSelectionUpdated(const TArray<FPlayerSelection>& NewPlayerSelections);
+	ACGameState* CGameState;
 };

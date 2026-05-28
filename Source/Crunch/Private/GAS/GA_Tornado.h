@@ -6,15 +6,16 @@
 #include "GAS/CGameplayAbility.h"
 #include "GA_Tornado.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UGA_Tornado : public UCGameplayAbility
 {
 	GENERATED_BODY()
-public:	
+protected:	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;	
+	
+private:
+	UFUNCTION()
+	void TornadoDamageEventReceived(FGameplayEventData Payload);
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
@@ -28,8 +29,5 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effect")
 	float TornadoDuration = 4.f;
-
-	UFUNCTION()
-	void TornadoDamageEventReceived(FGameplayEventData Payload);
 };
 

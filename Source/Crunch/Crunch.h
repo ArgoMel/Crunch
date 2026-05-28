@@ -36,6 +36,7 @@ namespace Crunch
 	namespace VFXParam
 	{
 		const FName Length("Length");
+		const FName Origin("Origin");
 	}
 	namespace ConstValue
 	{
@@ -49,5 +50,6 @@ namespace Crunch
 	{
 		const FName Root("root");
 		const FName Lazer("Lazer");
+		const FName TargetDashCenter("TargetDashCenter");
 	}
 }

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/GA_Freeze.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -24,15 +23,15 @@ void UGA_Freeze::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	}
 	
 	UAbilityTask_PlayMontageAndWait* PlayTargetingMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, FreezeTargetingMontage);
-	PlayTargetingMontage->OnBlendOut.AddDynamic(this, &UGA_Freeze::K2_EndAbility);
-	PlayTargetingMontage->OnCancelled.AddDynamic(this, &UGA_Freeze::K2_EndAbility);
-	PlayTargetingMontage->OnCompleted.AddDynamic(this, &UGA_Freeze::K2_EndAbility);
-	PlayTargetingMontage->OnInterrupted.AddDynamic(this, &UGA_Freeze::K2_EndAbility);
+	//PlayTargetingMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayTargetingMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayTargetingMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayTargetingMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
 	PlayTargetingMontage->ReadyForActivation();
 
 	UAbilityTask_WaitTargetData* WaitTargetData = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, TargetActorClass);
-	WaitTargetData->ValidData.AddDynamic(this, &UGA_Freeze::TargetReceived);
-	WaitTargetData->Cancelled.AddDynamic(this, &UGA_Freeze::TargetingCancelled);
+	WaitTargetData->ValidData.AddDynamic(this, &ThisClass::TargetReceived);
+	WaitTargetData->Cancelled.AddDynamic(this, &ThisClass::TargetingCancelled);
 	WaitTargetData->ReadyForActivation();
 	
 	AGameplayAbilityTargetActor* TargetActor;

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/GA_Tornado.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitCancel.h"
@@ -19,25 +18,25 @@ void UGA_Tornado::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayTornadoMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TornadoMontage);
-		PlayTornadoMontage->OnBlendOut.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
-		PlayTornadoMontage->OnCancelled.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
-		PlayTornadoMontage->OnInterrupted.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
-		PlayTornadoMontage->OnCompleted.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
+		//PlayTornadoMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTornadoMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTornadoMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTornadoMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayTornadoMontage->ReadyForActivation();
 
 		if (K2_HasAuthority())
 		{
 			UAbilityTask_WaitGameplayEvent* WaitDamageEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, UCAbilitySystemStatics::GetGenericDamagePointTag(), nullptr, false);
-			WaitDamageEvent->EventReceived.AddDynamic(this, &UGA_Tornado::TornadoDamageEventReceived);
+			WaitDamageEvent->EventReceived.AddDynamic(this, &ThisClass::TornadoDamageEventReceived);
 			WaitDamageEvent->ReadyForActivation();
 		}
 
 		UAbilityTask_WaitCancel* WaitCancel = UAbilityTask_WaitCancel::WaitCancel(this);
-		WaitCancel->OnCancel.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
+		WaitCancel->OnCancel.AddDynamic(this, &ThisClass::K2_EndAbility);
 		WaitCancel->ReadyForActivation();
 
 		UAbilityTask_WaitDelay* WaitTornadoTimeout = UAbilityTask_WaitDelay::WaitDelay(this, TornadoDuration);
-		WaitTornadoTimeout->OnFinish.AddDynamic(this, &UGA_Tornado::K2_EndAbility);
+		WaitTornadoTimeout->OnFinish.AddDynamic(this, &ThisClass::K2_EndAbility);
 		WaitTornadoTimeout->ReadyForActivation();
 	}
 }

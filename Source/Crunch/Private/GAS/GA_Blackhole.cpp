@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/GA_Blackhole.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
@@ -18,16 +17,16 @@ void UGA_Blackhole::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 		return;
 	}
 
-	PlayCastBlackholeMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargettingMontage);
-	PlayCastBlackholeMontageTask->OnBlendOut.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-	PlayCastBlackholeMontageTask->OnCancelled.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-	PlayCastBlackholeMontageTask->OnInterrupted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-	PlayCastBlackholeMontageTask->OnCompleted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-	PlayCastBlackholeMontageTask->ReadyForActivation();
+	PlayCastBlackHoleMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TargetingMontage);
+	//PlayCastBlackHoleMontageTask->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayCastBlackHoleMontageTask->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayCastBlackHoleMontageTask->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayCastBlackHoleMontageTask->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
+	PlayCastBlackHoleMontageTask->ReadyForActivation();
 
 	UAbilityTask_WaitTargetData* WaitPlacementTask = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, TargetActorClass);
-	WaitPlacementTask->ValidData.AddDynamic(this, &UGA_Blackhole::PlaceBlackhole);
-	WaitPlacementTask->Cancelled.AddDynamic(this, &UGA_Blackhole::PlacementCancelled);
+	WaitPlacementTask->ValidData.AddDynamic(this, &ThisClass::PlaceBlackHole);
+	WaitPlacementTask->Cancelled.AddDynamic(this, &ThisClass::PlacementCancelled);
 	WaitPlacementTask->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* TargetActor;
@@ -51,7 +50,7 @@ void UGA_Blackhole::EndAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_Blackhole::PlaceBlackhole(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+void UGA_Blackhole::PlaceBlackHole(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
 	if (!K2_CommitAbility())
 	{
@@ -62,37 +61,37 @@ void UGA_Blackhole::PlaceBlackhole(const FGameplayAbilityTargetDataHandle& Targe
 	RemoveAimEffect();
 	AddFocusEffect();
 
-	if (PlayCastBlackholeMontageTask)
+	if (PlayCastBlackHoleMontageTask)
 	{
-		PlayCastBlackholeMontageTask->OnBlendOut.RemoveAll(this);
-		PlayCastBlackholeMontageTask->OnCancelled.RemoveAll(this);
-		PlayCastBlackholeMontageTask->OnInterrupted.RemoveAll(this);
-		PlayCastBlackholeMontageTask->OnCompleted.RemoveAll(this);
+		PlayCastBlackHoleMontageTask->OnBlendOut.RemoveAll(this);
+		PlayCastBlackHoleMontageTask->OnCancelled.RemoveAll(this);
+		PlayCastBlackHoleMontageTask->OnInterrupted.RemoveAll(this);
+		PlayCastBlackHoleMontageTask->OnCompleted.RemoveAll(this);
 	}
 
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
-		UAbilityTask_PlayMontageAndWait* PlayHoldBlackholeMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, HoldBlackholeMontage);
-		PlayHoldBlackholeMontage->OnBlendOut.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayHoldBlackholeMontage->OnCancelled.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayHoldBlackholeMontage->OnInterrupted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayHoldBlackholeMontage->OnCompleted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
+		UAbilityTask_PlayMontageAndWait* PlayHoldBlackholeMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, HoldBlackHoleMontage);
+		//PlayHoldBlackholeMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayHoldBlackholeMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayHoldBlackholeMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayHoldBlackholeMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayHoldBlackholeMontage->ReadyForActivation();
 	}
 
-	BlackholeTargetingTask = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, BlackholeTargetActorClass);
-	BlackholeTargetingTask->ValidData.AddDynamic(this, &UGA_Blackhole::FinalTargetsReceived);
-	BlackholeTargetingTask->Cancelled.AddDynamic(this, &UGA_Blackhole::FinalTargetsReceived);
-	BlackholeTargetingTask->ReadyForActivation();
+	BlackHoleTargetingTask = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, BlackHoleTargetActorClass);
+	BlackHoleTargetingTask->ValidData.AddDynamic(this, &ThisClass::FinalTargetsReceived);
+	BlackHoleTargetingTask->Cancelled.AddDynamic(this, &ThisClass::FinalTargetsReceived);
+	BlackHoleTargetingTask->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* TargetActor;
-	BlackholeTargetingTask->BeginSpawningActor(this, BlackholeTargetActorClass, TargetActor);
+	BlackHoleTargetingTask->BeginSpawningActor(this, BlackHoleTargetActorClass, TargetActor);
 	ATA_Blackhole* BlackholeTargetActor = Cast<ATA_Blackhole>(TargetActor);
 	if (BlackholeTargetActor)
 	{
-		BlackholeTargetActor->ConfigureBlackhole(TargetAreaRadius, BlackholePullSpeed,BlackholeDuration, GetOwnerTeamId());
+		BlackholeTargetActor->ConfigureBlackhole(TargetAreaRadius, BlackHolePullSpeed,BlackHoleDuration, GetOwnerTeamId());
 	}
-	BlackholeTargetingTask->FinishSpawningActor(this, TargetActor);
+	BlackHoleTargetingTask->FinishSpawningActor(this, TargetActor);
 	if (BlackholeTargetActor)
 	{
 		BlackholeTargetActor->SetActorLocation(UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 1).ImpactPoint);
@@ -113,10 +112,10 @@ void UGA_Blackhole::FinalTargetsReceived(const FGameplayAbilityTargetDataHandle&
 		PushTargetsFromLocation(TargetDataHandle, BlowCenter,  BlowPushSpeed);
 
 		UAbilityTask_PlayMontageAndWait* PlayFinalBlowMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, FinalBlowMontage);
-		PlayFinalBlowMontage->OnBlendOut.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayFinalBlowMontage->OnCancelled.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayFinalBlowMontage->OnInterrupted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
-		PlayFinalBlowMontage->OnCompleted.AddDynamic(this, &UGA_Blackhole::K2_EndAbility);
+		//PlayFinalBlowMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayFinalBlowMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayFinalBlowMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayFinalBlowMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayFinalBlowMontage->ReadyForActivation();
 	}
 	else
@@ -131,7 +130,6 @@ void UGA_Blackhole::FinalTargetsReceived(const FGameplayAbilityTargetDataHandle&
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(FinalBlowCueTag, FinalBlowCueParams);
 	GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(UCAbilitySystemStatics::GetCameraShakeGameplayCueTag(), FinalBlowCueParams);
 }
-
 
 void UGA_Blackhole::AddAimEffect()
 {

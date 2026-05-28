@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/CPlayerState.h"
 #include "Character/PA_CharacterDefinition.h"
 #include "Character/CCharacter.h"
@@ -18,7 +17,7 @@ ACPlayerState::ACPlayerState()
 void ACPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ACPlayerState, PlayerSelection);
+	DOREPLIFETIME(ThisClass, PlayerSelection);
 }
 
 void ACPlayerState::BeginPlay()
@@ -28,7 +27,7 @@ void ACPlayerState::BeginPlay()
 
 	if (CGameState)
 	{
-		CGameState->OnPlayerSelectionUpdated.AddUObject(this, &ACPlayerState::PlayerSelectionUpdated);
+		CGameState->OnPlayerSelectionUpdated.AddUObject(this, &ThisClass::PlayerSelectionUpdated);
 	}
 }
 
@@ -58,15 +57,15 @@ FGenericTeamId ACPlayerState::GetTeamIdBasedOnSlot() const
 	return PlayerSelection.GetPlayerSlot() < UCNetStatics::GetPlayerCountPerTeam() ? FGenericTeamId{ 0 } : FGenericTeamId{ 1 };
 }
 
-void ACPlayerState::Server_SetSelectedCharacterDefination_Implementation(const UPA_CharacterDefinition* NewDefination)
+void ACPlayerState::Server_SetSelectedCharacterDefinition_Implementation(const UPA_CharacterDefinition* NewDefinition)
 {
 	if (!CGameState)
 		return;
 
-	if (!NewDefination)
+	if (!NewDefinition)
 		return;
 
-	if (CGameState->IsDefiniationSelected(NewDefination))
+	if (CGameState->IsDefiniationSelected(NewDefinition))
 		return;
 
 	if (PlayerSelection.GetCharacterDefination())
@@ -74,11 +73,11 @@ void ACPlayerState::Server_SetSelectedCharacterDefination_Implementation(const U
 		CGameState->SetCharacterDeselected(PlayerSelection.GetCharacterDefination());
 	}
 
-	PlayerSelection.SetCharacterDefination(NewDefination);
-	CGameState->SetCharacterSelected(this, NewDefination);
+	PlayerSelection.SetCharacterDefination(NewDefinition);
+	CGameState->SetCharacterSelected(this, NewDefinition);
 }
 
-bool ACPlayerState::Server_SetSelectedCharacterDefination_Validate(const UPA_CharacterDefinition* NewDefination)
+bool ACPlayerState::Server_SetSelectedCharacterDefinition_Validate(const UPA_CharacterDefinition* NewDefinition)
 {
 	return true;
 }

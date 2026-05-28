@@ -6,18 +6,29 @@
 #include "GAS/CGameplayAbility.h"
 #include "GA_Dash.generated.h"
 
-/**
- * 
- */
+class ATargetActor_Around;
+class UCharacterMovementComponent;
+
 UCLASS()
 class UGA_Dash : public UCGameplayAbility
 {
 	GENERATED_BODY()
-public:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override; private:
+protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-
+	
+public:
 	static FGameplayTag GetDashStartTag();
+	
+private:
+	void PushForward();
+	
+	UFUNCTION()
+	void StartDash(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void TargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Anim")
 	UAnimMontage* DashMontage;
@@ -29,10 +40,7 @@ private:
 	FGameplayTag LocalGameplayCueTag;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	FName TargetActorAttachSocketName = "TargetDashCenter";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Targeting")
-	TSubclassOf<class ATargetActor_Around> TargetActorClass;
+	TSubclassOf<ATargetActor_Around> TargetActorClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	float TargetHitPushSpeed = 3000.f;
@@ -46,13 +54,6 @@ private:
 	FActiveGameplayEffectHandle DashEffectHandle;
 
 	FTimerHandle PushForwardInputTimerHandle;
-
-	void PushForward();
-	class UCharacterMovementComponent* OwnerCharacterMovementComponent;
-
-	UFUNCTION()
-	void StartDash(FGameplayEventData Payload);
-
-	UFUNCTION()
-	void TargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
+	
+	TWeakObjectPtr<UCharacterMovementComponent> OwnerCharacterMovementComponent;
 };

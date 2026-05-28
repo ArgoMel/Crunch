@@ -6,9 +6,6 @@
 #include "Framework/CGameMode.h"
 #include "LobbyGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ALobbyGameMode : public ACGameMode
 {

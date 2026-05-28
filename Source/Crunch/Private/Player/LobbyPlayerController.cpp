@@ -1,11 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/LobbyPlayerController.h"
 #include "GameFramework/PlayerState.h"
 #include "Framework/CGameInstance.h"
 #include "Framework/CGameState.h"
 
+ALobbyPlayerController::ALobbyPlayerController()
+{
+	bAutoManageActiveCameraTarget = false;
+}
 
 void ALobbyPlayerController::Server_RequestSlotSelectionChange_Implementation(uint8 NewSlotID)
 {
@@ -47,11 +50,6 @@ bool ALobbyPlayerController::Server_StartHeroSelection_Validate()
 void ALobbyPlayerController::Client_StartHeroSelection_Implementation()
 {
 	OnSwitchToHeroSelection.ExecuteIfBound();
-}
-
-ALobbyPlayerController::ALobbyPlayerController()
-{
-	bAutoManageActiveCameraTarget = false;
 }
 
 void ALobbyPlayerController::Server_RequestStartMatch_Implementation()

@@ -6,18 +6,16 @@
 #include "Player/MenuPlayerController.h"
 #include "LobbyPlayerController.generated.h"
 
-
 DECLARE_DELEGATE(FOnSwitchToHeroSelection);
-/**
- * 
- */
+
 UCLASS()
 class ALobbyPlayerController : public AMenuPlayerController
 {
 	GENERATED_BODY()
 public:
 	ALobbyPlayerController();
-	FOnSwitchToHeroSelection OnSwitchToHeroSelection;
+	
+public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_RequestSlotSelectionChange(uint8 NewSlotID);
 
@@ -30,4 +28,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_StartHeroSelection();
 
+public:
+	FOnSwitchToHeroSelection OnSwitchToHeroSelection;
 };

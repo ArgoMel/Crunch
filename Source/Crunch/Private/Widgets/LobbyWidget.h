@@ -7,84 +7,89 @@
 #include "Player/PlayerInfoTypes.h"
 #include "LobbyWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UWidgetSwitcher;
+class UButton;
+class UUniformGridPanel;
+class UTeamSelectionWidget;
+class UTileView;
+class UAbilityListView;
+class UPlayerTeamLayoutWidget;
+class ALobbyPlayerController;
+class ACPlayerState;
+class ACGameState;
+class ACharacterDisplay;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class ULobbyWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
-	virtual void NativeConstruct() override;
+protected:
+	virtual void NativeOnInitialized() override;
+	
 private:	
-	UPROPERTY(meta=(BindWidget))
-	class UWidgetSwitcher* MainSwitcher;
-
-	UPROPERTY(meta=(BindWidget))	
-	class UWidget* TeamSelectionRoot;
-
-	UPROPERTY(meta=(BindWidget))
-	class UButton* StartHeroSelectionButton;
-
-	UPROPERTY(meta=(BindWidget))
-	class UUniformGridPanel* TeamSelectionSlotGridPanel;
-
-	UPROPERTY(EditDefaultsOnly, Category = "TeamSelection")
-	TSubclassOf<class UTeamSelectionWidget> TeamSelectionWidgetClass;
-
-	UPROPERTY()
-	TArray<class UTeamSelectionWidget*> TeamSelectionSlots;
-
 	void ClearAndPopulateTeamSelectionSlots();
 	void SlotSelected(uint8 NewSlotID);
-
-	UPROPERTY(meta=(BindWidget))	
-	class UWidget* HeroSelectionRoot;
-
-	UPROPERTY(meta=(BindWidget))	
-	class UTileView* CharacterSelectionTileView;
-
-	UPROPERTY(meta=(BindWidget))	
-	class UAbilityListView* AbilityListView;
-
-	UPROPERTY(meta=(BindWidget))	
-	class UPlayerTeamLayoutWidget* PlayerTeamLayoutWidget;
-
-	UPROPERTY(meta=(BindWidget))	
-	class UButton* StartMatchButton;
-
-	UPROPERTY()
-	class ALobbyPlayerController* LobbyPlayerController;
-
-	UPROPERTY()
-	class ACPlayerState* CPlayerState;
-
+	
+private:	
 	void ConfigureGameState();
-	FTimerHandle ConfigureGameStateTimerHandle;
-
-	UPROPERTY()
-	class ACGameState* CGameState;
-
-
+	
 	void UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& PlayerSelections);
 
 	UFUNCTION()
 	void StartHeroSelectionButtonClicked();
 
 	void SwitchToHeroSelection();
-	void CharacterDefinationLoaded();
+	void CharacterDefinitionLoaded();
 
 	void CharacterSelected(UObject* SelectedUObject);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Character Display")
-	TSubclassOf<class ACharacterDisplay> CharacterDisplayClass;
-
-	UPROPERTY()
-	class ACharacterDisplay* CharacterDisplay;
-
+	
 	void SpawnCharacterDisplay();
 	void UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection);
 
 	UFUNCTION()
 	void StartMatchButtonClicked();
+	
+private:	
+	UPROPERTY(meta=(BindWidget))
+	UWidgetSwitcher* MainSwitcher;
+
+	UPROPERTY(meta=(BindWidget))	
+	UWidget* TeamSelectionRoot;
+
+	UPROPERTY(meta=(BindWidget))
+	UButton* StartHeroSelectionButton;
+
+	UPROPERTY(meta=(BindWidget))
+	UUniformGridPanel* TeamSelectionSlotGridPanel;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TeamSelection")
+	TSubclassOf<UTeamSelectionWidget> TeamSelectionWidgetClass;
+
+	UPROPERTY()
+	TArray<UTeamSelectionWidget*> TeamSelectionSlots;
+
+	UPROPERTY(meta=(BindWidget))	
+	UWidget* HeroSelectionRoot;
+
+	UPROPERTY(meta=(BindWidget))	
+	UTileView* CharacterSelectionTileView;
+
+	UPROPERTY(meta=(BindWidget))	
+	UAbilityListView* AbilityListView;
+
+	UPROPERTY(meta=(BindWidget))	
+	UPlayerTeamLayoutWidget* PlayerTeamLayoutWidget;
+
+	UPROPERTY(meta=(BindWidget))	
+	UButton* StartMatchButton;
+	
+	TWeakObjectPtr<ALobbyPlayerController> LobbyPlayerController;
+	TWeakObjectPtr<ACPlayerState> CPlayerState;
+	TWeakObjectPtr<ACGameState> CGameState;
+	
+	FTimerHandle ConfigureGameStateTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character Display")
+	TSubclassOf<ACharacterDisplay> CharacterDisplayClass;
+	TWeakObjectPtr<ACharacterDisplay> CharacterDisplay;
 };

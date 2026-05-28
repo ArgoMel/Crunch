@@ -3,12 +3,12 @@
 #include "GAS/GA_Dash.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Abilities/Tasks/AbilityTask_NetworkSyncPoint.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TargetActor_Around.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "Crunch/Crunch.h"
 
 void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -21,14 +21,14 @@ void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayDashMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, DashMontage);
-		PlayDashMontage->OnBlendOut.AddDynamic(this, &UGA_Dash::K2_EndAbility);
-		PlayDashMontage->OnCancelled.AddDynamic(this, &UGA_Dash::K2_EndAbility);
-		PlayDashMontage->OnInterrupted.AddDynamic(this, &UGA_Dash::K2_EndAbility);
-		PlayDashMontage->OnCompleted.AddDynamic(this, &UGA_Dash::K2_EndAbility);
+		//PlayDashMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayDashMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayDashMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayDashMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayDashMontage->ReadyForActivation();
 
 		UAbilityTask_WaitGameplayEvent* WaitDashStartEvent = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, GetDashStartTag());
-		WaitDashStartEvent->EventReceived.AddDynamic(this, &UGA_Dash::StartDash);
+		WaitDashStartEvent->EventReceived.AddDynamic(this, &ThisClass::StartDash);
 		WaitDashStartEvent->ReadyForActivation();
 	}
 }
@@ -56,17 +56,16 @@ FGameplayTag UGA_Dash::GetDashStartTag()
 
 void UGA_Dash::PushForward()
 {
-	if (OwnerCharacterMovementComponent)
+	if (OwnerCharacterMovementComponent.IsValid())
 	{
 		const FVector ForwardActor = GetAvatarActorFromActorInfo()->GetActorForwardVector();
 		OwnerCharacterMovementComponent->AddInputVector(ForwardActor);
-		PushForwardInputTimerHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UGA_Dash::PushForward);
+		PushForwardInputTimerHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::PushForward);
 	}
 }
 
 void UGA_Dash::StartDash(FGameplayEventData Payload)
 {
-
 	if (K2_HasAuthority())
 	{
 		if (DashEffect)
@@ -77,12 +76,12 @@ void UGA_Dash::StartDash(FGameplayEventData Payload)
 
 	if (IsLocallyControlled())
 	{
-		PushForwardInputTimerHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UGA_Dash::PushForward);
+		PushForwardInputTimerHandle = GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::PushForward);
 		OwnerCharacterMovementComponent = GetAvatarActorFromActorInfo()->GetComponentByClass<UCharacterMovementComponent>();
 	}
 
 	UAbilityTask_WaitTargetData* WaitTargetData = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::CustomMulti, TargetActorClass);
-	WaitTargetData->ValidData.AddDynamic(this, &UGA_Dash::TargetReceived);
+	WaitTargetData->ValidData.AddDynamic(this, &ThisClass::TargetReceived);
 	WaitTargetData->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* TargetActor;
@@ -96,10 +95,9 @@ void UGA_Dash::StartDash(FGameplayEventData Payload)
 	WaitTargetData->FinishSpawningActor(this, TargetActor);
 	if (TargetActorAround)
 	{
-		TargetActorAround->AttachToComponent(GetOwningComponentFromActorInfo(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TargetActorAttachSocketName);
+		TargetActorAround->AttachToComponent(GetOwningComponentFromActorInfo(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Crunch::SocketName::TargetDashCenter);
 	}
 }
-
 
 void UGA_Dash::TargetReceived(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {

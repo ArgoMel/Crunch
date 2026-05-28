@@ -7,26 +7,45 @@
 #include "GenericTeamAgentInterface.h"
 #include "TA_Blackhole.generated.h"
 
-/**
- * 
- */
+class UNiagaraSystem;
+class USphereComponent;
+class UNiagaraComponent;
+
 UCLASS()
 class ATA_Blackhole : public AGameplayAbilityTargetActor, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 public:
 	ATA_Blackhole();
-	void ConfigureBlackhole(float InBlackholeRange, float InPullSpeed, float InBlackholeDuration, const FGenericTeamId& InTeamId);
-	/** Assigns Team Agent to given TeamID */
-	virtual void SetGenericTeamId(const FGenericTeamId& InTeamId) override;
-	
-	/** Retrieve team identifier in form of FGenericTeamId */
-	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual void StartTargeting(class UGameplayAbility* Ability) override;
+	virtual void StartTargeting(UGameplayAbility* Ability) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ConfirmTargetingAndContinue() override;
 	virtual void CancelTargeting() override;
+	
+	/** Assigns Team Agent to given TeamID */
+	virtual void SetGenericTeamId(const FGenericTeamId& InTeamId) override;
+	/** Retrieve team identifier in form of FGenericTeamId */
+	virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
+	
+public:
+	void ConfigureBlackhole(float InBlackholeRange, float InPullSpeed, float InBlackholeDuration, const FGenericTeamId& InTeamId);
+	
+private:
+	UFUNCTION()
+	void OnRep_BlackholeRange() const;
+	
+	UFUNCTION()
+	void ActorInBlackholeRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void ActorLeftBlackholeRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void TryAddTarget(AActor* OtherTarget);
+	void RemoveTarget(AActor* OtherTarget);
+	
+	void StopBlackhole();
+	
 private:
 	UPROPERTY(Replicated)
 	FGenericTeamId TeamId;
@@ -39,33 +58,17 @@ private:
 	float BlackholeRange;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	FName BlackholeVFXOriginVariableName = "Origin";
-
-	UPROPERTY(EditDefaultsOnly, Category = "VFX")
-	class UNiagaraSystem* BlackholeLinkVFX;
-
-	UFUNCTION()
-	void OnRep_BlackholeRange();
+	UNiagaraSystem* BlackholeLinkVFX;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class USceneComponent* RootComp;
+	USceneComponent* RootComp;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class USphereComponent* DetectionSphereComponent;
+	USphereComponent* DetectionSphereComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Component")
-	class UParticleSystemComponent* VFXComponent;
+	UParticleSystemComponent* VFXComponent;
 
-	UFUNCTION()
-	void ActorInBlackholeRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
-	UFUNCTION()
-	void ActorLeftBlackholeRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	void TryAddTarget(AActor* OtherTarget);
-	void RemoveTarget(AActor* OtherTarget);
-
-	TMap<AActor*, class UNiagaraComponent*> ActorsInRangeMap;
-
-	void StopBlackhole();
+	UPROPERTY()
+	TMap<AActor*, UNiagaraComponent*> ActorsInRangeMap;
 };

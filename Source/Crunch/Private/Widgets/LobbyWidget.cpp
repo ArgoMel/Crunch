@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/LobbyWidget.h"
 #include "Character/PA_CharacterDefinition.h"
 #include "Components/UniformGridPanel.h"
@@ -21,25 +20,25 @@
 #include "Widgets/TeamSelectionWidget.h"
 #include "Widgets/PlayerTeamLayoutWidget.h"
 
-void ULobbyWidget::NativeConstruct()
+void ULobbyWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	ClearAndPopulateTeamSelectionSlots();
 	ConfigureGameState();
 	LobbyPlayerController = GetOwningPlayer<ALobbyPlayerController>();
-	if (LobbyPlayerController)
+	if (LobbyPlayerController.IsValid())
 	{
-		LobbyPlayerController->OnSwitchToHeroSelection.BindUObject(this, &ULobbyWidget::SwitchToHeroSelection);
+		LobbyPlayerController->OnSwitchToHeroSelection.BindUObject(this, &ThisClass::SwitchToHeroSelection);
 	}
 	StartHeroSelectionButton->SetIsEnabled(false);
-	StartHeroSelectionButton->OnClicked.AddDynamic(this, &ULobbyWidget::StartHeroSelectionButtonClicked);
+	StartHeroSelectionButton->OnClicked.AddDynamic(this, &ThisClass::StartHeroSelectionButtonClicked);
 	StartMatchButton->SetIsEnabled(false);
-	StartMatchButton->OnClicked.AddDynamic(this, &ULobbyWidget::StartMatchButtonClicked);
+	StartMatchButton->OnClicked.AddDynamic(this, &ThisClass::StartMatchButtonClicked);
 
-	UCAssetManager::Get().LoadCharacterDefinitions(FStreamableDelegate::CreateUObject(this, &ULobbyWidget::CharacterDefinationLoaded));
+	UCAssetManager::Get().LoadCharacterDefinitions(FStreamableDelegate::CreateUObject(this, &ThisClass::CharacterDefinitionLoaded));
 	if (CharacterSelectionTileView)
 	{
-		CharacterSelectionTileView->OnItemSelectionChanged().AddUObject(this, &ULobbyWidget::CharacterSelected);
+		CharacterSelectionTileView->OnItemSelectionChanged().AddUObject(this, &ThisClass::CharacterSelected);
 	}
 
 	SpawnCharacterDisplay();
@@ -73,7 +72,7 @@ void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
 
 void ULobbyWidget::SlotSelected(uint8 NewSlotID)
 {
-	if (LobbyPlayerController)
+	if (LobbyPlayerController.IsValid())
 	{
 		LobbyPlayerController->Server_RequestSlotSelectionChange(NewSlotID);
 	}
@@ -86,7 +85,7 @@ void ULobbyWidget::ConfigureGameState()
 		return;
 
 	CGameState = World->GetGameState<ACGameState>();
-	if (!CGameState)
+	if (!CGameState.IsValid())
 	{
 		World->GetTimerManager().SetTimer(ConfigureGameStateTimerHandle, this, &ULobbyWidget::ConfigureGameState, 1.f);
 	}
@@ -131,7 +130,7 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 		}
 	}
 
-	if (CGameState)
+	if (CGameState.IsValid())
 	{
 		StartHeroSelectionButton->SetIsEnabled(CGameState->CanStartHeroSelection());
 		StartMatchButton->SetIsEnabled(CGameState->CanStartMatch());
@@ -145,7 +144,7 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 
 void ULobbyWidget::StartHeroSelectionButtonClicked()
 {
-	if (LobbyPlayerController)
+	if (LobbyPlayerController.IsValid())
 	{
 		LobbyPlayerController->Server_StartHeroSelection();
 	}
@@ -156,34 +155,34 @@ void ULobbyWidget::SwitchToHeroSelection()
 	MainSwitcher->SetActiveWidget(HeroSelectionRoot);
 }
 
-void ULobbyWidget::CharacterDefinationLoaded()
+void ULobbyWidget::CharacterDefinitionLoaded()
 {
-	TArray<UPA_CharacterDefinition*> LoadedCharacterDefinations;
-	if (UCAssetManager::Get().GetLoadedCharacterDefinitions(LoadedCharacterDefinations))
+	TArray<UPA_CharacterDefinition*> loadedCharacterDefinitions;
+	if (UCAssetManager::Get().GetLoadedCharacterDefinitions(loadedCharacterDefinitions))
 	{
-		CharacterSelectionTileView->SetListItems(LoadedCharacterDefinations);
+		CharacterSelectionTileView->SetListItems(loadedCharacterDefinitions);
 	}
 }
 
 void ULobbyWidget::CharacterSelected(UObject* SelectedUObject)
 {
-	if (!CPlayerState)
+	if (!CPlayerState.IsValid())
 	{
 		CPlayerState = GetOwningPlayerState<ACPlayerState>();
 	}
 
-	if (!CPlayerState)
+	if (!CPlayerState.IsValid())
 		return;
 
-	if (const UPA_CharacterDefinition* CharacterDefination = Cast<UPA_CharacterDefinition>(SelectedUObject))
+	if (const UPA_CharacterDefinition* characterDefinition = Cast<UPA_CharacterDefinition>(SelectedUObject))
 	{
-		CPlayerState->Server_SetSelectedCharacterDefination(CharacterDefination);
+		CPlayerState->Server_SetSelectedCharacterDefinition(characterDefinition);
 	}
 }
 
 void ULobbyWidget::SpawnCharacterDisplay()
 {
-	if (CharacterDisplay)
+	if (CharacterDisplay.IsValid())
 		return;
 
 	if (!CharacterDisplayClass)
@@ -199,7 +198,7 @@ void ULobbyWidget::SpawnCharacterDisplay()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	CharacterDisplay = GetWorld()->SpawnActor<ACharacterDisplay>(CharacterDisplayClass, CharacterDisplayTransform, SpawnParams);
-	GetOwningPlayer()->SetViewTarget(CharacterDisplay);
+	GetOwningPlayer()->SetViewTarget(CharacterDisplay.Get());
 }
 
 void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection)
@@ -218,7 +217,7 @@ void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelectio
 
 void ULobbyWidget::StartMatchButtonClicked()
 {
-	if (LobbyPlayerController)
+	if (LobbyPlayerController.IsValid())
 	{
 		LobbyPlayerController->Server_RequestStartMatch();
 	}

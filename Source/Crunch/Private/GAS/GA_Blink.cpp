@@ -25,8 +25,8 @@ void UGA_Blink::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	PlayTargetingMontage->ReadyForActivation();
 
 	UAbilityTask_WaitTargetData* WaitBlinkLocationTargetData = UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::UserConfirmed, GroundPickTargetActorClass);
-	WaitBlinkLocationTargetData->ValidData.AddDynamic(this, &UGA_Blink::GroundPickTargetReceived);
-	WaitBlinkLocationTargetData->Cancelled.AddDynamic(this, &UGA_Blink::GroundPickCancelled);
+	WaitBlinkLocationTargetData->ValidData.AddDynamic(this, &ThisClass::GroundPickTargetReceived);
+	WaitBlinkLocationTargetData->Cancelled.AddDynamic(this, &ThisClass::GroundPickCancelled);
 	WaitBlinkLocationTargetData->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* TargetActor;
@@ -60,16 +60,16 @@ void UGA_Blink::GroundPickTargetReceived(const FGameplayAbilityTargetDataHandle&
 	if (HasAuthorityOrPredictionKey(CurrentActorInfo, &CurrentActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayTeleportMontage = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, TeleportMontage);
-		PlayTeleportMontage->OnBlendOut.AddDynamic(this, &UGA_Blink::K2_EndAbility);
-		PlayTeleportMontage->OnCancelled.AddDynamic(this, &UGA_Blink::K2_EndAbility);
-		PlayTeleportMontage->OnInterrupted.AddDynamic(this, &UGA_Blink::K2_EndAbility);
-		PlayTeleportMontage->OnCompleted.AddDynamic(this, &UGA_Blink::K2_EndAbility);
+		//PlayTeleportMontage->OnBlendOut.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTeleportMontage->OnCancelled.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTeleportMontage->OnInterrupted.AddDynamic(this, &ThisClass::K2_EndAbility);
+		PlayTeleportMontage->OnCompleted.AddDynamic(this, &ThisClass::K2_EndAbility);
 		PlayTeleportMontage->ReadyForActivation();
 
 		if (K2_HasAuthority())
 		{
 			UAbilityTask_WaitGameplayEvent* WaitTeleportTimepoint = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, GetTeleportationTag());
-			WaitTeleportTimepoint->EventReceived.AddDynamic(this, &UGA_Blink::Teleport);
+			WaitTeleportTimepoint->EventReceived.AddDynamic(this, &ThisClass::Teleport);
 			WaitTeleportTimepoint->ReadyForActivation();
 		}
 	}

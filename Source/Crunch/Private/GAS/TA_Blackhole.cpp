@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GAS/TA_Blackhole.h"
 #include "Components/SphereComponent.h"
 #include "Components/SceneComponent.h"
@@ -8,9 +7,14 @@
 #include "Net/UnrealNetwork.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Crunch/Crunch.h"
 
 ATA_Blackhole::ATA_Blackhole()
 {
+	bReplicates = true;
+	ShouldProduceTargetDataOnServer = true;
+	PrimaryActorTick.bCanEverTick = true;
+	
 	RootComp = CreateDefaultSubobject<USceneComponent>("Root Comp");
 	SetRootComponent(RootComp);
 
@@ -18,37 +22,18 @@ ATA_Blackhole::ATA_Blackhole()
 	DetectionSphereComponent->SetupAttachment(GetRootComponent());
 	DetectionSphereComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	DetectionSphereComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
-	DetectionSphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ATA_Blackhole::ActorInBlackholeRange);
-	DetectionSphereComponent->OnComponentEndOverlap.AddDynamic(this, &ATA_Blackhole::ActorLeftBlackholeRange);
-
-	bReplicates = true;
-	ShouldProduceTargetDataOnServer = true;
-	PrimaryActorTick.bCanEverTick = true;
-
+	DetectionSphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::ActorInBlackholeRange);
+	DetectionSphereComponent->OnComponentEndOverlap.AddDynamic(this, &ThisClass::ActorLeftBlackholeRange);
+	
 	VFXComponent = CreateDefaultSubobject<UParticleSystemComponent>("VFX Component");
 	VFXComponent->SetupAttachment(GetRootComponent());
-}
-
-void ATA_Blackhole::ConfigureBlackhole(float InBlackholeRange, float InPullSpeed, float InBlackholeDuration, const FGenericTeamId& InTeamId)
-{
-	PullSpeed = InPullSpeed;
-	DetectionSphereComponent->SetSphereRadius(InBlackholeRange);
-	SetGenericTeamId(InTeamId);
-	BlackholeDuration = InBlackholeDuration;
-	BlackholeRange = InBlackholeRange;
-}
-
-void ATA_Blackhole::SetGenericTeamId(const FGenericTeamId& InTeamId)
-{
-	TeamId = InTeamId;
 }
 
 void ATA_Blackhole::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ATA_Blackhole, TeamId);
-	DOREPLIFETIME_CONDITION_NOTIFY(ATA_Blackhole, BlackholeRange, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME(ThisClass, TeamId);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, BlackholeRange, COND_None, REPNOTIFY_Always);
 }
 
 void ATA_Blackhole::StartTargeting(UGameplayAbility* Ability)
@@ -58,7 +43,7 @@ void ATA_Blackhole::StartTargeting(UGameplayAbility* Ability)
 	const UWorld* World = GetWorld();
 	if (World)
 	{
-		World->GetTimerManager().SetTimer(BlackholeDurationTimerHandle, this, &ATA_Blackhole::StopBlackhole, BlackholeDuration);
+		World->GetTimerManager().SetTimer(BlackholeDurationTimerHandle, this, &ThisClass::StopBlackhole, BlackholeDuration);
 	}
 }
 
@@ -76,7 +61,7 @@ void ATA_Blackhole::Tick(float DeltaTime)
 
 			if (NiagaraComponent)
 			{
-				NiagaraComponent->SetVariablePosition(BlackholeVFXOriginVariableName, VFXComponent->GetComponentLocation());
+				NiagaraComponent->SetVariablePosition(Crunch::VFXParam::Origin, VFXComponent->GetComponentLocation());
 			}
 		}
 	}
@@ -93,7 +78,21 @@ void ATA_Blackhole::CancelTargeting()
 	Super::CancelTargeting();
 }
 
-void ATA_Blackhole::OnRep_BlackholeRange()
+void ATA_Blackhole::SetGenericTeamId(const FGenericTeamId& InTeamId)
+{
+	TeamId = InTeamId;
+}
+
+void ATA_Blackhole::ConfigureBlackhole(float InBlackholeRange, float InPullSpeed, float InBlackholeDuration, const FGenericTeamId& InTeamId)
+{
+	PullSpeed = InPullSpeed;
+	DetectionSphereComponent->SetSphereRadius(InBlackholeRange);
+	SetGenericTeamId(InTeamId);
+	BlackholeDuration = InBlackholeDuration;
+	BlackholeRange = InBlackholeRange;
+}
+
+void ATA_Blackhole::OnRep_BlackholeRange() const
 {
 	DetectionSphereComponent->SetSphereRadius(BlackholeRange);
 }
@@ -111,18 +110,20 @@ void ATA_Blackhole::ActorLeftBlackholeRange(UPrimitiveComponent* OverlappedCompo
 void ATA_Blackhole::TryAddTarget(AActor* OtherTarget)
 {
 	if (!OtherTarget || ActorsInRangeMap.Contains(OtherTarget))
+	{
 		return;
-
+	}
 	if (GetTeamAttitudeTowards(*OtherTarget) != ETeamAttitude::Hostile)
+	{
 		return;
-
+	}
 	UNiagaraComponent* NiagaraComponent = nullptr;
 	if (BlackholeLinkVFX)
 	{
 		NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(BlackholeLinkVFX, OtherTarget->GetRootComponent(), NAME_None, FVector::Zero(), FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false);
 		if (NiagaraComponent)
 		{
-			NiagaraComponent->SetVariablePosition(BlackholeVFXOriginVariableName, VFXComponent->GetComponentLocation());
+			NiagaraComponent->SetVariablePosition(Crunch::VFXParam::Origin, VFXComponent->GetComponentLocation());
 		}
 	}
 
