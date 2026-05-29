@@ -6,23 +6,22 @@
 #include "GameFramework/PlayerController.h"
 #include "MenuPlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class AMenuPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:	
-	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
-
+protected:
+	virtual void BeginPlay() override;
+	
+private:
+	void SpawnWidget();
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Menu")
 	TSubclassOf<UUserWidget> MenuWidgetClass;
 
 	UPROPERTY()
 	UUserWidget* MenuWidget;
-
-	void SpawnWidget();
 };

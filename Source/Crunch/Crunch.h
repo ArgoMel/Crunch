@@ -41,6 +41,7 @@ namespace Crunch
 	namespace ConstValue
 	{
 		constexpr int32 MaxLevel= 4;
+		constexpr uint8 MaxPlayerCount= 5;
 	}
 	namespace TableRowName
 	{

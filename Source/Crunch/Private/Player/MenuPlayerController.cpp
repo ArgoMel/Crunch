@@ -1,8 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/MenuPlayerController.h"
 #include "Blueprint/UserWidget.h"
+
+void AMenuPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	if (IsLocalPlayerController())
+	{
+		SpawnWidget();
+	}
+}
 
 void AMenuPlayerController::BeginPlay()
 {
@@ -11,15 +19,6 @@ void AMenuPlayerController::BeginPlay()
 	SetShowMouseCursor(true);
 
 	if (HasAuthority() && IsLocalPlayerController())
-	{
-		SpawnWidget();
-	}
-}
-
-void AMenuPlayerController::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-	if (IsLocalPlayerController())
 	{
 		SpawnWidget();
 	}

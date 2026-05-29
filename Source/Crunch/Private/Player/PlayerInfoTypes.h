@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "PlayerInfoTypes.generated.h"
 
-
 class APlayerState;
 class UPA_CharacterDefinition;
+
 USTRUCT()
 struct FPlayerSelection
 {
@@ -20,13 +20,14 @@ public:
 	FORCEINLINE uint8 GetPlayerSlot() const { return Slot; }
 	FORCEINLINE FUniqueNetIdRepl GetPLayerUniqueId() const { return PlayerUniqueId; }
 	FORCEINLINE FString GetPlayerNickName() const { return PlayerNickName; }
-	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefination() const { return CharacterDefination; }
-	FORCEINLINE void SetCharacterDefination(const UPA_CharacterDefinition* NewCharacterDefination) { CharacterDefination = NewCharacterDefination; }
+	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefinition() const { return CharacterDefinition; }
+	FORCEINLINE void SetCharacterDefinition(const UPA_CharacterDefinition* NewCharacterDefinition) { CharacterDefinition = NewCharacterDefinition; }
 
 	bool IsForPlayer(const APlayerState* PlayerState) const;
 	bool IsValid() const;
 
 	static uint8 GetInvalidSlot();
+	
 private:
 	UPROPERTY()
 	uint8 Slot;
@@ -38,5 +39,5 @@ private:
 	FString PlayerNickName;
 
 	UPROPERTY()
-	const UPA_CharacterDefinition* CharacterDefination;
+	const UPA_CharacterDefinition* CharacterDefinition;
 };

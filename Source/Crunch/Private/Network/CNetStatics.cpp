@@ -1,13 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Network/CNetStatics.h"
 
-FOnlineSessionSettings UCNetStatics::GenerateOnlineSesisonSettings(const FName& SessionName, const FString& SessionSearchId, int Port)
+#include "OnlineSubsystemUtils.h"
+#include "Crunch/Crunch.h"
+
+FOnlineSessionSettings UCNetStatics::GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchId, int Port)
 {
 	FOnlineSessionSettings OnlineSessionSettings{};
 	OnlineSessionSettings.bIsLANMatch = false;
-	OnlineSessionSettings.NumPublicConnections = GetPlayerCountPerTeam() * 2;
+	OnlineSessionSettings.NumPublicConnections = Crunch::ConstValue::MaxPlayerCount * 2;
 	OnlineSessionSettings.bShouldAdvertise = true;
 	OnlineSessionSettings.bUsesPresence = false;
 	OnlineSessionSettings.bAllowJoinViaPresence = false;
@@ -25,9 +27,11 @@ FOnlineSessionSettings UCNetStatics::GenerateOnlineSesisonSettings(const FName& 
 	return OnlineSessionSettings;
 }
 
-IOnlineSessionPtr UCNetStatics::GetSessionPtr()
+IOnlineSessionPtr UCNetStatics::GetSessionPtr(const UObject* WorldContextObject)
 {
-	const IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
+	const UWorld* world=WorldContextObject->GetWorld();
+	check(world);
+	const IOnlineSubsystem* OnlineSubSystem = Online::GetSubsystem(world);
 	if (OnlineSubSystem)
 	{
 		return OnlineSubSystem->GetSessionInterface();
@@ -35,9 +39,11 @@ IOnlineSessionPtr UCNetStatics::GetSessionPtr()
 	return nullptr;
 }
 
-IOnlineIdentityPtr UCNetStatics::GetIdentityPtr()
+IOnlineIdentityPtr UCNetStatics::GetIdentityPtr(const UObject* WorldContextObject)
 {
-	const IOnlineSubsystem* OnlineSubSystem = IOnlineSubsystem::Get();
+	const UWorld* world=WorldContextObject->GetWorld();
+	check(world);
+	const IOnlineSubsystem* OnlineSubSystem = Online::GetSubsystem(world);
 	if (OnlineSubSystem)
 	{
 		return OnlineSubSystem->GetIdentityInterface();
@@ -45,14 +51,9 @@ IOnlineIdentityPtr UCNetStatics::GetIdentityPtr()
 	return nullptr;
 }
 
-uint8 UCNetStatics::GetPlayerCountPerTeam()
-{
-	return 5;
-}
-
 bool UCNetStatics::IsSessionServer(const UObject* WorldContextObject)
 {
-	return WorldContextObject->GetWorld()->GetNetMode() == ENetMode::NM_DedicatedServer;
+	return WorldContextObject->GetWorld()->GetNetMode() == NM_DedicatedServer;
 }
 
 FString UCNetStatics::GetSessionNameStr()
@@ -65,7 +66,7 @@ FName UCNetStatics::GetSessionNameKey()
 	return FName("SESSION_NAME");
 }
 
-FString UCNetStatics::GetSesisonSearchIdStr()
+FString UCNetStatics::GetSessionSearchIdStr()
 {
 	return GetCommandlineArgAsString(GetSessionSearchIdKey());
 }

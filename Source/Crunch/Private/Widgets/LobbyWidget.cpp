@@ -7,6 +7,7 @@
 #include "Components/TileView.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "Crunch/Crunch.h"
 #include "Framework/CAssetManager.h"
 #include "Framework/CGameState.h"
 #include "GameFramework/PlayerStart.h"
@@ -48,7 +49,7 @@ void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
 {
 	TeamSelectionSlotGridPanel->ClearChildren();
 
-	for (int i = 0; i < UCNetStatics::GetPlayerCountPerTeam() * 2; ++i)
+	for (int i = 0; i < Crunch::ConstValue::MaxPlayerCount * 2; ++i)
 	{
 		UTeamSelectionWidget* NewSelectionSlot = CreateWidget<UTeamSelectionWidget>(this, TeamSelectionWidgetClass);
 		if (NewSelectionSlot)
@@ -57,20 +58,20 @@ void ULobbyWidget::ClearAndPopulateTeamSelectionSlots()
 			UUniformGridSlot* NewGridSlot = TeamSelectionSlotGridPanel->AddChildToUniformGrid(NewSelectionSlot);
 			if (NewGridSlot)
 			{
-				const int Row = i % UCNetStatics::GetPlayerCountPerTeam();
-				const int Column = i < UCNetStatics::GetPlayerCountPerTeam() ? 0 : 1;
+				const int Row = i % Crunch::ConstValue::MaxPlayerCount;
+				const int Column = i < Crunch::ConstValue::MaxPlayerCount ? 0 : 1;
 
 				NewGridSlot->SetRow(Row);
 				NewGridSlot->SetColumn(Column);
 			}
 
-			NewSelectionSlot->OnSlotClicked.AddUObject(this, &ULobbyWidget::SlotSelected);
+			NewSelectionSlot->OnSlotClicked.AddUObject(this, &ThisClass::SlotSelected);
 			TeamSelectionSlots.Add(NewSelectionSlot);
 		}
 	}
 }
 
-void ULobbyWidget::SlotSelected(uint8 NewSlotID)
+void ULobbyWidget::SlotSelected(uint8 NewSlotID) const
 {
 	if (LobbyPlayerController.IsValid())
 	{
@@ -82,23 +83,24 @@ void ULobbyWidget::ConfigureGameState()
 {
 	const UWorld* World = GetWorld();
 	if (!World)
+	{
 		return;
-
+	}
 	CGameState = World->GetGameState<ACGameState>();
 	if (!CGameState.IsValid())
 	{
-		World->GetTimerManager().SetTimer(ConfigureGameStateTimerHandle, this, &ULobbyWidget::ConfigureGameState, 1.f);
+		World->GetTimerManager().SetTimer(ConfigureGameStateTimerHandle, this, &ThisClass::ConfigureGameState, 1.f);
 	}
 	else
 	{
-		CGameState->OnPlayerSelectionUpdated.AddUObject(this, &ULobbyWidget::UpdatePlayerSelectionDisplay);
+		CGameState->OnPlayerSelectionUpdated.AddUObject(this, &ThisClass::UpdatePlayerSelectionDisplay);
 		UpdatePlayerSelectionDisplay(CGameState->GetPlayerSelection());
 	}
 }
 
 void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& PlayerSelections)
 {
-	for (UTeamSelectionWidget* SelectionSlot : TeamSelectionSlots)
+	for (const UTeamSelectionWidget* SelectionSlot : TeamSelectionSlots)
 	{
 		SelectionSlot->UpdateSlotInfo("Empty");
 	}
@@ -114,11 +116,12 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 	for (const FPlayerSelection& PlayerSelection : PlayerSelections)
 	{
 		if (!PlayerSelection.IsValid())
+		{
 			continue;
-
+		}
 		TeamSelectionSlots[PlayerSelection.GetPlayerSlot()]->UpdateSlotInfo(PlayerSelection.GetPlayerNickName());
 
-		UCharacterEntryWidget* SelectedEntry = CharacterSelectionTileView->GetEntryWidgetFromItem<UCharacterEntryWidget>(PlayerSelection.GetCharacterDefination());
+		UCharacterEntryWidget* SelectedEntry = CharacterSelectionTileView->GetEntryWidgetFromItem<UCharacterEntryWidget>(PlayerSelection.GetCharacterDefinition());
 		if (SelectedEntry)
 		{
 			SelectedEntry->SetSelected(true);
@@ -203,12 +206,12 @@ void ULobbyWidget::SpawnCharacterDisplay()
 
 void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection)
 {
-	if (!PlayerSelection.GetCharacterDefination())
+	if (!PlayerSelection.GetCharacterDefinition())
 		return;
 
-	CharacterDisplay->ConfigureWithCharacterDefination(PlayerSelection.GetCharacterDefination());
+	CharacterDisplay->ConfigureWithCharacterDefination(PlayerSelection.GetCharacterDefinition());
 	AbilityListView->ClearListItems();
-	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* Abilities = PlayerSelection.GetCharacterDefination()->GetAbilities();
+	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* Abilities = PlayerSelection.GetCharacterDefinition()->GetAbilities();
 	if (Abilities)
 	{
 		AbilityListView->ConfigureAbilities(*Abilities);

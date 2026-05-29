@@ -8,27 +8,22 @@
 #include "OnlineSessionSettings.h"
 #include "CNetStatics.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class UCNetStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:	
-	static FOnlineSessionSettings GenerateOnlineSesisonSettings(const FName& SessionName, const FString& SessionSearchId, int Port);
+	static FOnlineSessionSettings GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchId, int Port);
 
-	static IOnlineSessionPtr GetSessionPtr();
-	static IOnlineIdentityPtr GetIdentityPtr();
-
-	static uint8 GetPlayerCountPerTeam();
+	static IOnlineSessionPtr GetSessionPtr(const UObject* WorldContextObject);
+	static IOnlineIdentityPtr GetIdentityPtr(const UObject* WorldContextObject);
 
 	static bool IsSessionServer(const UObject* WorldContextObject);
 
 	static FString GetSessionNameStr();
 	static FName GetSessionNameKey();
 
-	static FString GetSesisonSearchIdStr();
+	static FString GetSessionSearchIdStr();
 	static FName GetSessionSearchIdKey();
 
 	static int GetSessionPort();

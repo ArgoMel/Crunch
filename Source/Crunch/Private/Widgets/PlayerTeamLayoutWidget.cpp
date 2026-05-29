@@ -4,6 +4,7 @@
 #include "Widgets/PlayerTeamLayoutWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Crunch/Crunch.h"
 #include "Network/CNetStatics.h"
 #include "Widgets/PlayerTeamSlotWidget.h"
 
@@ -16,13 +17,13 @@ void UPlayerTeamLayoutWidget::NativeConstruct()
 	if (!PlayerTeamSlotWidgetClass)
 		return;
 
-	for (int i = 0; i < UCNetStatics::GetPlayerCountPerTeam() * 2; ++i)
+	for (int i = 0; i < Crunch::ConstValue::MaxPlayerCount * 2; ++i)
 	{
 		UPlayerTeamSlotWidget* NewSlotWidget = CreateWidget<UPlayerTeamSlotWidget>(GetOwningPlayer(), PlayerTeamSlotWidgetClass);
 		TeamSlotWidgets.Add(NewSlotWidget);
 		
 		UHorizontalBoxSlot* NewSlot;
-		if (i < UCNetStatics::GetPlayerCountPerTeam())
+		if (i < Crunch::ConstValue::MaxPlayerCount)
 		{
 			NewSlot = TeamOneLayoutBox->AddChildToHorizontalBox(NewSlotWidget);
 		}
@@ -47,6 +48,6 @@ void UPlayerTeamLayoutWidget::UpdatePlayerSelection(const TArray<FPlayerSelectio
 		if (!PlayerSelection.IsValid())
 			continue;
 
-		TeamSlotWidgets[PlayerSelection.GetPlayerSlot()]->UpdateSlot(PlayerSelection.GetPlayerNickName(), PlayerSelection.GetCharacterDefination());
+		TeamSlotWidgets[PlayerSelection.GetPlayerSlot()]->UpdateSlot(PlayerSelection.GetPlayerNickName(), PlayerSelection.GetCharacterDefinition());
 	}
 }

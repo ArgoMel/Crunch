@@ -3,6 +3,7 @@
 #include "Player/CPlayerState.h"
 #include "Character/PA_CharacterDefinition.h"
 #include "Character/CCharacter.h"
+#include "Crunch/Crunch.h"
 #include "Net/UnrealNetwork.h"
 #include "Network/CNetStatics.h"
 #include "Framework/CGameState.h"
@@ -44,9 +45,9 @@ void ACPlayerState::CopyProperties(APlayerState* PlayerState)
 
 TSubclassOf<APawn> ACPlayerState::GetSelectedPawnClass() const
 {
-	if (PlayerSelection.GetCharacterDefination())
+	if (PlayerSelection.GetCharacterDefinition())
 	{
-		return PlayerSelection.GetCharacterDefination()->LoadCharacterClass();
+		return PlayerSelection.GetCharacterDefinition()->LoadCharacterClass();
 	}
 
 	return nullptr;
@@ -54,7 +55,7 @@ TSubclassOf<APawn> ACPlayerState::GetSelectedPawnClass() const
 
 FGenericTeamId ACPlayerState::GetTeamIdBasedOnSlot() const
 {
-	return PlayerSelection.GetPlayerSlot() < UCNetStatics::GetPlayerCountPerTeam() ? FGenericTeamId{ 0 } : FGenericTeamId{ 1 };
+	return PlayerSelection.GetPlayerSlot() < Crunch::ConstValue::MaxPlayerCount ? FGenericTeamId{ 0 } : FGenericTeamId{ 1 };
 }
 
 void ACPlayerState::Server_SetSelectedCharacterDefinition_Implementation(const UPA_CharacterDefinition* NewDefinition)
@@ -65,15 +66,15 @@ void ACPlayerState::Server_SetSelectedCharacterDefinition_Implementation(const U
 	if (!NewDefinition)
 		return;
 
-	if (CGameState->IsDefiniationSelected(NewDefinition))
+	if (CGameState->IsDefinitionSelected(NewDefinition))
 		return;
 
-	if (PlayerSelection.GetCharacterDefination())
+	if (PlayerSelection.GetCharacterDefinition())
 	{
-		CGameState->SetCharacterDeselected(PlayerSelection.GetCharacterDefination());
+		CGameState->SetCharacterDeselected(PlayerSelection.GetCharacterDefinition());
 	}
 
-	PlayerSelection.SetCharacterDefination(NewDefinition);
+	PlayerSelection.SetCharacterDefinition(NewDefinition);
 	CGameState->SetCharacterSelected(this, NewDefinition);
 }
 

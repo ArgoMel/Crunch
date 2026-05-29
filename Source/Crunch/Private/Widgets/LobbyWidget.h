@@ -28,7 +28,7 @@ protected:
 	
 private:	
 	void ClearAndPopulateTeamSelectionSlots();
-	void SlotSelected(uint8 NewSlotID);
+	void SlotSelected(uint8 NewSlotID) const;
 	
 private:	
 	void ConfigureGameState();
