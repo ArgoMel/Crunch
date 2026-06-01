@@ -1,35 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/PlayerTeamSlotWidget.h"
 #include "Character/PA_CharacterDefinition.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Crunch/Crunch.h"
 
 void UPlayerTeamSlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(CharacterEmptyMatParamName, 1);
+	PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::Empty, 1);
 	CachedCharacterNameStr = "";
-}
-
-void UPlayerTeamSlotWidget::UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefination)
-{
-	CachedPlayerNameStr = PlayerName;
-
-	if (CharacterDefination)
-	{
-		PlayerCharacterIcon->GetDynamicMaterial()->SetTextureParameterValue(CharacterIconMatParamName, CharacterDefination->LoadIcon());
-		PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(CharacterEmptyMatParamName, 0);
-		CachedCharacterNameStr = CharacterDefination->GEtCharacterDisplayName();
-	}
-	else
-	{
-		PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(CharacterEmptyMatParamName, 1);
-		CachedCharacterNameStr = "";
-	}
-
-	UpdateNameText();
 }
 
 void UPlayerTeamSlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -46,7 +27,26 @@ void UPlayerTeamSlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent
 	PlayAnimationReverse(HoverAnim);
 }
 
-void UPlayerTeamSlotWidget::UpdateNameText()
+void UPlayerTeamSlotWidget::UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefinition)
+{
+	CachedPlayerNameStr = PlayerName;
+
+	if (CharacterDefinition)
+	{
+		PlayerCharacterIcon->GetDynamicMaterial()->SetTextureParameterValue(Crunch::MatParam::Icon, CharacterDefinition->LoadIcon());
+		PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::Empty, 0);
+		CachedCharacterNameStr = CharacterDefinition->GetCharacterDisplayName();
+	}
+	else
+	{
+		PlayerCharacterIcon->GetDynamicMaterial()->SetScalarParameterValue(Crunch::MatParam::Empty, 1);
+		CachedCharacterNameStr = "";
+	}
+
+	UpdateNameText();
+}
+
+void UPlayerTeamSlotWidget::UpdateNameText() const
 {
 	if (IsHovered())
 	{

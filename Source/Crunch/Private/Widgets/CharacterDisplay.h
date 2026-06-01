@@ -7,22 +7,22 @@
 #include "CharacterDisplay.generated.h"
 
 class UPA_CharacterDefinition;
+class UCameraComponent;
 
 UCLASS()
 class ACharacterDisplay : public AActor
 {
 	GENERATED_BODY()
+public:	
+	ACharacterDisplay();
 	
 public:	
-	// Sets default values for this actor's properties
-	ACharacterDisplay();
-	void ConfigureWithCharacterDefination(const UPA_CharacterDefinition* CharacterDefination);
+	void ConfigureWithCharacterDefinition(const UPA_CharacterDefinition* CharacterDefinition) const;
 
 private:	
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character Display")
-	class USkeletalMeshComponent* MeshComponent;
+	USkeletalMeshComponent* MeshComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character Display")
-	class UCameraComponent* ViewCameraComponent;
-
+	UCameraComponent* ViewCameraComponent;
 };

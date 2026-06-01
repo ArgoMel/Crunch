@@ -59,7 +59,7 @@ void ALobbyPlayerController::Client_StartHeroSelection_Implementation()
 
 void ALobbyPlayerController::Server_RequestStartMatch_Implementation()
 {
-	UCGameInstance* CGameInstance = GetGameInstance<UCGameInstance>();
+	const UCGameInstance* CGameInstance = GetGameInstance<UCGameInstance>();
 	if (CGameInstance)
 	{
 		CGameInstance->StartMatch();

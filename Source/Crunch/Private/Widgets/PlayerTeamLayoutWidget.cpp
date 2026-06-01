@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/PlayerTeamLayoutWidget.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
@@ -15,8 +14,9 @@ void UPlayerTeamLayoutWidget::NativeConstruct()
 	TeamTwoLayoutBox->ClearChildren();
 	
 	if (!PlayerTeamSlotWidgetClass)
+	{
 		return;
-
+	}
 	for (int i = 0; i < Crunch::ConstValue::MaxPlayerCount * 2; ++i)
 	{
 		UPlayerTeamSlotWidget* NewSlotWidget = CreateWidget<UPlayerTeamSlotWidget>(GetOwningPlayer(), PlayerTeamSlotWidgetClass);
@@ -46,8 +46,9 @@ void UPlayerTeamLayoutWidget::UpdatePlayerSelection(const TArray<FPlayerSelectio
 	for (const FPlayerSelection& PlayerSelection : PlayerSelections)
 	{
 		if (!PlayerSelection.IsValid())
+		{
 			continue;
-
+		}
 		TeamSlotWidgets[PlayerSelection.GetPlayerSlot()]->UpdateSlot(PlayerSelection.GetPlayerNickName(), PlayerSelection.GetCharacterDefinition());
 	}
 }

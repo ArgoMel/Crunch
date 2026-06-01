@@ -17,13 +17,13 @@ UCAssetManager& UCAssetManager::Get()
 
 void UCAssetManager::LoadCharacterDefinitions(const FStreamableDelegate& LoadFinishedCallback)
 {
-	LoadPrimaryAssetsWithType(UPA_CharacterDefinition::GetCharacterDefinationAssetType(), TArray<FName>(), LoadFinishedCallback);
+	LoadPrimaryAssetsWithType(UPA_CharacterDefinition::GetCharacterDefinitionAssetType(), TArray<FName>(), LoadFinishedCallback);
 }
 
 bool UCAssetManager::GetLoadedCharacterDefinitions(TArray<UPA_CharacterDefinition*>& LoadedCharacterDefinitions) const
 {
 	TArray<UObject*> LoadedObjects;
-	const bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefinition::GetCharacterDefinationAssetType(), LoadedObjects);
+	const bool bLoaded = GetPrimaryAssetObjectList(UPA_CharacterDefinition::GetCharacterDefinitionAssetType(), LoadedObjects);
 	if (bLoaded)
 	{
 		for (UObject* LoadedObject : LoadedObjects)

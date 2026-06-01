@@ -9,22 +9,22 @@
 
 class ACCharacter;
 class UGameplayAbility;
-/**
- * 
- */
+
 UCLASS()
 class UPA_CharacterDefinition : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
-	static FPrimaryAssetType GetCharacterDefinationAssetType();
+	
+public:
+	static FPrimaryAssetType GetCharacterDefinitionAssetType();
 
-	FString GEtCharacterDisplayName() const { return CharacterName; }
+	FString GetCharacterDisplayName() const { return CharacterName; }
 	UTexture2D* LoadIcon() const;
 	TSubclassOf<ACCharacter> LoadCharacterClass() const;
 	TSubclassOf<UAnimInstance> LoadDisplayAnimationBP() const;
-	class USkeletalMesh* LoadDisplayMesh() const;
+	USkeletalMesh* LoadDisplayMesh() const;
 	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* GetAbilities() const;
 
 private:	

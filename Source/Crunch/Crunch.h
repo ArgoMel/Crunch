@@ -32,6 +32,8 @@ namespace Crunch
 		const FName UpgradeAvailable("UpgradeAvailable");
 		const FName RenderTarget("RenderTarget");
 		const FName Progress("Progress");
+		const FName Saturation("Saturation");
+		const FName Empty("Empty");
 	}
 	namespace VFXParam
 	{

@@ -6,29 +6,29 @@
 #include "Blueprint/UserWidget.h"
 #include "AbilityToolTip.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UTextBlock;
+class UImage;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UAbilityToolTip : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void SetAbilityInfo(const FName& AbilityName, UTexture2D* AbilityTexture, const FText& AbilityDescription, float AbilityCooldown, float AbilityCost);
+	void SetAbilityInfo(const FName& AbilityName, UTexture2D* AbilityTexture, const FText& AbilityDescription, float AbilityCooldown, float AbilityCost) const;
 
 private:	
 	UPROPERTY(meta=(BindWidget))	
-	class UTextBlock* AbilityNameText;
+	UTextBlock* AbilityNameText;
 
 	UPROPERTY(meta=(BindWidget))	
-	class UImage* AbilityIcon;
+	UImage* AbilityIcon;
 
 	UPROPERTY(meta=(BindWidget))	
-	class UTextBlock* AbilityDescriptionText;
+	UTextBlock* AbilityDescriptionText;
 
 	UPROPERTY(meta=(BindWidget))	
-	class UTextBlock* AbilityCooldownText;
+	UTextBlock* AbilityCooldownText;
 
 	UPROPERTY(meta=(BindWidget))	
-	class UTextBlock* AbilityCostText;
+	UTextBlock* AbilityCostText;
 };

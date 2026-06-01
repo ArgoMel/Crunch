@@ -107,7 +107,7 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 
 	for (UUserWidget* CharacterEntryAsWidget : CharacterSelectionTileView->GetDisplayedEntryWidgets())
 	{
-		if (UCharacterEntryWidget* CharacterEntryWidget = Cast<UCharacterEntryWidget>(CharacterEntryAsWidget))
+		if (const UCharacterEntryWidget* CharacterEntryWidget = Cast<UCharacterEntryWidget>(CharacterEntryAsWidget))
 		{
 			CharacterEntryWidget->SetSelected(false);
 		}
@@ -121,7 +121,7 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 		}
 		TeamSelectionSlots[PlayerSelection.GetPlayerSlot()]->UpdateSlotInfo(PlayerSelection.GetPlayerNickName());
 
-		UCharacterEntryWidget* SelectedEntry = CharacterSelectionTileView->GetEntryWidgetFromItem<UCharacterEntryWidget>(PlayerSelection.GetCharacterDefinition());
+		const UCharacterEntryWidget* SelectedEntry = CharacterSelectionTileView->GetEntryWidgetFromItem<UCharacterEntryWidget>(PlayerSelection.GetCharacterDefinition());
 		if (SelectedEntry)
 		{
 			SelectedEntry->SetSelected(true);
@@ -145,6 +145,7 @@ void ULobbyWidget::UpdatePlayerSelectionDisplay(const TArray<FPlayerSelection>& 
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ULobbyWidget::StartHeroSelectionButtonClicked()
 {
 	if (LobbyPlayerController.IsValid())
@@ -153,12 +154,12 @@ void ULobbyWidget::StartHeroSelectionButtonClicked()
 	}
 }
 
-void ULobbyWidget::SwitchToHeroSelection()
+void ULobbyWidget::SwitchToHeroSelection() const
 {
 	MainSwitcher->SetActiveWidget(HeroSelectionRoot);
 }
 
-void ULobbyWidget::CharacterDefinitionLoaded()
+void ULobbyWidget::CharacterDefinitionLoaded() const
 {
 	TArray<UPA_CharacterDefinition*> loadedCharacterDefinitions;
 	if (UCAssetManager::Get().GetLoadedCharacterDefinitions(loadedCharacterDefinitions))
@@ -175,8 +176,9 @@ void ULobbyWidget::CharacterSelected(UObject* SelectedUObject)
 	}
 
 	if (!CPlayerState.IsValid())
+	{
 		return;
-
+	}
 	if (const UPA_CharacterDefinition* characterDefinition = Cast<UPA_CharacterDefinition>(SelectedUObject))
 	{
 		CPlayerState->Server_SetSelectedCharacterDefinition(characterDefinition);
@@ -186,11 +188,13 @@ void ULobbyWidget::CharacterSelected(UObject* SelectedUObject)
 void ULobbyWidget::SpawnCharacterDisplay()
 {
 	if (CharacterDisplay.IsValid())
+	{
 		return;
-
+	}
 	if (!CharacterDisplayClass)
+	{
 		return;
-
+	}
 	FTransform CharacterDisplayTransform = FTransform::Identity;
 	const AActor* PlayerStart = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass());
 	if (PlayerStart)
@@ -204,12 +208,14 @@ void ULobbyWidget::SpawnCharacterDisplay()
 	GetOwningPlayer()->SetViewTarget(CharacterDisplay.Get());
 }
 
-void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection)
+void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection) const
 {
 	if (!PlayerSelection.GetCharacterDefinition())
+	{
 		return;
+	}
 
-	CharacterDisplay->ConfigureWithCharacterDefination(PlayerSelection.GetCharacterDefinition());
+	CharacterDisplay->ConfigureWithCharacterDefinition(PlayerSelection.GetCharacterDefinition());
 	AbilityListView->ClearListItems();
 	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* Abilities = PlayerSelection.GetCharacterDefinition()->GetAbilities();
 	if (Abilities)
@@ -218,6 +224,7 @@ void ULobbyWidget::UpdateCharacterDisplay(const FPlayerSelection& PlayerSelectio
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ULobbyWidget::StartMatchButtonClicked()
 {
 	if (LobbyPlayerController.IsValid())

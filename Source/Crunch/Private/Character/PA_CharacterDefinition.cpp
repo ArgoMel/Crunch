@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Character/PA_CharacterDefinition.h"
 #include "Character/CCharacter.h"
 
 FPrimaryAssetId UPA_CharacterDefinition::GetPrimaryAssetId() const
 {
-	return FPrimaryAssetId(GetCharacterDefinationAssetType(), GetFName());
+	return FPrimaryAssetId(GetCharacterDefinitionAssetType(), GetFName());
 }
 
-FPrimaryAssetType UPA_CharacterDefinition::GetCharacterDefinationAssetType()
+FPrimaryAssetType UPA_CharacterDefinition::GetCharacterDefinitionAssetType()
 {
-	return FPrimaryAssetType("CharacterDefination");
+	return FPrimaryAssetType("CharacterDefinition");
 }
 
 UTexture2D* UPA_CharacterDefinition::LoadIcon() const
 {
 	CharacterIcon.LoadSynchronous();
 	if (CharacterIcon.IsValid())
+	{
 		return CharacterIcon.Get();
-
+	}
 	return nullptr;
 }
 
@@ -27,44 +27,49 @@ TSubclassOf<ACCharacter> UPA_CharacterDefinition::LoadCharacterClass() const
 {
 	CharacterClass.LoadSynchronous();
 	if (CharacterClass.IsValid())
+	{
 		return CharacterClass.Get();
-	
+	}
 	return TSubclassOf<ACCharacter>();
-
 }
 
 TSubclassOf<UAnimInstance> UPA_CharacterDefinition::LoadDisplayAnimationBP() const
 {
 	DisplayAnimBP.LoadSynchronous();
 	if (DisplayAnimBP.IsValid())
+	{
 		return DisplayAnimBP.Get();
-
+	}
 	return TSubclassOf<UAnimInstance>();
 }
 
 USkeletalMesh* UPA_CharacterDefinition::LoadDisplayMesh() const
 {
-	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
-	if (!LoadedCharaterClass)
+	const TSubclassOf<ACCharacter> LoadedCharacterClass = LoadCharacterClass();
+	if (!LoadedCharacterClass)
+	{
 		return nullptr;
-
-	const ACharacter* Character = Cast<ACharacter>(LoadedCharaterClass.GetDefaultObject());
+	}
+	const ACharacter* Character = Cast<ACharacter>(LoadedCharacterClass.GetDefaultObject());
 	if (!Character)
+	{
 		return nullptr;
-
+	}
 	return Character->GetMesh()->GetSkeletalMeshAsset();
 }
 
 const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>* UPA_CharacterDefinition::GetAbilities() const
 {
-	const TSubclassOf<ACCharacter> LoadedCharaterClass = LoadCharacterClass();
-	if (!LoadedCharaterClass)
+	const TSubclassOf<ACCharacter> LoadedCharacterClass = LoadCharacterClass();
+	if (!LoadedCharacterClass)
+	{
 		return nullptr;
-
-	const ACCharacter* Character = Cast<ACCharacter>(LoadedCharaterClass.GetDefaultObject());
+	}
+	const ACCharacter* Character = Cast<ACCharacter>(LoadedCharacterClass.GetDefaultObject());
 	if (!Character)
+	{
 		return nullptr;
-
-	return &(Character->GetAbilities());
+	}
+	return &Character->GetAbilities();
 }
 

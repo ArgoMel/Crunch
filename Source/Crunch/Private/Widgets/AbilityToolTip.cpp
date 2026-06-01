@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/AbilityToolTip.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-void UAbilityToolTip::SetAbilityInfo(const FName& AbilityName, UTexture2D* AbilityTexture, const FText& AbilityDescription, float AbilityCooldown, float AbilityCost)
+void UAbilityToolTip::SetAbilityInfo(const FName& AbilityName, UTexture2D* AbilityTexture, const FText& AbilityDescription, float AbilityCooldown, float AbilityCost) const
 {
 	AbilityNameText->SetText(FText::FromName(AbilityName));
 	AbilityIcon->SetBrushFromTexture(AbilityTexture);

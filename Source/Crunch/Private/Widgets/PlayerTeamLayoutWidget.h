@@ -8,16 +8,18 @@
 #include "PlayerTeamLayoutWidget.generated.h"
 
 class UPlayerTeamSlotWidget;
-/**
- * 
- */
-UCLASS()
+class UHorizontalBox;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UPlayerTeamLayoutWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual void NativeConstruct() override;
+	
+public:
 	void UpdatePlayerSelection(const TArray<FPlayerSelection>& PlayerSelections);
+	
 private:	
 	UPROPERTY(EditDefaultsOnly, Category = "Visual")
 	float PlayerTeamWidgetSlotMargin = 5.f;
@@ -26,10 +28,10 @@ private:
 	TSubclassOf<UPlayerTeamSlotWidget> PlayerTeamSlotWidgetClass;
 
 	UPROPERTY(meta=(BindWidget))
-	class UHorizontalBox* TeamOneLayoutBox;
+	UHorizontalBox* TeamOneLayoutBox;
 
 	UPROPERTY(meta=(BindWidget))
-	class UHorizontalBox* TeamTwoLayoutBox;
+	UHorizontalBox* TeamTwoLayoutBox;
 
 	UPROPERTY()
 	TArray<UPlayerTeamSlotWidget*> TeamSlotWidgets;

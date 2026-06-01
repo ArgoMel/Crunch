@@ -1,26 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Framework/CGameInstance.h"
 #include "Network/CNetStatics.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "HttpModule.h"
 
-void UCGameInstance::StartMatch()
-{
-	if (GetWorld()->GetNetMode() == ENetMode::NM_DedicatedServer || GetWorld()->GetNetMode() == ENetMode::NM_ListenServer)
-	{
-		LoadLevelAndListen(GameLevel);
-	}
-}
-
 void UCGameInstance::Init()
 {
 	Super::Init();
 	if (GetWorld()->IsEditorWorld())
+	{
 		return;
-
+	}
 	if (UCNetStatics::IsSessionServer(this))
 	{
 		CreateSession();
@@ -57,7 +49,7 @@ void UCGameInstance::ClientLogin(const FString& Type, const FString& Id, const F
 			LoggingInDelegateHandle.Reset();
 		}
 
-		LoggingInDelegateHandle = IdentityPtr->OnLoginCompleteDelegates->AddUObject(this, &UCGameInstance::LoginCompleted);
+		LoggingInDelegateHandle = IdentityPtr->OnLoginCompleteDelegates->AddUObject(this, &ThisClass::LoginCompleted);
 		if (!IdentityPtr->Login(0, FOnlineAccountCredentials(Type, Id, Token)))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Login Failed Right Away!"))
@@ -85,18 +77,18 @@ void UCGameInstance::LoginCompleted(int NumOfLocalPlayer, bool bWasSuccessful, c
 		if (bWasSuccessful)
 		{
 			PlayerNickname = IdentityPtr->GetPlayerNickname(UserId);
-			UE_LOG(LogTemp, Warning, TEXT("Logged in succesfully as: %s"), *(PlayerNickname))
+			UE_LOG(LogTemp, Warning, TEXT("Logged in successfully as: %s"), *(PlayerNickname))
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Loging in failed: %s"), *(Error))
+			UE_LOG(LogTemp, Warning, TEXT("Logging in failed: %s"), *(Error))
 		}
 
 		OnLoginCompleted.Broadcast(bWasSuccessful, PlayerNickname, Error);
 	}
 	else
 	{
-		OnLoginCompleted.Broadcast(false, "", "Ca't find the Identity Pointer");
+		OnLoginCompleted.Broadcast(false, "", "Can't find the Identity Pointer");
 	}
 }
 
@@ -104,7 +96,7 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Requesting Create and Join Session: %s"), *(NewSessionName.ToString()))
 	const FHttpRequestRef Request = FHttpModule::Get().CreateRequest();
-	FGuid SessioinSearchId = FGuid::NewGuid();
+	FGuid SessionSearchId = FGuid::NewGuid();
 
 	const FString CoordinatorURL = UCNetStatics::GetCoordinatorURL();
 
@@ -118,18 +110,18 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField(UCNetStatics::GetSessionNameKey().ToString(), NewSessionName.ToString());
-	JsonObject->SetStringField(UCNetStatics::GetSessionSearchIdKey().ToString(), SessioinSearchId.ToString());
+	JsonObject->SetStringField(UCNetStatics::GetSessionSearchIdKey().ToString(), SessionSearchId.ToString());
 
-	FString RequestBoby;
-	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&RequestBoby);
+	FString requestLobby;
+	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&requestLobby);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	Request->SetContentAsString(RequestBoby);
-	Request->OnProcessRequestComplete().BindUObject(this, &UCGameInstance::SessionCreationRequestCompleted, SessioinSearchId);
+	Request->SetContentAsString(requestLobby);
+	Request->OnProcessRequestComplete().BindUObject(this, &UCGameInstance::SessionCreationRequestCompleted, SessionSearchId);
 	
 	if (!Request->ProcessRequest())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Sesison Creation Request Failed Right Away!"))
+		UE_LOG(LogTemp, Warning, TEXT("Session Creation Request Failed Right Away!"))
 	}
 }
 
@@ -173,7 +165,7 @@ bool UCGameInstance::JoinSessionWithId(const FString& SessionIdStr)
 	return false;
 }
 
-void UCGameInstance::SessionCreationRequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SesisonSearchId)
+void UCGameInstance::SessionCreationRequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SessionSearchId)
 {
 	if (!bConnectedSuccessfully)
 	{
@@ -183,10 +175,10 @@ void UCGameInstance::SessionCreationRequestCompleted(FHttpRequestPtr Request, FH
 
 	UE_LOG(LogTemp, Warning, TEXT("Connection to Coordinator Successfully!"))
 
-	const int32 REsponseCode = Response->GetResponseCode();
-	if (REsponseCode != 200)
+	const int32 ResponseCode = Response->GetResponseCode();
+	if (ResponseCode != 200)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Session Creation Failed, with code: %d"), REsponseCode)
+		UE_LOG(LogTemp, Warning, TEXT("Session Creation Failed, with code: %d"), ResponseCode)
 		return;
 	}
 
@@ -201,8 +193,8 @@ void UCGameInstance::SessionCreationRequestCompleted(FHttpRequestPtr Request, FH
 		Port = JsonObject->GetIntegerField(*(UCNetStatics::GetPortKey().ToString()));
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Conntected to Coordinator Successfully and the new sesion created is on port: %d"), Port)
-	StartFindingCreatedSession(SesisonSearchId);
+	UE_LOG(LogTemp, Warning, TEXT("Connected to Coordinator Successfully and the new session created is on port: %d"), Port)
+	StartFindingCreatedSession(SessionSearchId);
 }
 
 void UCGameInstance::StartFindingCreatedSession(const FGuid& SessionSearchId)
@@ -214,15 +206,15 @@ void UCGameInstance::StartFindingCreatedSession(const FGuid& SessionSearchId)
 	}
 
 	StopAllSessionFindings();
-	UE_LOG(LogTemp, Warning, TEXT("Start Finding Created Sesssion with Id: %s"), *(SessionSearchId.ToString()))
+	UE_LOG(LogTemp, Warning, TEXT("Start Finding Created Session with Id: %s"), *(SessionSearchId.ToString()))
 
-	GetWorld()->GetTimerManager().SetTimer(FindCreatedSesisonTimerHandle, 
+	GetWorld()->GetTimerManager().SetTimer(FindCreatedSessionTimerHandle, 
 		FTimerDelegate::CreateUObject(this, &UCGameInstance::FindCreatedSession, SessionSearchId),
 		FindCreatedSessionSearchInterval,
 		true, 0.f
 		);
 
-	GetWorld()->GetTimerManager().SetTimer(FindCreatedSesisonTimeoutTimerHanle, this, &UCGameInstance::FindCreatedSessionTimeout, FindCreatedSessionTimeoutDuration);
+	GetWorld()->GetTimerManager().SetTimer(FindCreatedSessionTimeoutTimerHandle, this, &UCGameInstance::FindCreatedSessionTimeout, FindCreatedSessionTimeoutDuration);
 }
 
 void UCGameInstance::StopAllSessionFindings()
@@ -235,8 +227,8 @@ void UCGameInstance::StopAllSessionFindings()
 void UCGameInstance::StopFindingCreatedSession()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Stop Finding Created Session"))
-	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSesisonTimerHandle);
-	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSesisonTimeoutTimerHanle);
+	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSessionTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(FindCreatedSessionTimeoutTimerHandle);
 
 	if (const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this))
 	{
@@ -247,7 +239,7 @@ void UCGameInstance::StopFindingCreatedSession()
 
 void UCGameInstance::StopGlobalSessionSearch()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Stop Gloal Session Search"))
+	UE_LOG(LogTemp, Warning, TEXT("Stop Global Session Search"))
 	if (GlobalSessionSearchTimerHandle.IsValid())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(GlobalSessionSearchTimerHandle);
@@ -267,7 +259,7 @@ void UCGameInstance::FindGlobalSessions()
 	const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this);
 	if (!SessionPtr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Can't Find Sesison Interface, Wait for the next Global Session Search"))
+		UE_LOG(LogTemp, Warning, TEXT("Can't Find Session Interface, Wait for the next Global Session Search"))
 		return;
 	}
 
@@ -315,7 +307,7 @@ void UCGameInstance::FindCreatedSession(FGuid SessionSearchId)
 	const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this);
 	if (!SessionPtr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Can't find Sesison Ptr, canceling session search"))
+		UE_LOG(LogTemp, Warning, TEXT("Can't find Session Ptr, canceling session search"))
 		return;
 	}
 	
@@ -397,7 +389,7 @@ void UCGameInstance::JoinSessionCompleted(FName SessionName, EOnJoinSessionCompl
 	if (JoinResult == EOnJoinSessionCompleteResult::Success)
 	{
 		StopAllSessionFindings();
-		UE_LOG(LogTemp, Warning, TEXT("Joining Sesison: %s successful, the port is: %d"), *(SessionName.ToString()), Port)
+		UE_LOG(LogTemp, Warning, TEXT("Joining Session: %s successful, the port is: %d"), *(SessionName.ToString()), Port)
 
 		FString TravelURL = "";
 		SessionPtr->GetResolvedConnectString(SessionName, TravelURL);
@@ -412,7 +404,7 @@ void UCGameInstance::JoinSessionCompleted(FName SessionName, EOnJoinSessionCompl
 
 		UE_LOG(LogTemp, Warning, TEXT("Traveling to Session at: %s"), *TravelURL)
 
-		GetFirstLocalPlayerController(GetWorld())->ClientTravel(TravelURL, ETravelType::TRAVEL_Absolute);
+		GetFirstLocalPlayerController(GetWorld())->ClientTravel(TravelURL, TRAVEL_Absolute);
 	}
 	else
 	{
@@ -447,24 +439,24 @@ void UCGameInstance::CreateSession()
 	const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this);
 	if (SessionPtr)
 	{
-		ServerSesisonName = UCNetStatics::GetSessionNameStr();
+		ServerSessionName = UCNetStatics::GetSessionNameStr();
 		const FString SessionSearchId = UCNetStatics::GetSessionSearchIdStr();
 		SessionServerPort = UCNetStatics::GetSessionPort();
-		UE_LOG(LogTemp, Warning, TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"), *(ServerSesisonName), *(SessionSearchId), SessionServerPort)
+		UE_LOG(LogTemp, Warning, TEXT("#### Create Session With Name: %s, ID: %s, Port: %d"), *(ServerSessionName), *(SessionSearchId), SessionServerPort)
 
-		const FOnlineSessionSettings OnlineSesisonSetting = UCNetStatics::GenerateOnlineSessionSettings(FName(ServerSesisonName), SessionSearchId, SessionServerPort);
+		const FOnlineSessionSettings OnlineSessionSetting = UCNetStatics::GenerateOnlineSessionSettings(FName(ServerSessionName), SessionSearchId, SessionServerPort);
 		SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
 		SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnSessionCreated);
-		if (!SessionPtr->CreateSession(0, FName(ServerSesisonName), OnlineSesisonSetting))
+		if (!SessionPtr->CreateSession(0, FName(ServerSessionName), OnlineSessionSetting))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Sesison Creating Failed Right away!!!!"))
+			UE_LOG(LogTemp, Warning, TEXT("Session Creating Failed Right away!!!!"))
 			SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
 			TerminateSessionServer();
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Can't find sesison ptr, terminating"))
+		UE_LOG(LogTemp, Warning, TEXT("Can't find session ptr, terminating"))
 		TerminateSessionServer();
 	}
 }
@@ -489,7 +481,7 @@ void UCGameInstance::OnSessionCreated(FName SessionName, bool bWasSuccessful)
 	}
 }
 
-void UCGameInstance::EndSessisonCompleted(FName SessionName, bool bWasSuccessful)
+void UCGameInstance::EndSessionCompleted(FName SessionName, bool bWasSuccessful)
 {
 	FGenericPlatformMisc::RequestExit(false);
 }
@@ -499,8 +491,8 @@ void UCGameInstance::TerminateSessionServer()
 	if (const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this))
 	{
 		SessionPtr->OnEndSessionCompleteDelegates.RemoveAll(this);
-		SessionPtr->OnEndSessionCompleteDelegates.AddUObject(this, &UCGameInstance::EndSessisonCompleted);
-		if (!SessionPtr->EndSession(FName{ ServerSesisonName }))
+		SessionPtr->OnEndSessionCompleteDelegates.AddUObject(this, &UCGameInstance::EndSessionCompleted);
+		if (!SessionPtr->EndSession(FName{ ServerSessionName }))
 		{
 			FGenericPlatformMisc::RequestExit(false);
 		}
@@ -513,12 +505,20 @@ void UCGameInstance::TerminateSessionServer()
 
 void UCGameInstance::WaitPlayerJoinTimeoutReached()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Session Sever shut down aftert %f seconds without player joining"), WaitPlayerJoinTimeOutDuration)
+	UE_LOG(LogTemp, Warning, TEXT("Session Sever shut down after %f seconds without player joining"), WaitPlayerJoinTimeOutDuration)
 	TerminateSessionServer();
 }
 
+void UCGameInstance::StartMatch() const
+{
+	if (GetWorld()->GetNetMode() == NM_DedicatedServer 
+		|| GetWorld()->GetNetMode() == NM_ListenServer)
+	{
+		LoadLevelAndListen(GameLevel);
+	}
+}
 
-void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level)
+void UCGameInstance::LoadLevelAndListen(TSoftObjectPtr<UWorld> Level) const
 {
 	const FName LevelURL = FName(*FPackageName::ObjectPathToPackageName(Level.ToString()));
 

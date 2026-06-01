@@ -36,7 +36,7 @@ void ACPlayerState::CopyProperties(APlayerState* PlayerState)
 {
 	Super::CopyProperties(PlayerState);
 
-	ACPlayerState* NewPlayerState = Cast < ACPlayerState>(PlayerState);
+	ACPlayerState* NewPlayerState = Cast <ACPlayerState>(PlayerState);
 	if (NewPlayerState)
 	{
 		NewPlayerState->PlayerSelection = PlayerSelection;
@@ -61,14 +61,17 @@ FGenericTeamId ACPlayerState::GetTeamIdBasedOnSlot() const
 void ACPlayerState::Server_SetSelectedCharacterDefinition_Implementation(const UPA_CharacterDefinition* NewDefinition)
 {
 	if (!CGameState)
+	{
 		return;
-
+	}
 	if (!NewDefinition)
+	{
 		return;
-
+	}
 	if (CGameState->IsDefinitionSelected(NewDefinition))
+	{
 		return;
-
+	}
 	if (PlayerSelection.GetCharacterDefinition())
 	{
 		CGameState->SetCharacterDeselected(PlayerSelection.GetCharacterDefinition());

@@ -13,20 +13,15 @@
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnLoginCompleted, bool /*bWasSuccessful*/, const FString& /*PlayerNickName*/, const FString& /*ErrorMsg*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnGlobalSessionSearchCompleted, const TArray<FOnlineSessionSearchResult>& /*SearchResults*/)
 DECLARE_MULTICAST_DELEGATE(FOnJoinSesisonFailed);
-/**
- * 
- */
+
 UCLASS()
 class UCGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	void StartMatch();
 	virtual void Init() override;
 
-/*************************************/
-/*             Login                 */
-/*************************************/
+#pragma region Login
 public:
 	bool IsLoggedIn() const;
 	bool IsLoggingIn() const;
@@ -37,9 +32,9 @@ private:
 	void LoginCompleted(int NumOfLocalPlayer, bool bWasSuccessful, const FUniqueNetId& UserId, const FString& Error);
 
 	FDelegateHandle LoggingInDelegateHandle;
-/*************************************/
-/* Client Session Creation and Search */
-/*************************************/
+#pragma endregion Login 
+	
+#pragma region ClientSessionCreationAndSearch
 public:
 	void RequestCreateAndJoinSession(const FName& NewSessionName);
 	void CancelSessionCreation();
@@ -48,7 +43,7 @@ public:
 	FOnJoinSesisonFailed OnJoinSessionFailed;
 	FOnGlobalSessionSearchCompleted OnGlobalSessionSearchCompleted;
 private:
-	void SessionCreationRequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SesisonSearchId);
+	void SessionCreationRequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccessfully, FGuid SessionSearchId);
 	void StartFindingCreatedSession(const FGuid& SessionSearchId);
 	void StopAllSessionFindings();
 	void StopFindingCreatedSession();
@@ -56,8 +51,8 @@ private:
 	void FindGlobalSessions();
 	void GlobalSessionSearchCompleted(bool bWasSuccessful);
 
-	FTimerHandle FindCreatedSesisonTimerHandle;
-	FTimerHandle FindCreatedSesisonTimeoutTimerHanle;
+	FTimerHandle FindCreatedSessionTimerHandle;
+	FTimerHandle FindCreatedSessionTimeoutTimerHandle;
 	FTimerHandle GlobalSessionSearchTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Session Search")
@@ -72,22 +67,21 @@ private:
 	void FindCreatedSession(FGuid SessionSearchId);
 	void FindCreatedSessionTimeout();
 	void FindCreateSessionCompleted(bool bWasSuccessful);
-	void JoinSessionWithSearchResult(const class FOnlineSessionSearchResult& SearchResult);
+	void JoinSessionWithSearchResult(const FOnlineSessionSearchResult& SearchResult);
 	void JoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type JoinResult, int Port);
 
-	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
-
-/*************************************/
-/*         Session Server            */
-/*************************************/
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+#pragma endregion ClientSessionCreationAndSearch 
+	
+#pragma region SessionServer
 public:
 	void PlayerJoined(const FUniqueNetIdRepl& UniqueId);
 	void PlayerLeft(const FUniqueNetIdRepl& UniqueId);
 private:
 	void CreateSession();
 	void OnSessionCreated(FName SessionName, bool bWasSuccessful);
-	void EndSessisonCompleted(FName SessionName, bool bWasSuccessful);
-	FString ServerSesisonName;
+	void EndSessionCompleted(FName SessionName, bool bWasSuccessful);
+	FString ServerSessionName;
 	int SessionServerPort;
 
 	void TerminateSessionServer();
@@ -100,6 +94,14 @@ private:
 	void WaitPlayerJoinTimeoutReached();
 
 	TSet<FUniqueNetIdRepl> PlayerRecord;
+#pragma endregion SessionServer 
+	
+public:
+	void StartMatch() const;
+	
+private:
+	void LoadLevelAndListen(TSoftObjectPtr<UWorld> Level) const;
+	
 private:	
 	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	TSoftObjectPtr<UWorld> MainMenuLevel;
@@ -109,6 +111,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	TSoftObjectPtr<UWorld> GameLevel;
-
-	void LoadLevelAndListen(TSoftObjectPtr<UWorld> Level);
 };

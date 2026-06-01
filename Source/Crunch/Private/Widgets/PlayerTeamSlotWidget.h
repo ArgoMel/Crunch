@@ -7,38 +7,34 @@
 #include "PlayerTeamSlotWidget.generated.h"
 
 class UPA_CharacterDefinition;
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UPlayerTeamSlotWidget : public UUserWidget
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual void NativeConstruct() override;
-	void UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefination);
-
 	virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual void NativeOnMouseLeave( const FPointerEvent& InMouseEvent ) override;
+	
+public:
+	void UpdateSlot(const FString& PlayerName, const UPA_CharacterDefinition* CharacterDefinition);
 
+private:
+	void UpdateNameText() const;
+	
 private:	
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
-	class UWidgetAnimation* HoverAnim;
+	UWidgetAnimation* HoverAnim;
 
 	UPROPERTY(meta=(BindWidget))
-	class UImage* PlayerCharacterIcon;
+	UImage* PlayerCharacterIcon;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* NameText;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName CharacterIconMatParamName = "Icon";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Visual")
-	FName CharacterEmptyMatParamName = "Empty";
+	UTextBlock* NameText;
 
 	FString CachedPlayerNameStr;
 	FString CachedCharacterNameStr;
-
-	void UpdateNameText();
 };

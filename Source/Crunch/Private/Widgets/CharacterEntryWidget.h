@@ -8,31 +8,27 @@
 #include "CharacterEntryWidget.generated.h"
 
 class UPA_CharacterDefinition;
-/**
- * 
- */
-UCLASS()
+class UImage;
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UCharacterEntryWidget : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
-public:
-	
+protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
-	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefination() const { return CharacterDefination; }
-	void SetSelected(bool bIsSelected);
+	
+public:
+	FORCEINLINE const UPA_CharacterDefinition* GetCharacterDefinition() const { return CharacterDefinition; }
+	void SetSelected(bool bIsSelected) const;
+	
 private:	
 	UPROPERTY(meta=(BindWidget))
-	class UImage* CharacterIcon;
+	UImage* CharacterIcon;
 
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* CharacterNameText;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Character")
-	FName IconTextureMatParamName = "Icon";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Character")
-	FName SaturationMatParamName = "Saturation";
+	UTextBlock* CharacterNameText;
 
 	UPROPERTY()
-	const UPA_CharacterDefinition* CharacterDefination;
+	const UPA_CharacterDefinition* CharacterDefinition;
 };

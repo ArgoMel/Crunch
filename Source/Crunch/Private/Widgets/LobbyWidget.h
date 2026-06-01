@@ -38,13 +38,13 @@ private:
 	UFUNCTION()
 	void StartHeroSelectionButtonClicked();
 
-	void SwitchToHeroSelection();
-	void CharacterDefinitionLoaded();
+	void SwitchToHeroSelection() const;
+	void CharacterDefinitionLoaded() const;
 
 	void CharacterSelected(UObject* SelectedUObject);
 	
 	void SpawnCharacterDisplay();
-	void UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection);
+	void UpdateCharacterDisplay(const FPlayerSelection& PlayerSelection) const;
 
 	UFUNCTION()
 	void StartMatchButtonClicked();
