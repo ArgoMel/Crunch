@@ -21,15 +21,11 @@ public:
 	static bool IsSessionServer(const UObject* WorldContextObject);
 
 	static FString GetSessionNameStr();
-	static FName GetSessionNameKey();
 
 	static FString GetSessionSearchIdStr();
-	static FName GetSessionSearchIdKey();
 
 	static int GetSessionPort();
-	static FName GetPortKey();
-
-	static FName GetCoordinatorURLKey();
+	
 	static FString GetCoordinatorURL();
 	static FString GetDefaultCoordinatorURL();
 
@@ -37,7 +33,6 @@ public:
 	static int GetCommandlineArgAsInt(const FName& ParamName);
 
 	static FString GetTestingURL();
-	static FName GetTestingURLKey();
 
 	static void ReplacePort(FString& OutURLStr, int NewPort);
  };

@@ -80,7 +80,7 @@ public:
 private:
 	void CreateSession();
 	void OnSessionCreated(FName SessionName, bool bWasSuccessful);
-	void EndSessionCompleted(FName SessionName, bool bWasSuccessful);
+	void EndSessionCompleted(FName SessionName, bool bWasSuccessful) const;
 	FString ServerSessionName;
 	int SessionServerPort;
 

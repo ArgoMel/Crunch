@@ -4,10 +4,29 @@
  * DefaultGame.ini 
 	[/Script/AIModule.AISense_Sight]
 	bAutoRegisterAllPawnsAsSources=false
+ * DefaultGame.ini 
+	[OnlineSubsystemEOS]
+	bEnabled=true
+	
+	[OnlineSubsystem]
+	DefaultPlatformService=EOS
+	
+	[/Script/Engine.Engine]
+	!NetDriverDefinitions=ClearArray
+	+NetDriverDefinitions=(DefName="GameNetDriver",DriverClassName="/Script/SocketSubsystemEOS.NetDriverEOSBase",DriverClassNameFallback="/Script/OnlineSubsystemUtils.IpNetDriver")
+	+NetDriverDefinitions=(DefName="DemoNetDriver",DriverClassName="/Script/Engine.DemoNetDriver",DriverClassNameFallback="/Script/Engine.DemoNetDriver")
+	
+	[/Script/SocketSubsystemEOS.NetDriverEOSBase]
+	bIsUsingP2PSockets=true
  * TraceChannels Target
  * 에셋매니저 클래스 변경
  * 게임플레이큐 경로
  * 에셋매니저 프리머리 에셋 추가
+ * 패키징 쿠킹항 추가 에셋 다랙터리에 파티클폴더,게임플레이큐 폴더,/NNEDenoiser 추가
+ * 
+ * aws 서버 할떄
+ * eos overlay부터 online subsystem eos까지 6개 플러그인과 socket subsystem 플러그인 켜기
+ * 플러그인 online subsystem EOS artifacts,default artifact name 세팅
  */
 
 #pragma once
@@ -54,5 +73,13 @@ namespace Crunch
 		const FName Root("root");
 		const FName Lazer("Lazer");
 		const FName TargetDashCenter("TargetDashCenter");
+	}
+	namespace Session
+	{
+		const FName SessionName("SESSION_NAME");
+		const FName SessionSearchID("SESSION_SEARCH_ID");
+		const FName PortKey("PORT");
+		const FName CoordinatorURLKey("COORDINATOR_URL");
+		const FName TestingURLKey("TESTING_URL");
 	}
 }

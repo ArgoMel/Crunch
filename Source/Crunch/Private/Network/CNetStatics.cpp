@@ -20,9 +20,9 @@ FOnlineSessionSettings UCNetStatics::GenerateOnlineSessionSettings(const FName& 
 	OnlineSessionSettings.bUseLobbiesVoiceChatIfAvailable = false;
 	OnlineSessionSettings.bUsesStats = true;
 
-	OnlineSessionSettings.Set(GetSessionNameKey(), SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-	OnlineSessionSettings.Set(GetSessionSearchIdKey(), SessionSearchId, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-	OnlineSessionSettings.Set(GetPortKey(), Port, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	OnlineSessionSettings.Set(Crunch::Session::SessionName, SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	OnlineSessionSettings.Set(Crunch::Session::SessionSearchID, SessionSearchId, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	OnlineSessionSettings.Set(Crunch::Session::PortKey, Port, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 	return OnlineSessionSettings;
 }
@@ -58,42 +58,22 @@ bool UCNetStatics::IsSessionServer(const UObject* WorldContextObject)
 
 FString UCNetStatics::GetSessionNameStr()
 {
-	return GetCommandlineArgAsString(GetSessionNameKey());
-}
-
-FName UCNetStatics::GetSessionNameKey()
-{
-	return FName("SESSION_NAME");
+	return GetCommandlineArgAsString(Crunch::Session::SessionName);
 }
 
 FString UCNetStatics::GetSessionSearchIdStr()
 {
-	return GetCommandlineArgAsString(GetSessionSearchIdKey());
-}
-
-FName UCNetStatics::GetSessionSearchIdKey()
-{
-	return FName("SESSION_SEARCH_ID");
+	return GetCommandlineArgAsString(Crunch::Session::SessionSearchID);
 }
 
 int UCNetStatics::GetSessionPort()
 {
-	return GetCommandlineArgAsInt(GetPortKey());
-}
-
-FName UCNetStatics::GetPortKey()
-{
-	return FName("PORT");
-}
-
-FName UCNetStatics::GetCoordinatorURLKey()
-{
-	return FName("COORDINATOR_URL");
+	return GetCommandlineArgAsInt(Crunch::Session::PortKey);
 }
 
 FString UCNetStatics::GetCoordinatorURL()
 {
-	FString CoordinatorURL = GetCommandlineArgAsString(GetCoordinatorURLKey());
+	FString CoordinatorURL = GetCommandlineArgAsString(Crunch::Session::CoordinatorURLKey);
 	if (CoordinatorURL != "")
 	{
 		return CoordinatorURL;
@@ -113,7 +93,7 @@ FString UCNetStatics::GetDefaultCoordinatorURL()
 FString UCNetStatics::GetCommandlineArgAsString(const FName& ParamName)
 {
 	FString OutVal = "";
-	const FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
+	const FString CommandLineArg = FString::Printf(TEXT("%s="), *ParamName.ToString());
 	FParse::Value(FCommandLine::Get(), *CommandLineArg, OutVal);
 	return OutVal;
 }
@@ -121,26 +101,21 @@ FString UCNetStatics::GetCommandlineArgAsString(const FName& ParamName)
 int UCNetStatics::GetCommandlineArgAsInt(const FName& ParamName)
 {
 	int OutVal = 0;
-	const FString CommandLineArg = FString::Printf(TEXT("%s="), *(ParamName.ToString()));
+	const FString CommandLineArg = FString::Printf(TEXT("%s="), *ParamName.ToString());
 	FParse::Value(FCommandLine::Get(), *CommandLineArg, OutVal);
 	return OutVal;
 }
 
 FString UCNetStatics::GetTestingURL()
 {
-	FString TestURL = GetCommandlineArgAsString(GetTestingURLKey());
+	FString TestURL = GetCommandlineArgAsString(Crunch::Session::TestingURLKey);
 	UE_LOG(LogTemp, Warning, TEXT("Get Testing URL: %s"), *TestURL)
 	return TestURL;
 }
 
-FName UCNetStatics::GetTestingURLKey()
-{
-	return FName("TESTING_URL");
-}
-
 void UCNetStatics::ReplacePort(FString& OutURLStr, int NewPort)
 {
-	FURL URL(nullptr, *OutURLStr, ETravelType::TRAVEL_Absolute);
+	FURL URL(nullptr, *OutURLStr, TRAVEL_Absolute);
 	URL.Port = NewPort;
 	OutURLStr = URL.ToString();
 }

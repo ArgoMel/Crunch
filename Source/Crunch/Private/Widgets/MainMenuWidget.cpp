@@ -5,6 +5,7 @@
 #include "Components/EditableText.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/ScrollBox.h"
+#include "Crunch/Crunch.h"
 #include "Framework/CGameInstance.h"
 #include "Network/CNetStatics.h"
 #include "Widgets/WaitingWidget.h"
@@ -87,7 +88,7 @@ void UMainMenuWidget::UpdateLobbyList(const TArray<FOnlineSessionSearchResult>& 
 		if (NewSessionWidget)
 		{
 			FString SessionName = "Name_None";
-			SearchResult.Session.SessionSettings.Get<FString>(UCNetStatics::GetSessionNameKey(), SessionName);
+			SearchResult.Session.SessionSettings.Get<FString>(Crunch::Session::SessionName, SessionName);
 
 			FString SessionIdStr = SearchResult.Session.GetSessionIdStr();
 			NewSessionWidget->InitializeEntry(SessionName, SessionIdStr);

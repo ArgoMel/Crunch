@@ -5,6 +5,7 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "HttpModule.h"
+#include "Crunch/Crunch.h"
 
 void UCGameInstance::Init()
 {
@@ -109,8 +110,8 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField(UCNetStatics::GetSessionNameKey().ToString(), NewSessionName.ToString());
-	JsonObject->SetStringField(UCNetStatics::GetSessionSearchIdKey().ToString(), SessionSearchId.ToString());
+	JsonObject->SetStringField(Crunch::Session::SessionName.ToString(), NewSessionName.ToString());
+	JsonObject->SetStringField(Crunch::Session::SessionSearchID.ToString(), SessionSearchId.ToString());
 
 	FString requestLobby;
 	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&requestLobby);
@@ -190,7 +191,7 @@ void UCGameInstance::SessionCreationRequestCompleted(FHttpRequestPtr Request, FH
 
 	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 	{
-		Port = JsonObject->GetIntegerField(*(UCNetStatics::GetPortKey().ToString()));
+		Port = JsonObject->GetIntegerField(*(Crunch::Session::PortKey.ToString()));
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Connected to Coordinator Successfully and the new session created is on port: %d"), Port)
@@ -284,7 +285,7 @@ void UCGameInstance::GlobalSessionSearchCompleted(bool bWasSuccessful)
 		for (const FOnlineSessionSearchResult& OnlineSessionSearchResult : SessionSearch->SearchResults)
 		{
 			FString SessionName = "Name_None";
-			OnlineSessionSearchResult.Session.SessionSettings.Get<FString>(UCNetStatics::GetSessionNameKey(), SessionName);
+			OnlineSessionSearchResult.Session.SessionSettings.Get<FString>(Crunch::Session::SessionName, SessionName);
 			UE_LOG(LogTemp, Warning, TEXT("Found Session: %s after global session search"), *SessionName)
 		}
 	}
@@ -320,7 +321,7 @@ void UCGameInstance::FindCreatedSession(FGuid SessionSearchId)
 
 	SessionSearch->bIsLanQuery = false;
 	SessionSearch->MaxSearchResults = 1;
-	SessionSearch->QuerySettings.Set(UCNetStatics::GetSessionSearchIdKey(), SessionSearchId.ToString(), EOnlineComparisonOp::Equals);
+	SessionSearch->QuerySettings.Set(Crunch::Session::SessionSearchID, SessionSearchId.ToString(), EOnlineComparisonOp::Equals);
 
 	SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
 	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &UCGameInstance::FindCreateSessionCompleted);
@@ -359,9 +360,9 @@ void UCGameInstance::JoinSessionWithSearchResult(const FOnlineSessionSearchResul
 	}
 	
 	FString SessionName = "";
-	SearchResult.Session.SessionSettings.Get<FString>(UCNetStatics::GetSessionNameKey(), SessionName);
+	SearchResult.Session.SessionSettings.Get<FString>(Crunch::Session::SessionName, SessionName);
 
-	const FOnlineSessionSetting* PortSetting = SearchResult.Session.SessionSettings.Settings.Find(UCNetStatics::GetPortKey());
+	const FOnlineSessionSetting* PortSetting = SearchResult.Session.SessionSettings.Settings.Find(Crunch::Session::PortKey);
 	int64 Port = 7777;
 	PortSetting->Data.GetValue(Port);
 
@@ -427,7 +428,7 @@ void UCGameInstance::PlayerJoined(const FUniqueNetIdRepl& UniqueId)
 void UCGameInstance::PlayerLeft(const FUniqueNetIdRepl& UniqueId)
 {
 	PlayerRecord.Remove(UniqueId);
-	if (PlayerRecord.Num() == 0)
+	if (PlayerRecord.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("All player left the session, terminating"))
 		TerminateSessionServer();
@@ -446,7 +447,7 @@ void UCGameInstance::CreateSession()
 
 		const FOnlineSessionSettings OnlineSessionSetting = UCNetStatics::GenerateOnlineSessionSettings(FName(ServerSessionName), SessionSearchId, SessionServerPort);
 		SessionPtr->OnCreateSessionCompleteDelegates.RemoveAll(this);
-		SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &UCGameInstance::OnSessionCreated);
+		SessionPtr->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnSessionCreated);
 		if (!SessionPtr->CreateSession(0, FName(ServerSessionName), OnlineSessionSetting))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Session Creating Failed Right away!!!!"))
@@ -466,7 +467,7 @@ void UCGameInstance::OnSessionCreated(FName SessionName, bool bWasSuccessful)
 	if (bWasSuccessful)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("------------- Session Created!"))
-		GetWorld()->GetTimerManager().SetTimer(WaitPlayerJoinTimeoutHandle, this, &UCGameInstance::WaitPlayerJoinTimeoutReached, WaitPlayerJoinTimeOutDuration);
+		GetWorld()->GetTimerManager().SetTimer(WaitPlayerJoinTimeoutHandle, this, &ThisClass::WaitPlayerJoinTimeoutReached, WaitPlayerJoinTimeOutDuration);
 		LoadLevelAndListen(LobbyLevel);
 	}
 	else
@@ -481,7 +482,7 @@ void UCGameInstance::OnSessionCreated(FName SessionName, bool bWasSuccessful)
 	}
 }
 
-void UCGameInstance::EndSessionCompleted(FName SessionName, bool bWasSuccessful)
+void UCGameInstance::EndSessionCompleted(FName SessionName, bool bWasSuccessful) const
 {
 	FGenericPlatformMisc::RequestExit(false);
 }
@@ -491,7 +492,7 @@ void UCGameInstance::TerminateSessionServer()
 	if (const IOnlineSessionPtr SessionPtr = UCNetStatics::GetSessionPtr(this))
 	{
 		SessionPtr->OnEndSessionCompleteDelegates.RemoveAll(this);
-		SessionPtr->OnEndSessionCompleteDelegates.AddUObject(this, &UCGameInstance::EndSessionCompleted);
+		SessionPtr->OnEndSessionCompleteDelegates.AddUObject(this, &ThisClass::EndSessionCompleted);
 		if (!SessionPtr->EndSession(FName{ ServerSessionName }))
 		{
 			FGenericPlatformMisc::RequestExit(false);
