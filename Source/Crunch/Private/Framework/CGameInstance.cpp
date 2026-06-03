@@ -106,7 +106,6 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 
 	Request->SetURL(URL);
 	Request->SetVerb("POST");
-
 	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
 
 	const TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
@@ -118,7 +117,7 @@ void UCGameInstance::RequestCreateAndJoinSession(const FName& NewSessionName)
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	Request->SetContentAsString(requestLobby);
-	Request->OnProcessRequestComplete().BindUObject(this, &UCGameInstance::SessionCreationRequestCompleted, SessionSearchId);
+	Request->OnProcessRequestComplete().BindUObject(this, &ThisClass::SessionCreationRequestCompleted, SessionSearchId);
 	
 	if (!Request->ProcessRequest())
 	{

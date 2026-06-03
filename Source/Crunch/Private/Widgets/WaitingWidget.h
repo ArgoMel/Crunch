@@ -7,23 +7,19 @@
 #include "Components/Button.h"
 #include "WaitingWidget.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class UTextBlock;
+
+UCLASS(Abstract, BlueprintType, meta = (DisableNaiveTick))
 class UWaitingWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
 public:	
-	virtual void NativeConstruct() override;
-
-	FOnButtonClickedEvent& ClearAndGetButtonClickedEvent();
-	void SetWaitInfo(const FText& WaitInfo, bool bAllowCancel = false);
+	FOnButtonClickedEvent& ClearAndGetButtonClickedEvent() const;
+	void SetWaitInfo(const FText& WaitInfo, bool bAllowCancel = false) const;
 
 private:
 	UPROPERTY(meta=(BindWidget))
-	class UTextBlock* WaitInfoText;
+	UTextBlock* WaitInfoText;
 
 	UPROPERTY(meta=(BindWidget))
 	UButton* CancelBtn;

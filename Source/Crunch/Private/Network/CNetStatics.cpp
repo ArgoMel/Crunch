@@ -74,7 +74,7 @@ int UCNetStatics::GetSessionPort()
 FString UCNetStatics::GetCoordinatorURL()
 {
 	FString CoordinatorURL = GetCommandlineArgAsString(Crunch::Session::CoordinatorURLKey);
-	if (CoordinatorURL != "")
+	if (!CoordinatorURL.IsEmpty())
 	{
 		return CoordinatorURL;
 	}

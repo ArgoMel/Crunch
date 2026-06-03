@@ -4,7 +4,11 @@
  * DefaultGame.ini 
 	[/Script/AIModule.AISense_Sight]
 	bAutoRegisterAllPawnsAsSources=false
- * DefaultGame.ini 
+	
+	[Crunch.Net]
+	CoordinatorURL="3.143.228.73"
+	
+ * DefaultEngine.ini 
 	[OnlineSubsystemEOS]
 	bEnabled=true
 	
@@ -16,8 +20,6 @@
 	+NetDriverDefinitions=(DefName="GameNetDriver",DriverClassName="/Script/SocketSubsystemEOS.NetDriverEOSBase",DriverClassNameFallback="/Script/OnlineSubsystemUtils.IpNetDriver")
 	+NetDriverDefinitions=(DefName="DemoNetDriver",DriverClassName="/Script/Engine.DemoNetDriver",DriverClassNameFallback="/Script/Engine.DemoNetDriver")
 	
-	[/Script/SocketSubsystemEOS.NetDriverEOSBase]
-	bIsUsingP2PSockets=true
  * TraceChannels Target
  * 에셋매니저 클래스 변경
  * 게임플레이큐 경로

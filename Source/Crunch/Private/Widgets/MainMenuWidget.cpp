@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/MainMenuWidget.h"
 #include "Components/EditableText.h"
 #include "Components/WidgetSwitcher.h"
@@ -11,36 +10,36 @@
 #include "Widgets/WaitingWidget.h"
 #include "Widgets/SessionEntryWidget.h"
 
-void UMainMenuWidget::NativeConstruct()
+void UMainMenuWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	CGameInstance = GetGameInstance<UCGameInstance>();
 	if (CGameInstance)
 	{
-		CGameInstance->OnLoginCompleted.AddUObject(this, &UMainMenuWidget::LoginCompleted);
+		CGameInstance->OnLoginCompleted.AddUObject(this, &ThisClass::LoginCompleted);
 		if (CGameInstance->IsLoggedIn())
 		{
 			SwitchToMainWidget();
 		}
 
-		CGameInstance->OnJoinSessionFailed.AddUObject(this, &UMainMenuWidget::JoinSessionFailed);
-		CGameInstance->OnGlobalSessionSearchCompleted.AddUObject(this, &UMainMenuWidget::UpdateLobbyList);
+		CGameInstance->OnJoinSessionFailed.AddUObject(this, &ThisClass::JoinSessionFailed);
+		CGameInstance->OnGlobalSessionSearchCompleted.AddUObject(this, &ThisClass::UpdateLobbyList);
 		CGameInstance->StartGlobalSessionSearch();
-
 	}
 
-	LoginBtn->OnClicked.AddDynamic(this, &UMainMenuWidget::LoginBtnClicked);
+	LoginBtn->OnClicked.AddDynamic(this, &ThisClass::LoginBtnClicked);
 
-	CreateSessionBtn->OnClicked.AddDynamic(this, &UMainMenuWidget::CreateSesisonBtnClicked);
+	CreateSessionBtn->OnClicked.AddDynamic(this, &ThisClass::CreateSessionBtnClicked);
 	CreateSessionBtn->SetIsEnabled(false);
 
-	NewSessionNameText->OnTextChanged.AddDynamic(this, &UMainMenuWidget::NewSessionNameTextChanged);
-	JoinSessionBtn->OnClicked.AddDynamic(this, &UMainMenuWidget::JoinSessionBtnClicked);
+	NewSessionNameText->OnTextChanged.AddDynamic(this, &ThisClass::NewSessionNameTextChanged);
+	
+	JoinSessionBtn->OnClicked.AddDynamic(this, &ThisClass::JoinSessionBtnClicked);
 	JoinSessionBtn->SetIsEnabled(false);
 }
 
-void UMainMenuWidget::SwitchToMainWidget()
+void UMainMenuWidget::SwitchToMainWidget() const
 {
 	if (MainSwitcher)
 	{
@@ -48,15 +47,16 @@ void UMainMenuWidget::SwitchToMainWidget()
 	}
 }
 
-void UMainMenuWidget::CreateSesisonBtnClicked()
+void UMainMenuWidget::CreateSessionBtnClicked()
 {
 	if (CGameInstance && CGameInstance->IsLoggedIn())
 	{
 		CGameInstance->RequestCreateAndJoinSession(FName(NewSessionNameText->GetText().ToString()));
-		SwitchToWaitingWidget(FText::FromString("Creating Lobby"), true).AddDynamic(this, &UMainMenuWidget::CancelSessionCreation);
+		SwitchToWaitingWidget(FText::FromString("Creating Lobby"), true).AddDynamic(this, &ThisClass::CancelSessionCreation);
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UMainMenuWidget::CancelSessionCreation()
 {
 	if (CGameInstance)
@@ -66,12 +66,13 @@ void UMainMenuWidget::CancelSessionCreation()
 	SwitchToMainWidget();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UMainMenuWidget::NewSessionNameTextChanged(const FText& NewText)
 {
 	CreateSessionBtn->SetIsEnabled(!NewText.IsEmpty());
 }
 
-void UMainMenuWidget::JoinSessionFailed()
+void UMainMenuWidget::JoinSessionFailed() const
 {
 	SwitchToMainWidget();
 }
@@ -127,17 +128,20 @@ void UMainMenuWidget::SessionEntrySelected(const FString& SelectedEntryIdStr)
 	CurrentSelectedSessionId = SelectedEntryIdStr;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UMainMenuWidget::LoginBtnClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Logining In!"))
-	if (CGameInstance && !CGameInstance->IsLoggedIn() && !CGameInstance->IsLoggingIn())
+	UE_LOG(LogTemp, Warning, TEXT("Logging In!"))
+	if (CGameInstance 
+		&& !CGameInstance->IsLoggedIn() 
+		&& !CGameInstance->IsLoggingIn())
 	{
 		CGameInstance->ClientAccountPortalLogin();
 		SwitchToWaitingWidget(FText::FromString("Logging In"));
 	}
 }
 
-void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerNickname, const FString& ErrorMsg)
+void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerNickname, const FString& ErrorMsg) const
 {
 	if (bWasSuccessful)
 	{
@@ -151,7 +155,7 @@ void UMainMenuWidget::LoginCompleted(bool bWasSuccessful, const FString& PlayerN
 	SwitchToMainWidget();
 }
 
-FOnButtonClickedEvent& UMainMenuWidget::SwitchToWaitingWidget(const FText& WaitInfo, bool bAllowCancel)
+FOnButtonClickedEvent& UMainMenuWidget::SwitchToWaitingWidget(const FText& WaitInfo, bool bAllowCancel) const
 {
 	MainSwitcher->SetActiveWidget(WaitingWidget);
 	WaitingWidget->SetWaitInfo(WaitInfo, bAllowCancel);
