@@ -93,7 +93,7 @@ void UMainMenuWidget::UpdateLobbyList(const TArray<FOnlineSessionSearchResult>& 
 
 			FString SessionIdStr = SearchResult.Session.GetSessionIdStr();
 			NewSessionWidget->InitializeEntry(SessionName, SessionIdStr);
-			NewSessionWidget->OnSessionEntrySelected.AddUObject(this, &UMainMenuWidget::SessionEntrySelected);
+			NewSessionWidget->OnSessionEntrySelected.AddUObject(this, &ThisClass::SessionEntrySelected);
 			SessionScrollBox->AddChild(NewSessionWidget);
 			if (CurrentSelectedSessionId == SessionIdStr)
 			{
@@ -106,15 +106,16 @@ void UMainMenuWidget::UpdateLobbyList(const TArray<FOnlineSessionSearchResult>& 
 	JoinSessionBtn->SetIsEnabled(bCurrentSelectedSessionValid);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void UMainMenuWidget::JoinSessionBtnClicked()
 {
 	if (CGameInstance && !CurrentSelectedSessionId.IsEmpty())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trying to join session with id: %s"), *CurrentSelectedSessionId)
-			if (CGameInstance->JoinSessionWithId(CurrentSelectedSessionId))
-			{
-				SwitchToWaitingWidget(FText::FromString("Joining"));
-			}
+		if (CGameInstance->JoinSessionWithId(CurrentSelectedSessionId))
+		{
+			SwitchToWaitingWidget(FText::FromString("Joining"));
+		}
 	}
 	else
 	{

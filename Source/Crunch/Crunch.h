@@ -25,6 +25,7 @@
  * 게임플레이큐 경로
  * 에셋매니저 프리머리 에셋 추가
  * 패키징 쿠킹항 추가 에셋 다랙터리에 파티클폴더,게임플레이큐 폴더,/NNEDenoiser 추가
+ * 플래폼-윈도우 스플래시 이미지 2장, 아이콘 이미지 1장 변경
  * 
  * aws 서버 할떄
  * eos overlay부터 online subsystem eos까지 6개 플러그인과 socket subsystem 플러그인 켜기

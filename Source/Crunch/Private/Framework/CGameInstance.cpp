@@ -142,7 +142,7 @@ void UCGameInstance::CancelSessionCreation()
 void UCGameInstance::StartGlobalSessionSearch()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Starting Global Session Search"))
-	GetWorld()->GetTimerManager().SetTimer(GlobalSessionSearchTimerHandle, this, &UCGameInstance::FindGlobalSessions, GlobalSessionSearchInterval, true, 0.f);
+	GetWorld()->GetTimerManager().SetTimer(GlobalSessionSearchTimerHandle, this, &ThisClass::FindGlobalSessions, GlobalSessionSearchInterval, true, 0.f);
 }
 
 bool UCGameInstance::JoinSessionWithId(const FString& SessionIdStr)
@@ -209,12 +209,12 @@ void UCGameInstance::StartFindingCreatedSession(const FGuid& SessionSearchId)
 	UE_LOG(LogTemp, Warning, TEXT("Start Finding Created Session with Id: %s"), *(SessionSearchId.ToString()))
 
 	GetWorld()->GetTimerManager().SetTimer(FindCreatedSessionTimerHandle, 
-		FTimerDelegate::CreateUObject(this, &UCGameInstance::FindCreatedSession, SessionSearchId),
+		FTimerDelegate::CreateUObject(this, &ThisClass::FindCreatedSession, SessionSearchId),
 		FindCreatedSessionSearchInterval,
 		true, 0.f
 		);
 
-	GetWorld()->GetTimerManager().SetTimer(FindCreatedSessionTimeoutTimerHandle, this, &UCGameInstance::FindCreatedSessionTimeout, FindCreatedSessionTimeoutDuration);
+	GetWorld()->GetTimerManager().SetTimer(FindCreatedSessionTimeoutTimerHandle, this, &ThisClass::FindCreatedSessionTimeout, FindCreatedSessionTimeoutDuration);
 }
 
 void UCGameInstance::StopAllSessionFindings()
@@ -268,7 +268,7 @@ void UCGameInstance::FindGlobalSessions()
 	SessionSearch->MaxSearchResults = 20;
 	
 	SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
-	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &UCGameInstance::GlobalSessionSearchCompleted);
+	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::GlobalSessionSearchCompleted);
 	if (!SessionPtr->FindSessions(0, SessionSearch.ToSharedRef()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Find Global Session Failed Right Away"))
@@ -276,7 +276,7 @@ void UCGameInstance::FindGlobalSessions()
 	}
 }
 
-void UCGameInstance::GlobalSessionSearchCompleted(bool bWasSuccessful)
+void UCGameInstance::GlobalSessionSearchCompleted(bool bWasSuccessful) const
 {
 	if (bWasSuccessful)
 	{
@@ -300,7 +300,6 @@ void UCGameInstance::GlobalSessionSearchCompleted(bool bWasSuccessful)
 	}
 }
 
-
 void UCGameInstance::FindCreatedSession(FGuid SessionSearchId)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trying to find created session"))
@@ -323,7 +322,7 @@ void UCGameInstance::FindCreatedSession(FGuid SessionSearchId)
 	SessionSearch->QuerySettings.Set(Crunch::Session::SessionSearchID, SessionSearchId.ToString(), EOnlineComparisonOp::Equals);
 
 	SessionPtr->OnFindSessionsCompleteDelegates.RemoveAll(this);
-	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &UCGameInstance::FindCreateSessionCompleted);
+	SessionPtr->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::FindCreateSessionCompleted);
 	if (!SessionPtr->FindSessions(0, SessionSearch.ToSharedRef()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Find Session Failed Right Away!..."))
@@ -339,7 +338,7 @@ void UCGameInstance::FindCreatedSessionTimeout()
 
 void UCGameInstance::FindCreateSessionCompleted(bool bWasSuccessful)
 {
-	if (!bWasSuccessful || SessionSearch->SearchResults.Num() == 0)
+	if (!bWasSuccessful || SessionSearch->SearchResults.IsEmpty())
 	{
 		return;
 	}
@@ -367,7 +366,7 @@ void UCGameInstance::JoinSessionWithSearchResult(const FOnlineSessionSearchResul
 
 	UE_LOG(LogTemp, Warning, TEXT("Trying to join session: %s, at port: %lld"), *(SessionName), Port)
 	SessionPtr->OnJoinSessionCompleteDelegates.RemoveAll(this);
-	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &UCGameInstance::JoinSessionCompleted, static_cast<int>(Port));
+	SessionPtr->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::JoinSessionCompleted, static_cast<int>(Port));
 	if (!SessionPtr->JoinSession(0, FName(SessionName), SearchResult))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Joining Session Failed Right Away! ....."))

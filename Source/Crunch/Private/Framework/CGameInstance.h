@@ -49,7 +49,7 @@ private:
 	void StopFindingCreatedSession();
 	void StopGlobalSessionSearch();
 	void FindGlobalSessions();
-	void GlobalSessionSearchCompleted(bool bWasSuccessful);
+	void GlobalSessionSearchCompleted(bool bWasSuccessful) const;
 
 	FTimerHandle FindCreatedSessionTimerHandle;
 	FTimerHandle FindCreatedSessionTimeoutTimerHandle;

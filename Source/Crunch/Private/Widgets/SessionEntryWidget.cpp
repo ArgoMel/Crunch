@@ -1,15 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Widgets/SessionEntryWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 
-void USessionEntryWidget::NativeConstruct()
+void USessionEntryWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
-
-	SessionBtn->OnClicked.AddDynamic(this, &USessionEntryWidget::SessionEntrySelected);
+	Super::NativeOnInitialized();
+	SessionBtn->OnClicked.AddDynamic(this, &ThisClass::SessionEntrySelected);
 }
 
 void USessionEntryWidget::InitializeEntry(const FString& Name, const FString& SessionIdStr)
@@ -18,6 +16,7 @@ void USessionEntryWidget::InitializeEntry(const FString& Name, const FString& Se
 	CachedSessionIdStr = SessionIdStr;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void USessionEntryWidget::SessionEntrySelected()
 {
 	OnSessionEntrySelected.Broadcast(CachedSessionIdStr);
