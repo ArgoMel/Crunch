@@ -1,6 +1,6 @@
 /*
  * lumen 끔
- * AI System forget state actors false
+ * AI System forget stale actors true
  * DefaultGame.ini 
 	[/Script/AIModule.AISense_Sight]
 	bAutoRegisterAllPawnsAsSources=false

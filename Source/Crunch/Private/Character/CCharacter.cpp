@@ -2,6 +2,8 @@
 
 #include "Character/CCharacter.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "TimerManager.h"
+#include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
