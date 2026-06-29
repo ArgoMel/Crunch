@@ -8,6 +8,7 @@
 #include "AbilitySystemGlobals.h"
 #include "GameplayCueManager.h"
 #include "Crunch/Crunch.h"
+#include "Serialization/JsonTypes.h"
 
 FGameplayTag UCAbilitySystemStatics::GetBasicAttackAbilityTag()
 {
