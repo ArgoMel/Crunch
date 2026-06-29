@@ -3,6 +3,7 @@
 #include "AI/Minion.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Crunch/Crunch.h"
 
 void AMinion::SetGenericTeamId(const FGenericTeamId& NewTeamId)

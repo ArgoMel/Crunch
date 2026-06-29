@@ -2,6 +2,7 @@
 
 #include "Framework/CAssetManager.h"
 #include "Character/PA_CharacterDefinition.h"
+#include "Engine/Engine.h"
 
 UCAssetManager& UCAssetManager::Get()
 {
