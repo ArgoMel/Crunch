@@ -3,6 +3,7 @@
 #include "Animations/AN_SendGameplayEvent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsManager.h"
+#include "Components/SkeletalMeshComponent.h"
 
 FString UAN_SendGameplayEvent::GetNotifyName_Implementation() const
 {

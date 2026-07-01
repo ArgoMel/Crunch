@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameplayEffectTypes.h"
 #include "GameplayTagsManager.h"
+#include "Components/SkeletalMeshComponent.h"
 
 FString UAN_SendTargetGroup::GetNotifyName_Implementation() const
 {
