@@ -8,6 +8,9 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "TimerManager.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Widgets/RenderActorWidget.h"
 
 UGA_Shoot::UGA_Shoot()
 {

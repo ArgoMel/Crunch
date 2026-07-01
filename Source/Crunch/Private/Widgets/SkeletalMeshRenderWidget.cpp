@@ -5,6 +5,7 @@
 #include "Widgets/SkeletalMeshRenderActor.h"
 #include "Widgets/RenderActorTargetInterface.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SkeletalMeshComponent.h"
 
 void USkeletalMeshRenderWidget::NativeConstruct()
 {

@@ -8,6 +8,8 @@
 #include "Widgets/InventoryContextMenuWidget.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
+#include "GameFramework/Pawn.h"
+#include "Layout/WidgetPath.h"
 
 void UInventoryWidget::NativeOnInitialized()
 {

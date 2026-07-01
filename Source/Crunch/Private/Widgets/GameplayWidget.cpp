@@ -6,6 +6,7 @@
 #include "Components/CanvasPanel.h"
 #include "GAS/CAbilitySystemComponent.h"
 #include "AbilitySystemComponent.h"
+#include "GameFramework/Pawn.h"
 #include "Widgets/AbilityListView.h"
 #include "Widgets/GameplayMenu.h"
 #include "Widgets/ShopWidget.h"
