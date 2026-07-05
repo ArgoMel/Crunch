@@ -7,6 +7,8 @@
 #include "GAS/CGameplayAbilityTypes.h"
 #include "PA_CharacterDefinition.generated.h"
 
+class USkeletalMesh;
+class UAnimInstance;
 class ACCharacter;
 class UGameplayAbility;
 

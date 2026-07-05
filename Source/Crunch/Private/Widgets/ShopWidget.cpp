@@ -3,6 +3,7 @@
 #include "Widgets/ShopWidget.h"
 #include "Components/TileView.h"
 #include "Framework/CAssetManager.h"
+#include "GameFramework/Pawn.h"
 #include "Inventory/InventoryComponent.h"
 #include "Widgets/ShopItemWidget.h"
 #include "Widgets/ItemTreeWidget.h"

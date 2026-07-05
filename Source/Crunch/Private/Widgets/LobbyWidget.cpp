@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Widgets/LobbyWidget.h"
+
+#include "TimerManager.h"
 #include "Character/PA_CharacterDefinition.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
