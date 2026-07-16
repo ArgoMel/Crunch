@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "CAnimInstance.generated.h"
 
+class ACharacter;
 class UCharacterMovementComponent;
 
 UCLASS()
