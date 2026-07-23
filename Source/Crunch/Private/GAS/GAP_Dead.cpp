@@ -4,9 +4,12 @@
 #include "GAS/CAbilitySystemStatics.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "CollisionQueryParams.h"
+#include "CollisionShape.h"
 #include "GAS/CAttributeSet.h"
 #include "GAS/CHeroAttributeSet.h"
 #include "Engine/OverlapResult.h"
+#include "Engine/World.h"
 
 UGAP_Dead::UGAP_Dead()
 {
